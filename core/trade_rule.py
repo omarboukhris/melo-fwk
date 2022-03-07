@@ -8,6 +8,10 @@ class AbstractTradingRule:
 		self.name = name
 
 	def forcast(self, data: np.array):
+		"""
+		data as pandas.dataframe :
+			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
+		"""
 		pass
 
 
