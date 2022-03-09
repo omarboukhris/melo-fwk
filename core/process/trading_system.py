@@ -2,7 +2,8 @@
 import numpy as np
 import pandas as pd
 
-import datastream as ds
+from core.datastreams import DataStream, PandasDataStream
+
 
 def get_yfinance_dataframe_date(dataframe: pd.DataFrame, time_idx: int):
 	return dataframe[time_idx]["Datetime"]
@@ -47,16 +48,22 @@ class TradingSystem:
 	def __init__(
 		self,
 		balance: float,
-		data_source: ds.DataStream,
+		data_source: DataStream,
 		trading_rules: list,
 		forcast_weights: list,
 		enter_trade_fn: callable = base_enter_trade_predicat,
 		exit_trade_fn: callable = base_exit_trade_predicat):
 
+		assert data_source is not None, "(AssertionError) Data source is None"
 		assert len(trading_rules) == len(forcast_weights), \
 			"(AssertionError) Number of TradingRules must match forcast weights"
 
-		self.accout = [balance]
+		self.accout = [
+			{
+				"Date": data_source.get_current_date(),
+				"Balance": balance,
+			}
+		]
 		self.time_index = 0
 		self.order_book = []
 		self.current_trade = TradingSystem.EMPTY_TRADE
@@ -103,14 +110,16 @@ class TradingSystem:
 		return s
 
 	def get_account_history(self):
-		return self.accout
+		return pd.DataFrame(self.accout)
 
 	def update_balance(self):
 		"""update this method to use DataStreams"""
-		profit = self.accout[-1]
+		profit = dict()
+		profit["Date"] = self.data_source.get_current_date()
+		profit["Balance"] = self.accout[-1]["Balance"]
 		if self.is_trade_open():
-			profit = self.data_source[self.current_trade["entry_time"]] - self.data_source[self.current_trade["exit_time"]]
-			profit = profit if self.is_position_long() else -profit
+			profit["balance"] = self.data_source[self.current_trade["entry_time"]] - self.data_source[self.current_trade["exit_time"]]
+			profit["balance"] = profit if self.is_position_long() else -profit
 		self.accout.append(profit)
 
 	def simulation_ended(self):
@@ -118,8 +127,6 @@ class TradingSystem:
 
 	def trade_next(self):
 		"""This method trades sequentially one product at a time"""
-
-		assert self.data_source is not None, "(AssertionError) Data source is None"
 
 		if self.simulation_ended():
 			return
@@ -133,7 +140,11 @@ class TradingSystem:
 			self.close_trade(forcast, self.data_source.get_current_date())
 
 		self.update_balance()  # or mark to marker
-		self.data_source.next()
+
+		try:
+			self.data_source.next()
+		except StopIteration:
+			pass
 
 	def sharpe_ratio(self):
 		account = np.array(self.accout)
@@ -141,9 +152,9 @@ class TradingSystem:
 
 
 if __name__ == "__main__":
-	df = pd.read_csv("data/FB_1h_2y.csv")
+	df = pd.read_csv("data/FB_1d_10y.csv")
 
-	pds = ds.PandasDataStream(df)
+	pds = PandasDataStream(df)
 
 	tr_sys = TradingSystem(
 		balance=10000,
@@ -155,6 +166,6 @@ if __name__ == "__main__":
 	while not tr_sys.simulation_ended():
 		tr_sys.trade_next()
 
-
-
-
+	print(tr_sys.get_account_history())
+	# plotter = plt.PricePlotter(tr_sys.get_account_history())
+	# plotter.plot()

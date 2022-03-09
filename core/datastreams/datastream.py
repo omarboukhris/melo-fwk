@@ -1,8 +1,12 @@
 
 import pandas as pd
 
+
 class DataStream:
 	def __init__(self):
+		pass
+
+	def get_data(self):
 		pass
 
 	def get_current_date(self):
@@ -40,7 +44,7 @@ class PandasDataStream(DataStream):
 	"""This class is used to iterate over Yahoo Finance data wrapped in a Pandas Data Frame"""
 
 	def __init__(self, dataframe: pd.DataFrame, reverse: bool = True, date_label: str = "Date"):
-		
+
 		super(PandasDataStream, self).__init__()
 
 		self.dataframe = dataframe
@@ -50,6 +54,9 @@ class PandasDataStream(DataStream):
 
 	def reset(self):
 		self.time_idx = 0
+
+	def get_data(self):
+		return self.dataframe
 
 	def limit_reached(self):
 		return (
@@ -82,19 +89,29 @@ class PandasDataStream(DataStream):
 		return self
 
 	def __next__(self):
-		try:
-			self.time_idx += -1 if self.reverse else 1
+		self.time_idx += -1 if self.reverse else 1
+		if not self.limit_reached():
 			return self.dataframe.iloc[self.time_idx]
-
-		except IndexError:
-			self.reset()
+		else:
 			raise StopIteration()
 
 
+class PandasDataStreamHourly(PandasDataStream):
+	def __init__(self, dataframe: pd.DataFrame, reverse: bool = True):
+		super(PandasDataStreamHourly, self).__init__(dataframe, reverse, "Datatime")
+
+
 if __name__ == "__main__":
-	pdstream = PandasDataStream(pd.read_csv("data/FB_1d_10y.csv"))
+	pdstream = PandasDataStream(pd.read_csv("../data/FB_1d_10y.csv"))
 
 	for tick in pdstream:
 		assert pdstream.get_current_date() == tick["Date"], "dates are different"
 		assert pdstream.get_open() == tick["Open"], "open prices are different"
 		print(tick["Date"], "//", tick["Open"])
+
+	pdstream.reset()
+	while not pdstream.limit_reached():
+		# print(pdstream.next())
+		pdstream.next()
+	# plotter = PricePlotter(pdstream.get_data())
+	# plotter.plot()
