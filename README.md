@@ -1,6 +1,8 @@
 # Melo Trading Framework
 
+## Requirements
 
+pandas, matplotlib, yfinance, numpy (list will be updated with time)
 
 ## Getting started
 
