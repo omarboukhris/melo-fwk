@@ -9,6 +9,7 @@ class PricePlotter:
 		self.df = dataframe
 
 	def plot(self):
+		"""make it a scandlestick plot"""
 		interval = len(self.df) // 10 if len(self.df) > 10 else 2
 
 		# plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(6))

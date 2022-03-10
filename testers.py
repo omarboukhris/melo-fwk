@@ -36,10 +36,11 @@ def test_datastream():
 		process_tick(tick)
 
 
-tests = [
-	test_datastream,
-	test_trading_system,
-]
+if __name__ == "__main__":
+	tests = [
+		test_datastream,
+		test_trading_system,
+	]
 
-for t in tqdm.tqdm(tests):
-	t()
+	for t in tqdm.tqdm(tests):
+		t()

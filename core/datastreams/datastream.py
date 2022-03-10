@@ -43,7 +43,12 @@ class DataStream:
 class PandasDataStream(DataStream):
 	"""This class is used to iterate over Yahoo Finance data wrapped in a Pandas Data Frame"""
 
-	def __init__(self, dataframe: pd.DataFrame, reverse: bool = True, date_label: str = "Date"):
+	def __init__(
+		self,
+		dataframe: pd.DataFrame,
+		reverse: bool = True,
+		date_label: str = "Date",
+		window_size: int = 200):
 
 		super(PandasDataStream, self).__init__()
 
@@ -51,6 +56,7 @@ class PandasDataStream(DataStream):
 		self.time_idx = 0
 		self.reverse = reverse
 		self.date_label = date_label
+		self.window_size = window_size
 
 	def reset(self):
 		self.time_idx = 0
@@ -82,6 +88,14 @@ class PandasDataStream(DataStream):
 	def get_current_time_index(self):
 		return self.time_idx
 
+	def get_window(self):
+		if self.reverse and self.time_idx > -len(self.dataframe) + self.window_size:
+			return self.dataframe[self.time_idx - self.window_size: self.time_idx]
+		elif not self.reverse and self.time_idx < len(self.dataframe) - self.window_size:
+			return self.dataframe[self.time_idx: self.time_idx + self.window_size]
+		else:
+			return None
+
 	def next(self):
 		return self.__next__()
 
@@ -98,10 +112,11 @@ class PandasDataStream(DataStream):
 
 class PandasDataStreamHourly(PandasDataStream):
 	def __init__(self, dataframe: pd.DataFrame, reverse: bool = True):
-		super(PandasDataStreamHourly, self).__init__(dataframe, reverse, "Datatime")
+		super(PandasDataStreamHourly, self).__init__(dataframe, reverse, "Datetime")
 
 
 if __name__ == "__main__":
+
 	pdstream = PandasDataStream(pd.read_csv("../data/FB_1d_10y.csv"))
 
 	for tick in pdstream:
@@ -109,9 +124,3 @@ if __name__ == "__main__":
 		assert pdstream.get_open() == tick["Open"], "open prices are different"
 		print(tick["Date"], "//", tick["Open"])
 
-	pdstream.reset()
-	while not pdstream.limit_reached():
-		# print(pdstream.next())
-		pdstream.next()
-	# plotter = PricePlotter(pdstream.get_data())
-	# plotter.plot()

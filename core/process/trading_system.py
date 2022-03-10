@@ -118,8 +118,8 @@ class TradingSystem:
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
 		if self.is_trade_open():
-			profit["balance"] = self.data_source[self.current_trade["entry_time"]] - self.data_source[self.current_trade["exit_time"]]
-			profit["balance"] = profit if self.is_position_long() else -profit
+			profit["Balance"] = self.data_source[self.current_trade["entry_time"]] - self.data_source[self.current_trade["exit_time"]]
+			profit["Balance"] = profit if self.is_position_long() else -profit
 		self.accout.append(profit)
 
 	def simulation_ended(self):
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 	pds = PandasDataStream(df)
 
 	tr_sys = TradingSystem(
-		balance=10000,
+		balance=0,
 		data_source=pds,
 		trading_rules=[],
 		forcast_weights=[]
@@ -167,5 +167,3 @@ if __name__ == "__main__":
 		tr_sys.trade_next()
 
 	print(tr_sys.get_account_history())
-	# plotter = plt.PricePlotter(tr_sys.get_account_history())
-	# plotter.plot()
