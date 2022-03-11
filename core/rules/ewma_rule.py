@@ -24,11 +24,11 @@ class EWMATradingRule(AbstractTradingRule):
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_ewma = np.array(data["Close"].ewm(span=self.hyper_params["fast_span"]).mean())
-		slow_ewma = np.array(data["Close"].ewm(span=self.hyper_params["slow_span"]).mean())
+		fast_ewma = data["Close"].ewm(span=self.hyper_params["fast_span"]).mean().to_numpy()
+		slow_ewma = data["Close"].ewm(span=self.hyper_params["slow_span"]).mean().to_numpy()
 
-		ewma = np.array(fast_ewma - slow_ewma)
-		forcast_value = self.hyper_params["scaling_factor"] * (ewma.mean()/ewma.std())
+		ewma = fast_ewma[-1] - slow_ewma[-1]
+		forcast_value = self.hyper_params["scaling_factor"] * (ewma/slow_ewma.std())
 		if forcast_value > 0:
 			forcast_value = min(forcast_value, self.hyper_params["cap"])
 		else:
@@ -48,17 +48,18 @@ if __name__ == "__main__":
 		"scaling_factor": 20,
 		"cap": 20,
 	}
-	sma = EWMATradingRule("sma", sma_params)
+	ewma = EWMATradingRule("sma", sma_params)
 
 	output_forcast = []
 	for _ in pds:
 		window = pds.get_window()
 		if window is not None:
 			output_forcast.append({
-				"Balance": sma.forcast(window),
+				"Balance": ewma.forcast(window),
 				"Date": pds.get_current_date(),
 			})
 
 	df = pd.DataFrame(output_forcast)
-	acc_plt = AccountPlotter(df)
-	acc_plt.plot()
+	print(df)
+	# acc_plt = AccountPlotter(df)
+	# acc_plt.plot()

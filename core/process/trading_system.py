@@ -125,18 +125,23 @@ class TradingSystem:
 		return pd.DataFrame(self.order_book)
 
 	def update_balance(self):
+		"""
+			TODO:
+				The way balance is updated is WRONG and should be updated properly.
+				update_balance() should be mark to market even when closing a position.
+		"""
 		"""update this method to use DataStreams"""
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
-		if self.is_trade_open(): # mark to market
-			profit["Balance"] = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
-								self.data_source.get_close_at_index(self.data_source.get_current_date())
-			profit["Balance"] = profit["Balance"] if self.is_position_long() else -profit["Balance"]
+		if self.is_trade_open():  # mark to market
+			open_close_diff = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
+							self.data_source.get_close_at_index(self.data_source.get_current_date())
+			profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
 		else:
-			profit["Balance"] = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
-								self.data_source.get_close_at_index(self.current_trade["exit_time"])
-			profit["Balance"] = profit["Balance"] if self.is_position_long() else -profit["Balance"]
+			open_close_diff = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
+							self.data_source.get_close_at_index(self.current_trade["exit_time"])
+			profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
 		self.accout.append(copy.deepcopy(profit))
 
 	def simulation_ended(self):

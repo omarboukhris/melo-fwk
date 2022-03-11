@@ -45,7 +45,7 @@ def test_trading_rule():
 		"scaling_factor": 20,
 		"cap": 20,
 	}
-	ewma = SMATradingRule("ewma", ewma_params)
+	ewma = EWMATradingRule("ewma", ewma_params)
 
 	output_forcast = []
 	for _ in pds:
@@ -93,7 +93,10 @@ def test_trading_system():
 	account_plt.plot()
 	account_plt.show()
 
-	print(tr_sys.get_order_book())
+	orderbook = tr_sys.get_order_book()
+	print(orderbook)
+	df_account.to_csv("account.csv")
+	orderbook.to_csv("book.csv")
 
 
 
