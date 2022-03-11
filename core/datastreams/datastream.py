@@ -1,6 +1,6 @@
 
 import pandas as pd
-
+import numpy as np
 
 class DataStream:
 	def __init__(self):
@@ -18,6 +18,9 @@ class DataStream:
 	def get_close(self):
 		pass
 
+	def get_close_at_index(self, timestamp: str):
+		pass
+
 	def get_high(self):
 		pass
 
@@ -25,6 +28,9 @@ class DataStream:
 		pass
 
 	def get_current_time_index(self):
+		pass
+
+	def get_window(self):
 		pass
 
 	def limit_reached(self):
@@ -46,7 +52,7 @@ class PandasDataStream(DataStream):
 	def __init__(
 		self,
 		dataframe: pd.DataFrame,
-		reverse: bool = True,
+		reverse: bool = False,
 		date_label: str = "Date",
 		window_size: int = 200):
 
@@ -78,6 +84,11 @@ class PandasDataStream(DataStream):
 
 	def get_close(self):
 		return self.dataframe.iloc[self.time_idx]["Close"]
+
+	def get_close_at_index(self, timestamp: str):
+		x = self.dataframe.loc[self.dataframe[self.date_label] == timestamp, "Close"].to_numpy()
+		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
+		return x[0]
 
 	def get_high(self):
 		return self.dataframe.iloc[self.time_idx]["High"]

@@ -16,7 +16,11 @@ class PricePlotter:
 		plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=interval))
 		plt.plot(self.df["Date"], self.df[['Open', 'High', 'Low', 'Close']])
 		plt.gcf().autofmt_xdate()
+
+	@classmethod
+	def show(cls):
 		plt.show()
+
 
 class AccountPlotter:
 	def __init__(self, dataframe: pd.DataFrame):
@@ -29,5 +33,8 @@ class AccountPlotter:
 		plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=interval))
 		plt.plot(self.df["Date"], self.df[['Balance']])
 		plt.gcf().autofmt_xdate()
-		plt.show()
+		# plt.show()
 
+	@classmethod
+	def show(cls):
+		plt.show()

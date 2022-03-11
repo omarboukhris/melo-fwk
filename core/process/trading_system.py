@@ -1,18 +1,23 @@
 
 import numpy as np
 import pandas as pd
+import copy
 
 from core.datastreams import DataStream, PandasDataStream
 
+from core.rules import EWMATradingRule
 
 def get_yfinance_dataframe_date(dataframe: pd.DataFrame, time_idx: int):
 	return dataframe[time_idx]["Datetime"]
 
 def base_enter_trade_predicat(forcast: float):
-	return forcast != 0
+	return forcast != 0 and forcast is not None
 
 def base_exit_trade_predicat(forcast: float):
-	return forcast == 0
+	# if 1 > forcast > -1:
+	# 	print(forcast)
+	# return forcast == 0
+	return -.1 < forcast < .1
 
 class TradingSystem:
 	"""Class for backtesting offline a trading system.
@@ -98,29 +103,41 @@ class TradingSystem:
 		self.current_trade["status"] = TradingSystem.CLOSED
 		self.current_trade["forcast"][1] = forcast
 		self.current_trade["exit_time"] = exit_time
+		self.update_balance()
 
 		# add to order book and clean temporary
-		self.order_book.append(self.current_trade)
+		self.order_book.append(copy.deepcopy(self.current_trade))
+		# self.order_book.append(self.current_trade)
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
 	def forcast(self):
 		s = 0
 		for trading_rule, forcast_weight in zip(self.trading_rules, self.forcast_weights):
-			s += forcast_weight * trading_rule.forcast(self.data_source)
+			window = self.data_source.get_window()
+			if window is not None:
+				s += forcast_weight * trading_rule.forcast(window)
 		return s
 
 	def get_account_history(self):
 		return pd.DataFrame(self.accout)
+
+	def get_order_book(self):
+		return pd.DataFrame(self.order_book)
 
 	def update_balance(self):
 		"""update this method to use DataStreams"""
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
-		if self.is_trade_open():
-			profit["Balance"] = self.data_source[self.current_trade["entry_time"]] - self.data_source[self.current_trade["exit_time"]]
-			profit["Balance"] = profit if self.is_position_long() else -profit
-		self.accout.append(profit)
+		if self.is_trade_open(): # mark to market
+			profit["Balance"] = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
+								self.data_source.get_close_at_index(self.data_source.get_current_date())
+			profit["Balance"] = profit["Balance"] if self.is_position_long() else -profit["Balance"]
+		else:
+			profit["Balance"] = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
+								self.data_source.get_close_at_index(self.current_trade["exit_time"])
+			profit["Balance"] = profit["Balance"] if self.is_position_long() else -profit["Balance"]
+		self.accout.append(copy.deepcopy(profit))
 
 	def simulation_ended(self):
 		return self.data_source.limit_reached()
@@ -135,11 +152,13 @@ class TradingSystem:
 
 		if not self.is_trade_open() and self.enter_trade_fn(forcast):
 			self.open_trade(forcast, self.data_source.get_current_date())
+			self.update_balance()  # or mark to marker
 
 		elif self.is_trade_open() and self.exit_trade_fn(forcast):
 			self.close_trade(forcast, self.data_source.get_current_date())
 
-		self.update_balance()  # or mark to marker
+		else:
+			self.update_balance()  # or mark to marker
 
 		try:
 			self.data_source.next()
@@ -153,17 +172,25 @@ class TradingSystem:
 
 if __name__ == "__main__":
 	df = pd.read_csv("data/FB_1d_10y.csv")
-
 	pds = PandasDataStream(df)
+
+	sma_params = {
+		"fast_span": 1,
+		"slow_span": 8,
+		"scaling_factor": 20,
+		"cap": 20,
+	}
+	sma = EWMATradingRule("sma", sma_params)
 
 	tr_sys = TradingSystem(
 		balance=0,
 		data_source=pds,
-		trading_rules=[],
-		forcast_weights=[]
+		trading_rules=[sma],
+		forcast_weights=[1.]
 	)
 
 	while not tr_sys.simulation_ended():
 		tr_sys.trade_next()
 
-	print(tr_sys.get_account_history())
+	print(tr_sys.get_account_history(), end="\n\n")
+	print(tr_sys.get_order_book())
