@@ -67,12 +67,22 @@ def test_trading_rule():
 
 
 def test_trading_system():
-	df = pd.read_csv("core/data/FB_1d_10y.csv")
-	pds = ds.PandasDataStream(df)
+	"""
+	goog : 8 32
+	googl : 2 8
+	meta : 4 16
+	aapl : 16 64
+
+
+	:return:
+	"""
+
+	df = pd.read_csv("core/data/FB_1h_2y.csv")
+	pds = ds.PandasDataStream(df, offset=1, date_label="Datetime")
 
 	sma_params = {
 		"fast_span": 4,
-		"slow_span": 8,
+		"slow_span": 16,
 		"scaling_factor": 20,
 		"cap": 20,
 	}
@@ -88,13 +98,14 @@ def test_trading_system():
 	while not tr_sys.simulation_ended():
 		tr_sys.trade_next()
 
+	print(tr_sys.sharpe_ratio())
+
 	df_account = tr_sys.get_account_history()
 	account_plt = AccountPlotter(df_account)
 	account_plt.plot()
 	account_plt.show()
 
 	orderbook = tr_sys.get_order_book()
-	print(orderbook)
 	df_account.to_csv("account.csv")
 	orderbook.to_csv("book.csv")
 
@@ -102,8 +113,8 @@ def test_trading_system():
 
 if __name__ == "__main__":
 	tests = [
-		test_datastream,
-		test_trading_rule,
+		# test_datastream,
+		# test_trading_rule,
 		# test_empty_trading_system,
 		test_trading_system,
 	]

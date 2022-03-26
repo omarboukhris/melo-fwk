@@ -1,12 +1,11 @@
 
-from core.rules.trade_rule import AbstractTradingRule
+from core.rules.trade_rule import ITradingRule
 from core.datastreams import datastream as ds
 from core.helpers import AccountPlotter
 
 import pandas as pd
-import numpy as np
 
-class EWMATradingRule(AbstractTradingRule):
+class EWMATradingRule(ITradingRule):
 
 	def __init__(self, name: str, hyper_params: dict):
 		"""
@@ -19,7 +18,7 @@ class EWMATradingRule(AbstractTradingRule):
 		"""
 		super(EWMATradingRule, self).__init__(name, hyper_params)
 
-	def forcast(self, data: pd.DataFrame):
+	def forecast(self, data: pd.DataFrame):
 		"""
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
@@ -28,13 +27,13 @@ class EWMATradingRule(AbstractTradingRule):
 		slow_ewma = data["Close"].ewm(span=self.hyper_params["slow_span"]).mean().to_numpy()
 
 		ewma = fast_ewma[-1] - slow_ewma[-1]
-		forcast_value = self.hyper_params["scaling_factor"] * (ewma/slow_ewma.std())
-		if forcast_value > 0:
-			forcast_value = min(forcast_value, self.hyper_params["cap"])
+		forecast_value = self.hyper_params["scaling_factor"] * (ewma / slow_ewma.std())
+		if forecast_value > 0:
+			forecast_value = min(forecast_value, self.hyper_params["cap"])
 		else:
-			forcast_value = max(forcast_value, -self.hyper_params["cap"])
+			forecast_value = max(forecast_value, -self.hyper_params["cap"])
 
-		return forcast_value
+		return forecast_value
 
 
 if __name__ == "__main__":
@@ -48,14 +47,14 @@ if __name__ == "__main__":
 		"scaling_factor": 20,
 		"cap": 20,
 	}
-	ewma = EWMATradingRule("sma", sma_params)
+	ewma_tr = EWMATradingRule("sma", sma_params)
 
 	output_forcast = []
 	for _ in pds:
 		window = pds.get_window()
 		if window is not None:
 			output_forcast.append({
-				"Balance": ewma.forcast(window),
+				"Balance": ewma_tr.forecast(window),
 				"Date": pds.get_current_date(),
 			})
 

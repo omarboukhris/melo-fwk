@@ -1,5 +1,5 @@
 
-from core.rules.trade_rule import AbstractTradingRule
+from core.rules.trade_rule import ITradingRule
 from core.datastreams import datastream as ds
 from core.helpers import AccountPlotter
 
@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import math
 
-class SMATradingRule(AbstractTradingRule):
+class SMATradingRule(ITradingRule):
 
 	def __init__(self, name: str, hyper_params: dict):
 		"""
@@ -20,23 +20,22 @@ class SMATradingRule(AbstractTradingRule):
 		"""
 		super(SMATradingRule, self).__init__(name, hyper_params)
 
-	def forcast(self, data: pd.DataFrame):
+	def forecast(self, data: pd.DataFrame):
 		"""
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_sma = np.array(data["Close"].rolling(self.hyper_params["fast_span"]).mean())
-		slow_sma = np.array(data["Close"].rolling(self.hyper_params["slow_span"]).mean())
+		fast_sma = data["Close"].rolling(self.hyper_params["fast_span"]).mean()
+		slow_sma = data["Close"].rolling(self.hyper_params["slow_span"]).mean()
 
-		sma = fast_sma - slow_sma
-		sma = np.array([i for i in sma if not math.isnan(i)])
-		forcast_value = self.hyper_params["scaling_factor"] * (sma.mean()/sma.std())
-		if forcast_value > 0:
-			forcast_value = min(forcast_value, self.hyper_params["cap"])
+		sma = fast_sma.iloc[-1] - slow_sma.iloc[-1]
+		forecast_value = self.hyper_params["scaling_factor"] * (sma / slow_sma.std())
+		if forecast_value > 0:
+			forecast_value = min(forecast_value, self.hyper_params["cap"])
 		else:
-			forcast_value = max(forcast_value, -self.hyper_params["cap"])
+			forecast_value = max(forecast_value, -self.hyper_params["cap"])
 
-		return forcast_value
+		return forecast_value
 
 
 if __name__ == "__main__":
@@ -57,7 +56,7 @@ if __name__ == "__main__":
 		window = pds.get_window()
 		if window is not None:
 			output_forcast.append({
-				"Balance": sma_rule.forcast(window),
+				"Balance": sma_rule.forecast(window),
 				"Date": pds.get_current_date(),
 			})
 

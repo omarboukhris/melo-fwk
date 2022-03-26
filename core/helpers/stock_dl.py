@@ -14,8 +14,8 @@ def download_and_store(stock, filename, period, interval):
 
 if __name__ == "__main__":
 
-	stocks = ["AAPL", "GOOG", "BTC-EUR", "ETH-EUR", "EURUSD=X", "FB"]
-	filenames = ["../data/AAPL", "../data/GOOG", "../data/BTCEUR", "../data/ETHEUR", "../data/EURUSD", "../data/FB"]
+	stocks = ["AAPL", "GOOG", "GOOGL", "BTC-EUR", "ETH-EUR", "EURUSD=X", "FB"]
+	filenames = ["../data/AAPL", "../data/GOOG", "../data/GOOGL", "../data/BTCEUR", "../data/ETHEUR", "../data/EURUSD", "../data/FB"]
 	settings = [
 		{
 			"period": "10y",
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 		},
 	]
 
-	idx, ext_id = 5, 2
+	idx, ext_id = 1, 1
 
 	download_and_store(
 		stocks[idx],

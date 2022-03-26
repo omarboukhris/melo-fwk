@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import copy
 
+from melodb.loggers import ILogger
+from melodb.Order import Order
+
 from core.datastreams import DataStream, PandasDataStream
 
 from core.rules import EWMATradingRule
@@ -39,29 +42,27 @@ class TradingSystem:
 	- a predicat for exiting a trade
 	"""
 
-	OPEN = True
-	CLOSED = False
-	EMPTY_TRADE = {
-		"status": CLOSED,
-		"size": 1.,
-		"position": "standby",
-		"forcast": [0., 0.],  # (open, close)
-		"entry_time": "",
-		"exit_time": "",
-	}
+	EMPTY_TRADE = Order.empty()
+
+	component_name = "TradingSystem"
 
 	def __init__(
 		self,
 		balance: float,
 		data_source: DataStream,
 		trading_rules: list,
-		forcast_weights: list,
+		forecast_weights: list,
 		enter_trade_fn: callable = base_enter_trade_predicat,
-		exit_trade_fn: callable = base_exit_trade_predicat):
+		exit_trade_fn: callable = base_exit_trade_predicat,
+		logger: ILogger = ILogger(component_name)
+	):
+		self.logger = logger
+		if logger is not None:
+			self.logger = ILogger(TradingSystem.component_name)
 
-		assert data_source is not None, "(AssertionError) Data source is None"
-		assert len(trading_rules) == len(forcast_weights), \
-			"(AssertionError) Number of TradingRules must match forcast weights"
+		assert data_source is not None, self.logger.error("(AssertionError) Data source is None")
+		assert len(trading_rules) == len(forecast_weights), \
+			self.logger.error("(AssertionError) Number of TradingRules must match forcast weights")
 
 		self.accout = [
 			{
@@ -74,9 +75,11 @@ class TradingSystem:
 		self.current_trade = TradingSystem.EMPTY_TRADE
 		self.data_source = data_source
 		self.trading_rules = trading_rules
-		self.forcast_weights = forcast_weights
+		self.forecast_weights = forecast_weights
 		self.enter_trade_fn = enter_trade_fn
 		self.exit_trade_fn = exit_trade_fn
+
+		self.logger.info(f"Trading System for data source '{self.data_source.name}' initialized")
 
 	def reset(self):
 		self.time_index = 0
@@ -84,38 +87,43 @@ class TradingSystem:
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
 	def is_trade_open(self):
-		return self.current_trade["status"] == TradingSystem.OPEN
+		return self.current_trade.status == Order.Status.OPEN
 
 	def is_position_long(self):
-		return self.current_trade["position"] == "long"
+		return self.current_trade.side == Order.Side.LONG
 
 	def is_position_short(self):
-		return self.current_trade["position"] == "short"
+		return self.current_trade.side == Order.Side.SHORT
 
-	def open_trade(self, forcast: float, entry_time: str):
-		self.current_trade["status"] = TradingSystem.OPEN
-		self.current_trade["position"] = "long" if forcast > 0 else "short"
-		self.current_trade["forcast"][0] = forcast
-		self.current_trade["entry_time"] = entry_time
+	def open_trade(self, forecast: float, entry_time: str):
+		self.current_trade.status = Order.Status.OPEN
+		self.current_trade.side = Order.Side.BUY if forecast > 0 else Order.Side.SELL
+		self.current_trade.forecast[0] = forecast
+		self.current_trade.open_ts = entry_time
 
-	def close_trade(self, forcast: float, exit_time: str):
+		self.logger.info(f"Opened Trade {self.current_trade}")
+
+	def close_trade(self, forecast: float, exit_time: str):
 		# update open trade values
-		self.current_trade["status"] = TradingSystem.CLOSED
-		self.current_trade["forcast"][1] = forcast
-		self.current_trade["exit_time"] = exit_time
+		self.current_trade.status = Order.Status.CLOSED
+		self.current_trade.forecast[1] = forecast
+		self.current_trade.close_ts = exit_time
 		self.update_balance()
+
+		self.logger.info(f"Closed Trade {self.current_trade}")
 
 		# add to order book and clean temporary
 		self.order_book.append(copy.deepcopy(self.current_trade))
 		# self.order_book.append(self.current_trade)
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
-	def forcast(self):
+	def forecast(self):
 		s = 0
-		for trading_rule, forcast_weight in zip(self.trading_rules, self.forcast_weights):
+		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
 			window = self.data_source.get_window()
 			if window is not None:
-				s += forcast_weight * trading_rule.forcast(window)
+				s += forecast_weight * trading_rule.forecast(window)
+		self.logger.info(f"Forcasting {s}")
 		return s
 
 	def get_account_history(self):
@@ -126,41 +134,41 @@ class TradingSystem:
 
 	def update_balance(self):
 		"""
-			TODO:
-				The way balance is updated is WRONG and should be updated properly.
-				update_balance() should be mark to market even when closing a position.
+		implemented continous trading
+		should rename class to continuous trading system
 		"""
-		"""update this method to use DataStreams"""
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
-		if self.is_trade_open():  # mark to market
-			open_close_diff = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
-							self.data_source.get_close_at_index(self.data_source.get_current_date())
-			profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
-		else:
-			open_close_diff = self.data_source.get_close_at_index(self.current_trade["entry_time"]) - \
-							self.data_source.get_close_at_index(self.current_trade["exit_time"])
-			profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
+		open_close_diff = self.data_source.get_diff_from_index(self.data_source.get_current_date())
+		profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
 		self.accout.append(copy.deepcopy(profit))
 
 	def simulation_ended(self):
 		return self.data_source.limit_reached()
 
 	def trade_next(self):
+		"""
+		The way this method trades makes it impossible to get out of a bad trade in time,
+		turnover rate is usually bad
+		Should redefine enter/exit trade methods or even better, write a proper predicat
+		component to get more "complex" behaviour
+		:return:
+		"""
+
 		"""This method trades sequentially one product at a time"""
 
 		if self.simulation_ended():
 			return
 
-		forcast = self.forcast()
+		forecast = self.forecast()
 
-		if not self.is_trade_open() and self.enter_trade_fn(forcast):
-			self.open_trade(forcast, self.data_source.get_current_date())
+		if not self.is_trade_open() and self.enter_trade_fn(forecast):
+			self.open_trade(forecast, self.data_source.get_current_date())
 			self.update_balance()  # or mark to marker
 
-		elif self.is_trade_open() and self.exit_trade_fn(forcast):
-			self.close_trade(forcast, self.data_source.get_current_date())
+		elif self.is_trade_open() and self.exit_trade_fn(forecast):
+			self.close_trade(forecast, self.data_source.get_current_date())
 
 		else:
 			self.update_balance()  # or mark to marker
@@ -171,13 +179,15 @@ class TradingSystem:
 			pass
 
 	def sharpe_ratio(self):
-		account = np.array(self.accout)
+		account = np.array(pd.DataFrame(self.accout)["Balance"])
 		return account.mean()/account.std()
 
 
 if __name__ == "__main__":
+	from melodb.loggers import ConsoleLogger, CompositeLogger
+
 	df = pd.read_csv("data/FB_1d_10y.csv")
-	pds = PandasDataStream(df)
+	pds = PandasDataStream("Instrument 1", df)
 
 	sma_params = {
 		"fast_span": 1,
@@ -188,10 +198,13 @@ if __name__ == "__main__":
 	sma = EWMATradingRule("sma", sma_params)
 
 	tr_sys = TradingSystem(
+		logger=CompositeLogger([
+			ConsoleLogger("TradingSystem")
+		]),
 		balance=0,
 		data_source=pds,
 		trading_rules=[sma],
-		forcast_weights=[1.]
+		forecast_weights=[1.]
 	)
 
 	while not tr_sys.simulation_ended():

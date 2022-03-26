@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 
 class DataStream:
-	def __init__(self):
-		pass
+	def __init__(self, name: str):
+		self.name = name
 
 	def get_data(self):
 		pass
@@ -19,6 +19,9 @@ class DataStream:
 		pass
 
 	def get_close_at_index(self, timestamp: str):
+		pass
+
+	def get_diff_from_index(self, timestamp: str):
 		pass
 
 	def get_high(self):
@@ -51,21 +54,27 @@ class PandasDataStream(DataStream):
 
 	def __init__(
 		self,
+		name: str,
 		dataframe: pd.DataFrame,
+		offset: int = 0,
 		reverse: bool = False,
 		date_label: str = "Date",
 		window_size: int = 200):
 
-		super(PandasDataStream, self).__init__()
+		super(PandasDataStream, self).__init__(name)
 
 		self.dataframe = dataframe
-		self.time_idx = 0
+		self.offset = offset
 		self.reverse = reverse
+		self.time_idx = -self.offset if self.reverse else self.offset
 		self.date_label = date_label
 		self.window_size = window_size
 
 	def reset(self):
-		self.time_idx = 0
+		self.time_idx = -self.offset if self.reverse else self.offset
+
+	def set_offset(self, offset: int):
+		self.offset = offset
 
 	def get_data(self):
 		return self.dataframe
@@ -89,6 +98,15 @@ class PandasDataStream(DataStream):
 		x = self.dataframe.loc[self.dataframe[self.date_label] == timestamp, "Close"].to_numpy()
 		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
 		return x[0]
+
+	def get_diff_from_index(self, timestamp: str):
+		x = self.dataframe.index[self.dataframe[self.date_label] == timestamp].to_numpy()
+		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
+
+		t1, t2 = self.dataframe.iloc[x-1]["Close"].to_numpy(), self.dataframe.iloc[x]["Close"].to_numpy()
+		assert t1.shape == t2.shape and t1.shape == (1,), f"{t1} vs {t2}"
+
+		return (t1-t2)[0]
 
 	def get_high(self):
 		return self.dataframe.iloc[self.time_idx]["High"]
@@ -123,7 +141,10 @@ class PandasDataStream(DataStream):
 
 class PandasDataStreamHourly(PandasDataStream):
 	def __init__(self, dataframe: pd.DataFrame, reverse: bool = True):
-		super(PandasDataStreamHourly, self).__init__(dataframe, reverse, "Datetime")
+		super(PandasDataStreamHourly, self).__init__(
+			dataframe,
+			reverse=reverse,
+			date_label="Datetime")
 
 
 if __name__ == "__main__":
@@ -133,5 +154,5 @@ if __name__ == "__main__":
 	for tick in pdstream:
 		assert pdstream.get_current_date() == tick["Date"], "dates are different"
 		assert pdstream.get_open() == tick["Open"], "open prices are different"
-		print(tick["Date"], "//", tick["Open"])
+		print(tick["Date"], "//", tick["Open"], pdstream.get_diff_from_index(tick["Date"]))
 
