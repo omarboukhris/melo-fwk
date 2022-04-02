@@ -8,19 +8,8 @@ from melodb.Order import Order
 
 from core.datastreams import DataStream, PandasDataStream
 
-from core.rules import EWMATradingRule
+from core.rules import EWMATradingRule, BaseTradingPolicy, ITradingPolicy
 
-def get_yfinance_dataframe_date(dataframe: pd.DataFrame, time_idx: int):
-	return dataframe[time_idx]["Datetime"]
-
-def base_enter_trade_predicat(forcast: float):
-	return forcast != 0 and forcast is not None
-
-def base_exit_trade_predicat(forcast: float):
-	# if 1 > forcast > -1:
-	# 	print(forcast)
-	# return forcast == 0
-	return -.1 < forcast < .1
 
 class TradingSystem:
 	"""Class for backtesting offline a trading system.
@@ -52,8 +41,7 @@ class TradingSystem:
 		data_source: DataStream,
 		trading_rules: list,
 		forecast_weights: list,
-		enter_trade_fn: callable = base_enter_trade_predicat,
-		exit_trade_fn: callable = base_exit_trade_predicat,
+		trading_policy: ITradingPolicy = BaseTradingPolicy(),
 		logger: ILogger = ILogger(component_name)
 	):
 		self.logger = logger
@@ -76,8 +64,7 @@ class TradingSystem:
 		self.data_source = data_source
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights
-		self.enter_trade_fn = enter_trade_fn
-		self.exit_trade_fn = exit_trade_fn
+		self.trading_policy = trading_policy
 
 		self.logger.info(f"Trading System for data source '{self.data_source.name}' initialized")
 
@@ -163,11 +150,11 @@ class TradingSystem:
 
 		forecast = self.forecast()
 
-		if not self.is_trade_open() and self.enter_trade_fn(forecast):
+		if not self.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
 			self.open_trade(forecast, self.data_source.get_current_date())
 			self.update_balance()  # or mark to marker
 
-		elif self.is_trade_open() and self.exit_trade_fn(forecast):
+		elif self.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())
 
 		else:
@@ -186,7 +173,7 @@ class TradingSystem:
 if __name__ == "__main__":
 	from melodb.loggers import ConsoleLogger, CompositeLogger
 
-	df = pd.read_csv("data/FB_1d_10y.csv")
+	df = pd.read_csv("../data/FB_1d_10y.csv")
 	pds = PandasDataStream("Instrument 1", df)
 
 	sma_params = {
@@ -195,7 +182,7 @@ if __name__ == "__main__":
 		"scaling_factor": 20,
 		"cap": 20,
 	}
-	sma = EWMATradingRule("sma", sma_params)
+	ewma = EWMATradingRule("ewma", sma_params)
 
 	tr_sys = TradingSystem(
 		logger=CompositeLogger([
@@ -203,7 +190,7 @@ if __name__ == "__main__":
 		]),
 		balance=0,
 		data_source=pds,
-		trading_rules=[sma],
+		trading_rules=[ewma],
 		forecast_weights=[1.]
 	)
 

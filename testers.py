@@ -15,7 +15,7 @@ def test_empty_trading_system():
 		balance=10000,
 		data_source=pds,
 		trading_rules=[],
-		forcast_weights=[]
+		forecast_weights=[]
 	)
 
 	while not tr_sys.simulation_ended():
@@ -52,7 +52,7 @@ def test_trading_rule():
 		window = pds.get_window()
 		if window is not None:
 			output_forcast.append({
-				"Balance": ewma.forcast(window),
+				"Balance": ewma.forecast(window),
 				"Date": pds.get_current_date(),
 			})
 
@@ -78,7 +78,7 @@ def test_trading_system():
 	"""
 
 	df = pd.read_csv("core/data/FB_1h_2y.csv")
-	pds = ds.PandasDataStream(df, offset=1, date_label="Datetime")
+	pds = ds.PandasDataStream(name="FB", dataframe=df, offset=1, date_label="Datetime")
 
 	sma_params = {
 		"fast_span": 4,
@@ -92,7 +92,7 @@ def test_trading_system():
 		balance=0,
 		data_source=pds,
 		trading_rules=[sma],
-		forcast_weights=[1.]
+		forecast_weights=[1.]
 	)
 
 	while not tr_sys.simulation_ended():

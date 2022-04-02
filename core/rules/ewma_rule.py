@@ -47,7 +47,7 @@ if __name__ == "__main__":
 		"scaling_factor": 20,
 		"cap": 20,
 	}
-	ewma_tr = EWMATradingRule("sma", sma_params)
+	ewma_tr = EWMATradingRule("ewma", sma_params)
 
 	output_forcast = []
 	for _ in pds:
