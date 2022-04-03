@@ -132,7 +132,6 @@ class TradingSystem:
 		open_close_diff = self.data_source.get_diff_from_index(self.data_source.get_current_date())
 		profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
 		self.accout.append(copy.deepcopy(profit))
-		self.accout.append(copy.deepcopy(profit))
 
 	def simulation_ended(self):
 		return self.data_source.limit_reached()
