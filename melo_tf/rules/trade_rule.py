@@ -13,7 +13,3 @@ class ITradingRule:
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
 		pass
-
-
-if __name__ == "__main__":
-	pass

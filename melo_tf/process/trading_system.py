@@ -15,21 +15,19 @@ from melo_tf.policies import BaseTradingPolicy, ITradingPolicy
 class TradingSystem:
 	"""Class for backtesting offline a trading system.
 	This class trades only one position, one product at a time.
-	To backtest for a whole portfolio, you need a TradingSystem/asset,
-	then sum up after an iteration.
+	To backtest for a whole portfolio, you need a TradingSystem per asset,
+	then sum up after each iteration.
 	Sub-classes can implement multi-threaded execution if needed.
 
 	TODO:
-		Implement a TradingSystem class handling multiple positions sequentially
-		Implement an OnlineTradingSystem class to handle trades after deployment
-		Implement a TradingFramework containing a list of TradingSystem to backtest whole portfolio
+		Implement an TradeExecutor to execute trades online (demo/live) and offline (backtest)
+		=> warping of open/close_trade methods
 
 	Needs :
 	- a data source for historic price data
 	- a set of trading rules
 	- a set of forcast weights (sum(w_i) == 1)
-	- a predicat for entering a trade
-	- a predicat for exiting a trade
+	- a policy for entering/exiting trades
 	"""
 
 	EMPTY_TRADE = Order.empty()
@@ -156,10 +154,10 @@ class TradingSystem:
 			self.open_trade(forecast, self.data_source.get_current_date())
 			self.update_balance()  # or mark to marker
 
-		elif self.trading_policy.turnover_predicat(forecast):
-			self.close_trade(forecast, self.data_source.get_current_date())
-			self.open_trade(forecast, self.data_source.get_current_date())
-			self.update_balance()  # or mark to marker
+		# elif self.trading_policy.turnover_predicat(forecast):
+		# 	self.close_trade(forecast, self.data_source.get_current_date())
+		# 	self.open_trade(forecast, self.data_source.get_current_date())
+		# 	self.update_balance()  # or mark to marker
 
 		elif self.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())
@@ -194,7 +192,7 @@ if __name__ == "__main__":
 	sma_params = {
 		"fast_span": 1,
 		"slow_span": 8,
-		"scaling_factor": 20,
+		"scale": 20,
 		"cap": 20,
 	}
 	ewma = EWMATradingRule("ewma", sma_params)

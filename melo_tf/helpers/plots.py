@@ -29,20 +29,41 @@ class PricePlotter:
 
 
 class AccountPlotter:
-	def __init__(self, dataframe: pd.DataFrame):
+	def __init__(self, dataframe: pd.DataFrame, twinx_dataframe: pd.DataFrame = None):
 		self.df = dataframe
+		self.twin_df = twinx_dataframe
 		self.ylim = None
 
-	def plot(self):
-		interval = len(self.df) // 10 if len(self.df) > 10 else 2
+	@staticmethod
+	def align_yaxis(ax1, v1, ax2, v2):
+		"""adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+		_, y1 = ax1.transData.transform((0, v1))
+		_, y2 = ax2.transData.transform((0, v2))
+		inv = ax2.transData.inverted()
+		_, dy = inv.transform((0, 0)) - inv.transform((0, y1 - y2))
+		miny, maxy = ax2.get_ylim()
+		ax2.set_ylim(miny + dy, maxy + dy)
 
-		# plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(6))
-		self.ylim = self.df[["Balance"]].max(), self.df[["Balance"]].min()
+	@staticmethod
+	def plot_df(df: pd.DataFrame, x_label: str, y_label: str, ax, color: str = "blue"):
+		interval = len(df) // 10 if len(df) > 10 else 2
 		plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=interval))
-		plt.plot(self.df["Date"], self.df[['Balance']])
+		ax.plot(df[x_label], df[[y_label]], color=color)
 		plt.gcf().autofmt_xdate()
-		# plt.show()
 
+		return ax
+
+	def plot(self):
+		_, ax = plt.subplots()
+		self.ylim = self.df[["Balance"]].max(), self.df[["Balance"]].min()
+		AccountPlotter.plot_df(self.df, x_label="Date", y_label="Balance", ax=ax)
+
+	def plot_twinx(self):
+		_, ax1 = plt.subplots()
+		AccountPlotter.plot_df(self.df, x_label="Date", y_label="Balance", ax=ax1, color="blue")
+		ax2 = ax1.twinx()
+		AccountPlotter.plot_df(self.twin_df, x_label="Date", y_label="Close", ax=ax2, color="green")
+		# AccountPlotter.align_yaxis(ax1, 0, ax2, 0)
 
 	def add_vlines(self, order_book: pd.DataFrame):
 		for _, order in order_book.iterrows():

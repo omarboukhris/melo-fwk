@@ -80,8 +80,8 @@ def test_trading_system():
 	:return:
 	"""
 
-	df = pd.read_csv("melo_tf/data/Commodity Data/Cocoa_sanitized.csv")
-	# df = pd.read_csv("melo_tf/data/Stocks/FB_1h_2y.csv")
+	# df = pd.read_csv("melo_tf/data/Commodity Data/Gold_sanitized.csv")
+	df = pd.read_csv("melo_tf/data/Stocks/ETHEUR_1d_10y.csv")
 	pds = ds.PandasDataStream(name="test_tr_sys", dataframe=df, offset=1)
 
 	sma_params = {

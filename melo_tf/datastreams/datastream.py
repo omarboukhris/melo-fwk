@@ -40,6 +40,10 @@ class DataStream:
 		pass
 
 	def next(self):
+		"""
+		DataSource next() method should request live data from market with online datastream
+		"""
+
 		return self.__next__()
 
 	def __iter__(self):
@@ -106,7 +110,7 @@ class PandasDataStream(DataStream):
 		t1, t2 = self.dataframe.iloc[x-1]["Close"].to_numpy(), self.dataframe.iloc[x]["Close"].to_numpy()
 		assert t1.shape == t2.shape and t1.shape == (1,), f"{t1} vs {t2}"
 
-		return (t1-t2)[0]
+		return (t2-t1)[0]
 
 	def get_high(self):
 		return self.dataframe.iloc[self.time_idx]["High"]
@@ -141,10 +145,13 @@ class PandasDataStream(DataStream):
 
 if __name__ == "__main__":
 
-	pdstream = PandasDataStream(pd.read_csv("../data/FB_1d_10y.csv"))
-
+	pdstream = PandasDataStream(
+		name="cocoa_sntz",
+		dataframe=pd.read_csv("../data/Commodity Data/Cocoa_sanitized.csv")
+	)
+	print(pd.read_csv("../data/Commodity Data/Cocoa_sanitized.csv"))
 	for tick in pdstream:
 		assert pdstream.get_current_date() == tick["Date"], "dates are different"
 		assert pdstream.get_open() == tick["Open"], "open prices are different"
-		print(tick["Date"], "//", tick["Open"], pdstream.get_diff_from_index(tick["Date"]))
+		print(tick["Date"], "//", tick["Close"], pdstream.get_diff_from_index(tick["Date"]))
 
