@@ -1,10 +1,11 @@
 
 from rules import ewma_rule, sma_rule
-from datastreams import datastream as ds
-from helpers import AccountPlotter
+from datastreams import backtest_data_loader as btdl
+from helpers.plots import ForecastPlotter
 
 import pandas as pd
-import tqdm, glob
+import tqdm
+
 from typing import List
 
 class TestRules:
@@ -12,59 +13,84 @@ class TestRules:
 	ewma_meta_default = {
 		"fast": 2,
 		"slow": 8,
-		"multiplier": 1.5,
+		"multiplier": 1.9,
 		"iterations": 6,
-		"scale": 20,
+		"scale": 2,
 		"cap": 20
 	}
 
 	sma_meta_default = {
 		"fast": 2,
 		"slow": 8,
-		"multiplier": 1.5,
+		"multiplier": 1.9,
 		"iterations": 6,
 		"scale": 20,
 		"cap": 20
 	}
 
 	@staticmethod
-	def get_products(path: str):
-		product_path_list = glob.glob(path)
-		output = []
-		for path in product_path_list:
-			product_name = path.split("/")[-1][:-4]
-			output.append({"name": product_name, "datasource": path})
-		return output
+	def test_moving_average_with_residue(
+		product_list: List[dict],
+		metaparams: dict,
+		rule_name: str,
+		RuleClass: callable,
+		DataLoader_fn: callable):
 
-	@staticmethod
-	def test_moving_average_with_residue(product_list: List[dict], ewma_metaparams: dict, RuleClass: callable, rule_name: str):
 		for product in tqdm.tqdm(product_list):
-			ewma_params = {
-				"fast_span": ewma_metaparams["fast"],
-				"slow_span": ewma_metaparams["slow"],
-				"scale": ewma_metaparams["scale"],
-				"cap": ewma_metaparams["cap"],
+			params = {
+				"fast_span": metaparams["fast"],
+				"slow_span": metaparams["slow"],
+				"scale": metaparams["scale"],
+				"cap": metaparams["cap"],
 			}
-			for _ in tqdm.tqdm(range(ewma_metaparams["iterations"])):
-				input_df = pd.read_csv(product["datasource"])
-				pds = ds.PandasDataStream(product["name"], input_df)
-				ewma_tr = RuleClass(rule_name, ewma_params)
+			ewma_tr = RuleClass(rule_name, params)
+
+			for _ in tqdm.tqdm(range(metaparams["iterations"])):
+				input_df, pds = DataLoader_fn(product)
 
 				simulation_result_df = pd.DataFrame(TestRules.run_simulation(ewma_tr, pds))
-				acc_plt = AccountPlotter(simulation_result_df, input_df)
-				acc_plt.plot_twinx()
-				acc_plt.save_png(f"data/residual/ewma_{product['name']}_{ewma_params['fast_span']}_{ewma_params['slow_span']}.png")
+				plotter = ForecastPlotter(simulation_result_df, input_df)
+				plotter.plot_twinx()
+				plotter.save_png(f"data/residual/{rule_name}_{product['name']}_{int(params['fast_span'])}_{int(params['slow_span'])}.png")
 
-				ewma_params["fast_span"] = ewma_params["fast_span"] * ewma_metaparams["multiplier"]
-				ewma_params["slow_span"] = ewma_params["slow_span"] * ewma_metaparams["multiplier"]
+				params["fast_span"] = params["fast_span"] * metaparams["multiplier"]
+				params["slow_span"] = params["slow_span"] * metaparams["multiplier"]
 
 	@staticmethod
 	def test_ewma_with_residue(product_list: List[dict], ewma_metaparams: dict):
-		TestRules.test_moving_average_with_residue(product_list, ewma_metaparams, ewma_rule.EWMATradingRule, "ewma")
+		TestRules.test_moving_average_with_residue(
+			product_list,
+			ewma_metaparams,
+			"ewma",
+			ewma_rule.EWMATradingRule,
+			btdl.BacktestDataLoader.get_product_datastream)
 
 	@staticmethod
-	def test_sma_with_residue(product_list: List[dict], ewma_metaparams: dict):
-		TestRules.test_moving_average_with_residue(product_list, ewma_metaparams, sma_rule.SMATradingRule, "sma")
+	def test_sma_with_residue(product_list: List[dict], sma_metaparams: dict):
+		TestRules.test_moving_average_with_residue(
+			product_list,
+			sma_metaparams,
+			"sma",
+			sma_rule.SMATradingRule,
+			btdl.BacktestDataLoader.get_product_datastream)
+
+	@staticmethod
+	def test_mock_ewma_with_residue(product_list: List[dict], ewma_metaparams: dict):
+		TestRules.test_moving_average_with_residue(
+			product_list,
+			ewma_metaparams,
+			"ewma",
+			ewma_rule.EWMATradingRule,
+			btdl.BacktestDataLoader.get_mock_datastream)
+
+	@staticmethod
+	def test_mock_sma_with_residue(product_list: List[dict], sma_metaparams: dict):
+		TestRules.test_moving_average_with_residue(
+			product_list,
+			sma_metaparams,
+			"sma",
+			sma_rule.SMATradingRule,
+			btdl.BacktestDataLoader.get_mock_datastream)
 
 	@staticmethod
 	def run_simulation(ewma_tr, pds):
@@ -74,20 +100,46 @@ class TestRules:
 			if window is not None:
 				output_forcast.append({
 					"Date": pds.get_current_date(),
-					"Balance": ewma_tr.forecast(window),
+					"Forecast": ewma_tr.forecast(window),
 				})
 		return output_forcast
 
 
+def test_ewma(products: List[dict]):
+	ewma_meta = TestRules.ewma_meta_default
+	TestRules.test_ewma_with_residue(
+		products,
+		ewma_meta
+	)
+
+
+def test_sma(products: List[dict]):
+	sma_meta = TestRules.ewma_meta_default
+	TestRules.test_sma_with_residue(
+		products,
+		sma_meta,
+	)
+
+
+def test_mock_ewma():
+	ewma_meta = TestRules.ewma_meta_default
+	TestRules.test_mock_ewma_with_residue(
+		[{"name": "mock"}],
+		ewma_meta
+	)
+
+
+def test_mock_sma():
+	sma_meta = TestRules.ewma_meta_default
+	TestRules.test_mock_sma_with_residue(
+		[{"name": "mock"}],
+		sma_meta,
+	)
+
+
 if __name__ == "__main__":
 
-	TestRules.test_ewma_with_residue(
-		TestRules.get_products("data/Stocks/*.csv"),
-		TestRules.ewma_meta_default,
-	)
-
-	TestRules.test_sma_with_residue(
-		TestRules.get_products("data/Stocks/*.csv"),
-		TestRules.sma_meta_default,
-	)
-
+	products_list = btdl.BacktestDataLoader.get_products("data/Stocks/*1d_10y.csv")
+	test_ewma(products_list)
+	# test_sma(products_list)
+	# test_mock_sma()

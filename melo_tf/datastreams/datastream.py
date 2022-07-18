@@ -1,6 +1,5 @@
 
 import pandas as pd
-import numpy as np
 
 class DataStream:
 	def __init__(self, name: str):
@@ -63,7 +62,7 @@ class PandasDataStream(DataStream):
 		offset: int = 0,
 		reverse: bool = False,
 		date_label: str = "Date",
-		window_size: int = 200):
+		window_size: int = 70):
 
 		super(PandasDataStream, self).__init__(name)
 
@@ -81,6 +80,7 @@ class PandasDataStream(DataStream):
 		self.offset = offset
 
 	def get_data(self):
+		""" Get the whole dataframe """
 		return self.dataframe
 
 	def limit_reached(self):
@@ -90,25 +90,33 @@ class PandasDataStream(DataStream):
 		)
 
 	def get_current_date(self):
+		""" Get current Date """
 		return self.dataframe.iloc[self.time_idx][self.date_label]
 
 	def get_open(self):
+		""" Get current open price """
 		return self.dataframe.iloc[self.time_idx]["Open"]
 
 	def get_close(self):
+		""" Get current close price """
 		return self.dataframe.iloc[self.time_idx]["Close"]
 
 	def get_close_at_index(self, timestamp: str):
+		""" Get closing price at specified timestamp """
 		x = self.dataframe.loc[self.dataframe[self.date_label] == timestamp, "Close"].to_numpy()
 		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
 		return x[0]
 
+	def get_current_diff(self):
+		return self.get_diff_from_index(self.get_current_date())
+
 	def get_diff_from_index(self, timestamp: str):
+		""" Computes difference between two successive timestamps """
 		x = self.dataframe.index[self.dataframe[self.date_label] == timestamp].to_numpy()
 		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
 
 		t1, t2 = self.dataframe.iloc[x-1]["Close"].to_numpy(), self.dataframe.iloc[x]["Close"].to_numpy()
-		assert t1.shape == t2.shape and t1.shape == (1,), f"{t1} vs {t2}"
+		assert t1.shape == t2.shape and t1.shape == (1,), f"PandasDataStream.get_diff_from_index : {t1} vs {t2}"
 
 		return (t2-t1)[0]
 
@@ -141,17 +149,3 @@ class PandasDataStream(DataStream):
 			return self.dataframe.iloc[self.time_idx]
 		else:
 			raise StopIteration()
-
-
-if __name__ == "__main__":
-
-	pdstream = PandasDataStream(
-		name="cocoa_sntz",
-		dataframe=pd.read_csv("../data/Commodity Data/Cocoa_sanitized.csv")
-	)
-	print(pd.read_csv("../data/Commodity Data/Cocoa_sanitized.csv"))
-	for tick in pdstream:
-		assert pdstream.get_current_date() == tick["Date"], "dates are different"
-		assert pdstream.get_open() == tick["Open"], "open prices are different"
-		print(tick["Date"], "//", tick["Close"], pdstream.get_diff_from_index(tick["Date"]))
-

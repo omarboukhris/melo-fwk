@@ -6,10 +6,7 @@ import copy
 from melodb.loggers import ILogger
 from melodb.Order import Order
 
-from melo_tf.datastreams import DataStream, PandasDataStream
-
-from melo_tf.rules import EWMATradingRule
-from melo_tf.policies import BaseTradingPolicy, ITradingPolicy
+from process.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
 
 
 class TradingSystem:
@@ -37,7 +34,7 @@ class TradingSystem:
 	def __init__(
 		self,
 		balance: float,
-		data_source: DataStream,
+		data_source,
 		trading_rules: list,
 		forecast_weights: list,
 		trading_policy: ITradingPolicy = BaseTradingPolicy(),
@@ -127,9 +124,9 @@ class TradingSystem:
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
-		open_close_diff = self.data_source.get_diff_from_index(self.data_source.get_current_date())
-		profit["Balance"] += -open_close_diff if self.is_position_long() else open_close_diff
-		self.accout.append(copy.deepcopy(profit))
+		open_close_diff = self.data_source.get_current_diff()
+		profit["Balance"] += open_close_diff if self.is_position_long() else -open_close_diff
+		self.accout.append(profit)
 
 	def simulation_ended(self):
 		return self.data_source.limit_reached()
@@ -152,7 +149,6 @@ class TradingSystem:
 
 		if not self.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
 			self.open_trade(forecast, self.data_source.get_current_date())
-			self.update_balance()  # or mark to marker
 
 		# elif self.trading_policy.turnover_predicat(forecast):
 		# 	self.close_trade(forecast, self.data_source.get_current_date())
@@ -162,8 +158,7 @@ class TradingSystem:
 		elif self.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())
 
-		else:
-			self.update_balance()  # or mark to marker
+		self.update_balance()  # or mark to market
 
 		try:
 			self.data_source.next()
@@ -181,32 +176,3 @@ class TradingSystem:
 	def run(self):
 		while not self.simulation_ended():
 			self.trade_next()
-
-
-if __name__ == "__main__":
-	from melodb.loggers import ConsoleLogger, CompositeLogger
-
-	df = pd.read_csv("../data/Commodity Data/Cocoa.csv")
-	pds = PandasDataStream("Instrument 1", df)
-
-	sma_params = {
-		"fast_span": 1,
-		"slow_span": 8,
-		"scale": 20,
-		"cap": 20,
-	}
-	ewma = EWMATradingRule("ewma", sma_params)
-
-	tr_sys = TradingSystem(
-		logger=CompositeLogger([
-			ConsoleLogger("TradingSystem")
-		]),
-		balance=0,
-		data_source=pds,
-		trading_rules=[ewma],
-		forecast_weights=[1.]
-	)
-	tr_sys.run()
-
-	print(tr_sys.get_account_history(), end="\n\n")
-	print(tr_sys.get_order_book())

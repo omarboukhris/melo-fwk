@@ -1,0 +1,133 @@
+
+import pandas as pd
+import tqdm
+from rules.ewma_rule import EWMATradingRule
+# from rules.sma_rule import SMATradingRule
+from process import trading_system as ts
+from helpers.plots import ForecastPlotter, AccountPlotter
+from datastreams import datastream as ds, backtest_data_loader as bdl
+
+def test_empty_trading_system():
+	df = pd.read_csv("data/CommodityData/Cocoa_sanitized.csv")
+
+	pds = ds.PandasDataStream(name="test_empty_tsys", dataframe=df)
+
+	tr_sys = ts.TradingSystem(
+		balance=10000,
+		data_source=pds,
+		trading_rules=[],
+		forecast_weights=[]
+	)
+
+	while not tr_sys.simulation_ended():
+		tr_sys.trade_next()
+
+	assert tr_sys.simulation_ended(), "(AssertionError) Simulation not ended"
+
+
+def test_datastream():
+	def process_tick(_):
+		pass
+
+	pdstream = ds.PandasDataStream(
+		name="FB_test",
+		dataframe=pd.read_csv("data/CommodityData/Cocoa_sanitized.csv"))
+
+	for tick in pdstream:
+		process_tick(tick)
+
+def test_trading_rule():
+
+	products = bdl.BacktestDataLoader.get_products("data/CommodityData/Cocoa_sanitized.csv")
+	assert len(products) > 0
+	df, pds = bdl.BacktestDataLoader.get_product_datastream(products[0])
+
+	ewma_params = {
+		"fast_span": 32,
+		"slow_span": 128,
+		"scale": 6,
+		"cap": 20,
+	}
+	ewma = EWMATradingRule("ewma", ewma_params)
+
+	output_forcast = []
+	for _ in pds:
+		window = pds.get_window()
+		if window is not None:
+			output_forcast.append({
+				"Forecast": ewma.forecast(window),
+				"Date": pds.get_current_date(),
+			})
+
+	forcast_df = pd.DataFrame(output_forcast)
+	acc_plt = ForecastPlotter(forcast_df, df)
+	acc_plt.plot()
+	acc_plt.plot_twinx()
+	acc_plt.save_png("data/residual/test_trading_rule__forecast_plot")
+	# acc_plt.show()
+
+	# price_plt = PricePlotter(df)
+	# price_plt.plot()
+	# price_plt.save_png("data/residual/test_trading_rule__price_plot")
+	# price_plt.show()
+
+
+def test_trading_system():
+	"""
+	2y 1h :
+		goog : 8 32
+		googl : 2 8
+		meta : 4 16    # mid trends
+		aapl : 16 64   # long trends
+
+
+	:return:
+	"""
+
+	# df = pd.read_csv("data/Commodity Data/Gold_sanitized.csv")
+	# products = bdl.BacktestDataLoader.get_products("data/Stocks/GOOG_1d_10y.csv")
+	products = bdl.BacktestDataLoader.get_products("data/CommodityData/Gold_sanitized.csv")
+	assert len(products) > 0
+	df, pds = bdl.BacktestDataLoader.get_product_datastream(products[0])
+
+	sma_params = {
+		"fast_span": 32,
+		"slow_span": 128,
+		"scale": 6,
+		"cap": 20,
+	}
+	sma = EWMATradingRule("sma", sma_params)
+
+	tr_sys = ts.TradingSystem(
+		balance=10000,
+		data_source=pds,
+		trading_rules=[sma],
+		forecast_weights=[1.]
+	)
+	tr_sys.run()
+
+	# print(tr_sys.sharpe_ratio())
+	orderbook = tr_sys.get_order_book()
+
+	df_account = tr_sys.get_account_history()
+	account_plt = AccountPlotter(df_account, df)
+	account_plt.plot()
+	account_plt.plot_twinx()
+	account_plt.save_png("data/residual/test_trading_rule__price_plot.png")
+	# account_plt.add_vlines(orderbook)
+	# account_plt.show()
+	# df_account.to_csv("test_results/account.csv")
+	# orderbook.to_csv("test_results/book.csv")
+
+
+
+if __name__ == "__main__":
+	tests = [
+		# test_datastream,
+		# test_trading_rule,
+		# test_empty_trading_system,
+		test_trading_system,
+	]
+
+	for t in tqdm.tqdm(tests):
+		t()

@@ -21,11 +21,14 @@ class SMATradingRule(tr.ITradingRule):
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_sma = data["Close"].rolling(self.hyper_params["fast_span"]).mean()
-		slow_sma = data["Close"].rolling(self.hyper_params["slow_span"]).mean()
+		fast_sma = data["Close"].rolling(int(self.hyper_params["fast_span"])).mean()
+		slow_sma = data["Close"].rolling(int(self.hyper_params["slow_span"])).mean()
 
 		sma = fast_sma.iloc[-1] - slow_sma.iloc[-1]
-		forecast_value = self.hyper_params["scale"] * (sma / slow_sma.std())
+		# sma = fast_sma.mean() - slow_sma.mean()  # this is whole thing needs to be fire proofed
+
+		# forecast_value = self.hyper_params["scale"] * (sma / slow_sma.std())
+		forecast_value = sma
 		if forecast_value > 0:
 			forecast_value = min(forecast_value, self.hyper_params["cap"])
 		else:

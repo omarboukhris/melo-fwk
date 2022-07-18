@@ -2,6 +2,7 @@
 import rules.trade_rule as tr
 
 import pandas as pd
+import numpy as np
 
 class EWMATradingRule(tr.ITradingRule):
 
@@ -21,11 +22,18 @@ class EWMATradingRule(tr.ITradingRule):
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_ewma = data["Close"].ewm(span=self.hyper_params["fast_span"]).mean().to_numpy()
-		slow_ewma = data["Close"].ewm(span=self.hyper_params["slow_span"]).mean().to_numpy()
+		fast_ewma = data["Close"].ewm(span=int(self.hyper_params["fast_span"])).mean().to_numpy()
+		slow_ewma = data["Close"].ewm(span=int(self.hyper_params["slow_span"])).mean().to_numpy()
 
-		ewma = fast_ewma[-1] - slow_ewma[-1]
-		forecast_value = self.hyper_params["scale"] * (ewma / slow_ewma.std())
+		std = data["Close"].ewm(span=int(self.hyper_params["fast_span"])).std().to_numpy()
+
+		ewma = fast_ewma - slow_ewma
+
+		np.seterr(invalid="ignore")
+		forecast_vect = self.hyper_params["scale"] * (ewma / std)
+		np.seterr(invalid="warn")
+
+		forecast_value = forecast_vect[-1]
 		if forecast_value > 0:
 			forecast_value = min(forecast_value, self.hyper_params["cap"])
 		else:

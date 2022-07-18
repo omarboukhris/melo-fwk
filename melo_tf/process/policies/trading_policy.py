@@ -17,7 +17,7 @@ class ITradingPolicy:
 
 class BaseTradingPolicy(ITradingPolicy):
 
-	threshold = 2
+	threshold = 1e-2
 
 	def __init__(self):
 		super(BaseTradingPolicy, self).__init__()
