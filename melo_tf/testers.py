@@ -37,10 +37,13 @@ def test_datastream():
 		process_tick(tick)
 
 def test_trading_rule():
+	products = bdl.BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
+	for p in tqdm.tqdm(products):
+		run_trading_rule_loop(p)
 
-	products = bdl.BacktestDataLoader.get_products("data/CommodityData/Cocoa_sanitized.csv")
-	assert len(products) > 0
-	df, pds = bdl.BacktestDataLoader.get_product_datastream(products[0])
+def run_trading_rule_loop(product):
+
+	df, pds = bdl.BacktestDataLoader.get_product_datastream(product)
 
 	ewma_params = {
 		"fast_span": 32,
@@ -61,9 +64,7 @@ def test_trading_rule():
 
 	forcast_df = pd.DataFrame(output_forcast)
 	acc_plt = ForecastPlotter(forcast_df, df)
-	acc_plt.plot()
-	acc_plt.plot_twinx()
-	acc_plt.save_png("data/residual/test_trading_rule__forecast_plot")
+	acc_plt.save_png(f"data/residual/{product['name']}_plot.png")
 	# acc_plt.show()
 
 	# price_plt = PricePlotter(df)
@@ -86,9 +87,18 @@ def test_trading_system():
 
 	# df = pd.read_csv("data/Commodity Data/Gold_sanitized.csv")
 	# products = bdl.BacktestDataLoader.get_products("data/Stocks/GOOG_1d_10y.csv")
-	products = bdl.BacktestDataLoader.get_products("data/CommodityData/Gold_sanitized.csv")
-	assert len(products) > 0
-	df, pds = bdl.BacktestDataLoader.get_product_datastream(products[0])
+	products = bdl.BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
+	sum_ = 0.
+	for p in tqdm.tqdm(products):
+		df_account = run_trading_loop(p)
+		sum_ += df_account["Balance"].iloc[-1]
+	starting_balance = 10000
+	print(f"starting balance : {starting_balance}")
+	print(f"final balance : {starting_balance + sum_}")
+
+
+def run_trading_loop(product):
+	df, pds = bdl.BacktestDataLoader.get_product_datastream(product)
 
 	sma_params = {
 		"fast_span": 32,
@@ -99,7 +109,7 @@ def test_trading_system():
 	sma = EWMATradingRule("sma", sma_params)
 
 	tr_sys = ts.TradingSystem(
-		balance=10000,
+		balance=0,
 		data_source=pds,
 		trading_rules=[sma],
 		forecast_weights=[1.]
@@ -107,24 +117,23 @@ def test_trading_system():
 	tr_sys.run()
 
 	# print(tr_sys.sharpe_ratio())
-	orderbook = tr_sys.get_order_book()
+	# orderbook = tr_sys.get_order_book()
 
 	df_account = tr_sys.get_account_history()
 	account_plt = AccountPlotter(df_account, df)
-	account_plt.plot()
-	account_plt.plot_twinx()
-	account_plt.save_png("data/residual/test_trading_rule__price_plot.png")
 	# account_plt.add_vlines(orderbook)
+	account_plt.save_png(f"data/residual/{product['name']}_plot.png")
 	# account_plt.show()
 	# df_account.to_csv("test_results/account.csv")
 	# orderbook.to_csv("test_results/book.csv")
+	return df_account
 
 
 
 if __name__ == "__main__":
 	tests = [
 		# test_datastream,
-		# test_trading_rule,
+		test_trading_rule,
 		# test_empty_trading_system,
 		test_trading_system,
 	]

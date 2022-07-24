@@ -1,6 +1,8 @@
 
 import pandas as pd
 
+import datetime as dt
+
 class DataStream:
 	def __init__(self, name: str):
 		self.name = name
@@ -73,6 +75,29 @@ class PandasDataStream(DataStream):
 		self.date_label = date_label
 		self.window_size = window_size
 
+	def parse_date_column(self):
+		def parse_date(date: str):
+			try:
+				return dt.datetime.strptime(date, "%Y-%m-%d").year
+			except ValueError:
+				return dt.datetime.strptime(date, "%Y-%m-%d %H:%M:%S%z").year
+			except Exception as e:
+				print(date)
+				raise e
+
+		self.dataframe["Year"] = self.dataframe[self.date_label].apply(parse_date)
+
+	def get_data_by_year(self, y: int):
+		return PandasDataStream(
+			name=self.name,
+			dataframe=self.dataframe.loc[
+				self.dataframe["Year"] == y,
+			],
+			offset=self.offset,
+			reverse=self.reverse,
+			date_label=self.date_label,
+		)
+
 	def reset(self):
 		self.time_idx = -self.offset if self.reverse else self.offset
 
@@ -115,6 +140,8 @@ class PandasDataStream(DataStream):
 		x = self.dataframe.index[self.dataframe[self.date_label] == timestamp].to_numpy()
 		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
 
+		if x == 0:
+			return 0
 		t1, t2 = self.dataframe.iloc[x-1]["Close"].to_numpy(), self.dataframe.iloc[x]["Close"].to_numpy()
 		assert t1.shape == t2.shape and t1.shape == (1,), f"PandasDataStream.get_diff_from_index : {t1} vs {t2}"
 

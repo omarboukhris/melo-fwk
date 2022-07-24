@@ -17,22 +17,23 @@ class ITradingPolicy:
 
 class BaseTradingPolicy(ITradingPolicy):
 
-	threshold = 1e-2
+	THRESHOLD = 1e-3
 
-	def __init__(self):
+	def __init__(self, threshold=THRESHOLD):
 		super(BaseTradingPolicy, self).__init__()
+		self.threshold = threshold
 
 	def enter_trade_predicat(self, forecast: float):
 		self.forecasts.append(forecast)
-		return not (-BaseTradingPolicy.threshold < forecast < BaseTradingPolicy.threshold)
+		return not (-self.threshold < forecast < self.threshold)
 
 	def exit_trade_predicat(self, forecast: float):
 		self.forecasts.append(forecast)
-		return -BaseTradingPolicy.threshold < forecast < BaseTradingPolicy.threshold
+		return -self.threshold < forecast < self.threshold
 
 	def turnover_predicat(self, forecast: float):
-		turnover = forecast * self.forecasts[-1] < 0
 		self.forecasts.append(forecast)
+		turnover = forecast * self.forecasts[-1] < 0
 		return turnover
 
 

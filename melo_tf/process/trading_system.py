@@ -56,6 +56,7 @@ class TradingSystem:
 		]
 		self.time_index = 0
 		self.order_book = []
+		self.forecast_history = []
 		self.current_trade = TradingSystem.EMPTY_TRADE
 		self.data_source = data_source
 		self.trading_rules = trading_rules
@@ -67,6 +68,7 @@ class TradingSystem:
 	def reset(self):
 		self.time_index = 0
 		self.order_book = []
+		self.forecast_history = []
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
 	def is_trade_open(self):
@@ -79,6 +81,8 @@ class TradingSystem:
 		return self.current_trade.side == Order.Side.SHORT
 
 	def open_trade(self, forecast: float, entry_time: str):
+		# this should be done in Order class
+		# use PositionSizePolicy to compute position size depending on vol target config
 		self.current_trade.status = Order.Status.OPEN
 		self.current_trade.side = Order.Side.BUY if forecast > 0 else Order.Side.SELL
 		self.current_trade.forecast[0] = forecast
@@ -87,7 +91,7 @@ class TradingSystem:
 		self.logger.info(f"Opened Trade {self.current_trade}")
 
 	def close_trade(self, forecast: float, exit_time: str):
-		# update open trade values
+		# update open trade values should be done in Order class
 		self.current_trade.status = Order.Status.CLOSED
 		self.current_trade.forecast[1] = forecast
 		self.current_trade.close_ts = exit_time
@@ -124,7 +128,7 @@ class TradingSystem:
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
-		open_close_diff = self.data_source.get_current_diff()
+		open_close_diff = self.data_source.get_current_diff() * self.current_trade.quantity  # * leverage - costs # ultimately use a pricing object
 		profit["Balance"] += open_close_diff if self.is_position_long() else -open_close_diff
 		self.accout.append(profit)
 
@@ -146,6 +150,10 @@ class TradingSystem:
 			return
 
 		forecast = self.forecast()
+		self.forecast_history.append({
+			"Date": self.data_source.get_current_date(),
+			"Forecast": forecast
+		})
 
 		if not self.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
 			self.open_trade(forecast, self.data_source.get_current_date())

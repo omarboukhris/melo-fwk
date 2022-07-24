@@ -25,7 +25,7 @@ class EWMATradingRule(tr.ITradingRule):
 		fast_ewma = data["Close"].ewm(span=int(self.hyper_params["fast_span"])).mean().to_numpy()
 		slow_ewma = data["Close"].ewm(span=int(self.hyper_params["slow_span"])).mean().to_numpy()
 
-		std = data["Close"].ewm(span=int(self.hyper_params["fast_span"])).std().to_numpy()
+		std = data["Close"].ewm(span=25).std().to_numpy()
 
 		ewma = fast_ewma - slow_ewma
 

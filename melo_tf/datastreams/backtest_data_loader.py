@@ -21,6 +21,12 @@ class BacktestDataLoader:
 
 	@staticmethod
 	def get_products(path: str):
+		""" Globs historic data files and prepares them in a list
+		of instruments to trade
+
+		:param path: to glob files from
+		:return: list of products with each product a key/value pair = {"name", "datasource"}
+		"""
 		product_path_list = glob.glob(path)
 		output = []
 		for path in product_path_list:
@@ -37,7 +43,10 @@ class BacktestDataLoader:
 	def get_mock_datastream(_: dict):
 		mock_dict = {
 			"Date": [i for i in range(BacktestDataLoader.mock_datastream_length)],
-			"Close": [i for i in range(BacktestDataLoader.mock_datastream_length)]
+			"Close": [i for i in range(BacktestDataLoader.mock_datastream_length)],
+			"Open": [i for i in range(BacktestDataLoader.mock_datastream_length)],
+			"High": [i for i in range(BacktestDataLoader.mock_datastream_length)],
+			"Low": [i for i in range(BacktestDataLoader.mock_datastream_length)],
 		}
 		mock_df = pd.DataFrame(mock_dict)
 		return mock_df, ds.PandasDataStream("mock", mock_df)
