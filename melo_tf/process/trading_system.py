@@ -25,6 +25,13 @@ class TradingSystem:
 	- a set of trading rules
 	- a set of forcast weights (sum(w_i) == 1)
 	- a policy for entering/exiting trades
+
+	Coming up :
+	- a Sizing policy used for volatility targetting
+		Should do sanity checks like checking vol is not too low
+	- Balance update / Mark to Market object for modular PnL calculations
+		would have account history
+		PnL computation
 	"""
 
 	EMPTY_TRADE = Order.empty()
@@ -71,6 +78,7 @@ class TradingSystem:
 		self.forecast_history = []
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
+	# these should go to Order class in melo-db
 	def is_trade_open(self):
 		return self.current_trade.status == Order.Status.OPEN
 
@@ -81,27 +89,22 @@ class TradingSystem:
 		return self.current_trade.side == Order.Side.SHORT
 
 	def open_trade(self, forecast: float, entry_time: str):
-		# this should be done in Order class
-		# use PositionSizePolicy to compute position size depending on vol target config
-		self.current_trade.status = Order.Status.OPEN
-		self.current_trade.side = Order.Side.BUY if forecast > 0 else Order.Side.SELL
-		self.current_trade.forecast[0] = forecast
-		self.current_trade.open_ts = entry_time
+		self.current_trade.open_trade(forecast, entry_time)
+
+		# submit open order
 
 		self.logger.info(f"Opened Trade {self.current_trade}")
 
 	def close_trade(self, forecast: float, exit_time: str):
-		# update open trade values should be done in Order class
-		self.current_trade.status = Order.Status.CLOSED
-		self.current_trade.forecast[1] = forecast
-		self.current_trade.close_ts = exit_time
+		self.current_trade.close_trade(forecast, exit_time)
 		self.update_balance()
+
+		# submit close order
 
 		self.logger.info(f"Closed Trade {self.current_trade}")
 
-		# add to order book and clean temporary
-		self.order_book.append(copy.deepcopy(self.current_trade))
-		# self.order_book.append(self.current_trade)
+		# add to order book and clean
+		self.order_book.append(self.current_trade)
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
 	def forecast(self):
