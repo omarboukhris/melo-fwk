@@ -28,8 +28,7 @@ class BaseTradingPolicy(ITradingPolicy):
 		return not (-self.threshold < forecast < self.threshold)
 
 	def exit_trade_predicat(self, forecast: float):
-		self.forecasts.append(forecast)
-		return -self.threshold < forecast < self.threshold
+		return not self.enter_trade_predicat(forecast)
 
 	def turnover_predicat(self, forecast: float):
 		self.forecasts.append(forecast)

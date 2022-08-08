@@ -78,16 +78,6 @@ class TradingSystem:
 		self.forecast_history = []
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
-	# these should go to Order class in melo-db
-	def is_trade_open(self):
-		return self.current_trade.status == Order.Status.OPEN
-
-	def is_position_long(self):
-		return self.current_trade.side == Order.Side.LONG
-
-	def is_position_short(self):
-		return self.current_trade.side == Order.Side.SHORT
-
 	def open_trade(self, forecast: float, entry_time: str):
 		self.current_trade.open_trade(forecast, entry_time)
 
@@ -131,8 +121,8 @@ class TradingSystem:
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
-		open_close_diff = self.data_source.get_current_diff() * self.current_trade.quantity  # * leverage - costs # ultimately use a pricing object
-		profit["Balance"] += open_close_diff if self.is_position_long() else -open_close_diff
+		open_close_diff = self.data_source.get_current_diff() * self.current_trade.quantity  # * leverage
+		profit["Balance"] += open_close_diff if self.current_trade.is_position_long() else -open_close_diff
 		self.accout.append(profit)
 
 	def simulation_ended(self):
@@ -158,7 +148,7 @@ class TradingSystem:
 			"Forecast": forecast
 		})
 
-		if not self.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
+		if not self.current_trade.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
 			self.open_trade(forecast, self.data_source.get_current_date())
 
 		# elif self.trading_policy.turnover_predicat(forecast):
@@ -166,7 +156,7 @@ class TradingSystem:
 		# 	self.open_trade(forecast, self.data_source.get_current_date())
 		# 	self.update_balance()  # or mark to marker
 
-		elif self.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
+		elif self.current_trade.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())
 
 		self.update_balance()  # or mark to market
@@ -176,13 +166,9 @@ class TradingSystem:
 		except StopIteration:
 			pass
 
-	def sharpe_ratio(self):
+	def volatility_normalized_PnL(self):
 		account = np.array(pd.DataFrame(self.accout)["Balance"])
 		return account.mean()/account.std()
-
-		# diff_mean = account.mean() - self.data_source.get_data()["Close"].mean()
-		# diff_std = account.std() - self.data_source.get_data()["Close"].std()
-		# return diff_mean / diff_std
 
 	def run(self):
 		while not self.simulation_ended():
