@@ -14,6 +14,7 @@ class EWMATradingRule(tr.ITradingRule):
 			slow_span
 			scaling_factor
 			cap
+			note: Add vol_lookback
 		"""
 		super(EWMATradingRule, self).__init__(name, hyper_params)
 
@@ -25,7 +26,7 @@ class EWMATradingRule(tr.ITradingRule):
 		fast_ewma = data["Close"].ewm(span=int(self.hyper_params["fast_span"])).mean().to_numpy()
 		slow_ewma = data["Close"].ewm(span=int(self.hyper_params["slow_span"])).mean().to_numpy()
 
-		std = data["Close"].ewm(span=25).std().to_numpy()
+		std = data["Close"].ewm(span=36).std().to_numpy()
 
 		ewma = fast_ewma - slow_ewma
 

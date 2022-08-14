@@ -10,6 +10,9 @@ class DataStream:
 	def get_data(self) -> pd.DataFrame:
 		pass
 
+	def with_daily_returns(self):
+		pass
+
 	def get_current_date(self):
 		pass
 
@@ -20,6 +23,9 @@ class DataStream:
 		pass
 
 	def get_close_at_index(self, timestamp: str):
+		pass
+
+	def get_current_diff(self):
 		pass
 
 	def get_diff_from_index(self, timestamp: str):
@@ -86,6 +92,13 @@ class PandasDataStream(DataStream):
 				raise e
 
 		self.dataframe["Year"] = self.dataframe[self.date_label].apply(parse_date)
+
+	def with_daily_returns(self):
+		# daily_diff = []
+		# for i in range(len(self.dataframe)):
+		# 	daily_diff.append(self.get_diff_from_index(self.dataframe.iloc[i].loc["Date"]))
+		# self.dataframe["Daily_diff"] = daily_diff
+		self.dataframe["Daily_diff"] = self.dataframe["Open"] - self.dataframe["Close"]
 
 	def get_data_by_year(self, y: int):
 		return PandasDataStream(

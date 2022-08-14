@@ -21,6 +21,8 @@ class TestDataStreams:
 		for product in tqdm.tqdm(products):
 			_, pdstream = BacktestDataLoader.get_product_datastream(product)
 			pdstream.parse_date_column()
+			pdstream.with_daily_returns()
+			# print(pdstream.get_data()[["Date", "Close", "daily_diff"]])
 
 			for y in years:
 				yearly_pdstream = pdstream.get_data_by_year(y)
@@ -30,6 +32,7 @@ class TestDataStreams:
 				for tick in yearly_pdstream:
 					TestDataStreams.quick_sanity_check(pdstream, product, tick)
 					assert pdstream.get_diff_from_index(tick["Date"]) == y
+
 
 	@staticmethod
 	def quick_sanity_check(pdstream, product, tick):
