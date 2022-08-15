@@ -7,6 +7,7 @@ from melodb.loggers import ILogger
 from melodb.Order import Order
 
 from process.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
+from process.policies.vol_target_policy import ConstSizePolicy, ISizePolicy
 
 
 class TradingSystem:
@@ -44,6 +45,7 @@ class TradingSystem:
 		data_source,
 		trading_rules: list,
 		forecast_weights: list,
+		size_policy: ISizePolicy = ConstSizePolicy(),
 		trading_policy: ITradingPolicy = BaseTradingPolicy(),
 		logger: ILogger = ILogger(component_name)
 	):
@@ -68,6 +70,7 @@ class TradingSystem:
 		self.data_source = data_source
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights
+		self.size_policy = size_policy
 		self.trading_policy = trading_policy
 
 		self.logger.info(f"Trading System for data source '{self.data_source.name}' initialized")
@@ -79,7 +82,8 @@ class TradingSystem:
 		self.current_trade = TradingSystem.EMPTY_TRADE
 
 	def open_trade(self, forecast: float, entry_time: str):
-		self.current_trade.open_trade(forecast, entry_time)
+		size = self.size_policy.position_size(forecast)
+		self.current_trade.open_trade(forecast, size, entry_time)
 
 		# submit open order
 

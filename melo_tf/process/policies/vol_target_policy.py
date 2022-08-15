@@ -21,9 +21,18 @@ class VolTarget:
 			f"daily cash vol target : {self.daily_cash_vol_target()}\n"
 
 
-class VolTargetSizePolicy:
+class ISizePolicy:
+	def position_size(self, forecast: float) -> float:
+		pass
+
+class ConstSizePolicy(ISizePolicy):
+	def position_size(self, forecast: float) -> float:
+		return 1.0
+
+class VolTargetSizePolicy(ISizePolicy):
 
 	def __init__(self, datastream, risk_policy: VolTarget):
+		super(VolTargetSizePolicy, self).__init__()
 		self.datastream = datastream
 		self.risk_policy = risk_policy
 
