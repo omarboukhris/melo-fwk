@@ -51,7 +51,7 @@ def run_trading_rule_loop(product):
 		"scale": 6,
 		"cap": 20,
 	}
-	ewma = EWMATradingRule("ewma", ewma_params)
+	ewma = EWMATradingRule(**ewma_params)
 
 	output_forcast = []
 	for _ in pds:
@@ -106,7 +106,7 @@ def run_trading_loop(product):
 		"scale": 6,
 		"cap": 20,
 	}
-	sma = EWMATradingRule("sma", sma_params)
+	sma = EWMATradingRule(**sma_params)
 
 	tr_sys = ts.TradingSystem(
 		balance=0,

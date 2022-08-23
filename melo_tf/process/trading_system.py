@@ -26,13 +26,6 @@ class TradingSystem:
 	- a set of trading rules
 	- a set of forcast weights (sum(w_i) == 1)
 	- a policy for entering/exiting trades
-
-	Coming up :
-	- a Sizing policy used for volatility targetting
-		Should do sanity checks like checking vol is not too low
-	- Balance update / Mark to Market object for modular PnL calculations
-		would have account history
-		PnL computation
 	"""
 
 	EMPTY_TRADE = Order.empty()

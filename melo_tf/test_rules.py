@@ -43,7 +43,7 @@ class TestRules:
 				"scale": metaparams["scale"],
 				"cap": metaparams["cap"],
 			}
-			ewma_tr = RuleClass(rule_name, params)
+			ewma_tr = RuleClass(**params)
 
 			for _ in tqdm.tqdm(range(metaparams["iterations"])):
 				input_df, pds = DataLoader_fn(product)

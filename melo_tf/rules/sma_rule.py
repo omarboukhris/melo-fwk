@@ -1,37 +1,36 @@
 
-import rules.trade_rule as tr
+from dataclasses import dataclass
 
 import pandas as pd
+import numpy as np
 
-class SMATradingRule(tr.ITradingRule):
-
-	def __init__(self, name: str, hyper_params: dict):
-		"""
-		:param name: Strategy's name
-		:param hyper_params: dict with parameters :
-			fast_span
-			slow_span
-			scaling_factor
-			cap
-		"""
-		super(SMATradingRule, self).__init__(name, hyper_params)
+@dataclass(frozen=True)
+class SMATradingRule:
+	fast_span: int
+	slow_span: int
+	scale: float
+	cap: float
 
 	def forecast(self, data: pd.DataFrame):
 		"""
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_sma = data["Close"].rolling(int(self.hyper_params["fast_span"])).mean()
-		slow_sma = data["Close"].rolling(int(self.hyper_params["slow_span"])).mean()
+		fast_sma = data["Close"].rolling(int(self.fast_span)).mean().to_numpy()
+		slow_sma = data["Close"].rolling(int(self.slow_span)).mean().to_numpy()
 
-		sma = fast_sma.iloc[-1] - slow_sma.iloc[-1]
-		# sma = fast_sma.mean() - slow_sma.mean()  # this is whole thing needs to be fire proofed
+		std = data["Close"].rolling(25).std().to_numpy()
 
-		# forecast_value = self.hyper_params["scale"] * (sma / slow_sma.std())
-		forecast_value = sma
+		sma = fast_sma - slow_sma
+
+		np.seterr(invalid="ignore")
+		forecast_vect = self.scale * (sma / std)
+		np.seterr(invalid="warn")
+
+		forecast_value = forecast_vect[-1]
 		if forecast_value > 0:
-			forecast_value = min(forecast_value, self.hyper_params["cap"])
+			forecast_value = min(forecast_value, self.cap)
 		else:
-			forecast_value = max(forecast_value, -self.hyper_params["cap"])
+			forecast_value = max(forecast_value, -self.cap)
 
 		return forecast_value

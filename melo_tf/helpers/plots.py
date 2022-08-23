@@ -6,6 +6,8 @@ import matplotlib.dates as mdates
 
 class AbstractPlotter:
 	def __init__(self, dataframe: pd.DataFrame, twinx_dataframe: pd.DataFrame = None):
+		self.fig = None
+		self.ax1, self.ax2 = None, None
 		self.df = dataframe
 		self.twin_df = twinx_dataframe
 		self.ylim = None
@@ -45,21 +47,22 @@ class AbstractPlotter:
 	def save_png(self, filename: str):
 		def save_fig():
 			plt.savefig(filename)
+			plt.close(self.fig)
 			plt.close()
 		self._render(save_fig)
 
 	def plot(self):
-		_, ax = plt.subplots()
-		return ax
+		_, self.ax1 = plt.subplots()
 
 	def plot_twinx(self):
-		_, ax1 = plt.subplots()
-		ax2 = ax1.twinx()
-		return ax1, ax2
+		_, self.ax1 = plt.subplots()
+		self.ax2 = self.ax1.twinx()
+		return self.ax1, self.ax2
 
 	def show(self):
 		def show_plot():
 			plt.show()
+			plt.close(self.fig)
 			plt.close()
 		self._render(show_plot)
 
@@ -68,44 +71,44 @@ class AccountPlotter(AbstractPlotter):
 		super(AccountPlotter, self).__init__(dataframe, twinx_dataframe)
 
 	def plot(self):
-		_, ax = plt.subplots()
+		self.fig, self.ax1 = plt.subplots()
 		self.ylim = self.df[["Balance"]].max(), self.df[["Balance"]].min()
-		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Balance"], ax=ax)
-		return ax
+		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Balance"], ax=self.ax1)
+		return self.ax1
 
 	def plot_twinx(self):
-		_, ax1 = plt.subplots()
-		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Balance"], ax=ax1, color="blue")
-		ax2 = ax1.twinx()
-		AbstractPlotter.plot_df(self.twin_df, x_label="Date", y_label=["Close"], ax=ax2, color="green")
-		return ax1, ax2
+		self.fig, self.ax1 = plt.subplots()
+		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Balance"], ax=self.ax1, color="blue")
+		self.ax2 = self.ax1.twinx()
+		AbstractPlotter.plot_df(self.twin_df, x_label="Date", y_label=["Close"], ax=self.ax2, color="green")
+		return self.ax1, self.ax2
 
 class PricePlotter(AbstractPlotter):
 	def __init__(self, dataframe: pd.DataFrame):
 		super(PricePlotter, self).__init__(dataframe)
 
 	def plot(self):
-		_, ax = plt.subplots()
+		self.fig, self.ax1 = plt.subplots()
 		self.ylim = self.df[["Close"]].max(), self.df[["Close"]].min()
-		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=['Open', 'High', 'Low', 'Close'], ax=ax)
-		return ax
+		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=['Open', 'High', 'Low', 'Close'], ax=self.ax1)
+		return self.ax1
 
 class ForecastPlotter(AbstractPlotter):
 	def __init__(self, dataframe: pd.DataFrame, twinx_dataframe: pd.DataFrame = None):
 		super(ForecastPlotter, self).__init__(dataframe, twinx_dataframe)
 
 	def plot(self):
-		_, ax = plt.subplots()
+		self.fig, self.ax1 = plt.subplots()
 		self.ylim = self.df[["Forecast"]].max(), self.df[["Forecast"]].min()
-		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Forecast"], ax=ax)
-		return ax
+		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Forecast"], ax=self.ax1)
+		return self.ax1
 
 	def plot_twinx(self):
-		_, ax1 = plt.subplots()
-		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Forecast"], ax=ax1, color="blue")
-		ax2 = ax1.twinx()
-		AbstractPlotter.plot_df(self.twin_df, x_label="Date", y_label=["Close"], ax=ax2, color="green")
-		return ax1, ax2
+		self.fig, self.ax1 = plt.subplots()
+		AbstractPlotter.plot_df(self.df, x_label="Date", y_label=["Forecast"], ax=self.ax1, color="blue")
+		self.ax2 = self.ax1.twinx()
+		AbstractPlotter.plot_df(self.twin_df, x_label="Date", y_label=["Close"], ax=self.ax2, color="green")
+		return self.ax1, self.ax2
 
 	def add_vlines(self, order_book: pd.DataFrame):
 		for _, order in order_book.iterrows():
