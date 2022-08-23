@@ -8,14 +8,16 @@ import tqdm
 
 from typing import List
 
-class TestRules:
+import unittest
+
+class TestRulesHelper:
 
 	ewma_meta_default = {
 		"fast": 2,
 		"slow": 8,
 		"multiplier": 1.9,
 		"iterations": 6,
-		"scale": 2,
+		"scale": 20,
 		"cap": 20
 	}
 
@@ -43,12 +45,11 @@ class TestRules:
 				"scale": metaparams["scale"],
 				"cap": metaparams["cap"],
 			}
-			ewma_tr = RuleClass(**params)
 
 			for _ in tqdm.tqdm(range(metaparams["iterations"])):
+				ewma_tr = RuleClass(**params)
 				input_df, pds = DataLoader_fn(product)
-
-				simulation_result_df = pd.DataFrame(TestRules.run_simulation(ewma_tr, pds))
+				simulation_result_df = pd.DataFrame(TestRulesHelper.run_simulation(ewma_tr, pds))
 				plotter = ForecastPlotter(simulation_result_df, input_df)
 				plotter.plot_twinx()
 				plotter.save_png(f"data/residual/{rule_name}_{product['name']}_{int(params['fast_span'])}_{int(params['slow_span'])}.png")
@@ -58,7 +59,7 @@ class TestRules:
 
 	@staticmethod
 	def test_ewma_with_residue(product_list: List[dict], ewma_metaparams: dict):
-		TestRules.test_moving_average_with_residue(
+		TestRulesHelper.test_moving_average_with_residue(
 			product_list,
 			ewma_metaparams,
 			"ewma",
@@ -67,7 +68,7 @@ class TestRules:
 
 	@staticmethod
 	def test_sma_with_residue(product_list: List[dict], sma_metaparams: dict):
-		TestRules.test_moving_average_with_residue(
+		TestRulesHelper.test_moving_average_with_residue(
 			product_list,
 			sma_metaparams,
 			"sma",
@@ -76,7 +77,7 @@ class TestRules:
 
 	@staticmethod
 	def test_mock_ewma_with_residue(product_list: List[dict], ewma_metaparams: dict):
-		TestRules.test_moving_average_with_residue(
+		TestRulesHelper.test_moving_average_with_residue(
 			product_list,
 			ewma_metaparams,
 			"ewma",
@@ -85,7 +86,7 @@ class TestRules:
 
 	@staticmethod
 	def test_mock_sma_with_residue(product_list: List[dict], sma_metaparams: dict):
-		TestRules.test_moving_average_with_residue(
+		TestRulesHelper.test_moving_average_with_residue(
 			product_list,
 			sma_metaparams,
 			"sma",
@@ -104,42 +105,40 @@ class TestRules:
 				})
 		return output_forcast
 
-
-def test_ewma(products: List[dict]):
-	ewma_meta = TestRules.ewma_meta_default
-	TestRules.test_ewma_with_residue(
-		products,
-		ewma_meta
-	)
-
-
-def test_sma(products: List[dict]):
-	sma_meta = TestRules.ewma_meta_default
-	TestRules.test_sma_with_residue(
-		products,
-		sma_meta,
-	)
+class RulesUnitTest(unittest.TestCase):
+	def test_ewma(self):
+		products = btdl.BacktestDataLoader.get_products("data/Stocks/*1d_10y.csv")
+		ewma_meta = TestRulesHelper.ewma_meta_default
+		TestRulesHelper.test_ewma_with_residue(
+			products,
+			ewma_meta
+		)
 
 
-def test_mock_ewma():
-	ewma_meta = TestRules.ewma_meta_default
-	TestRules.test_mock_ewma_with_residue(
-		[{"name": "mock"}],
-		ewma_meta
-	)
+	def test_sma(self):
+		products = btdl.BacktestDataLoader.get_products("data/Stocks/*1d_10y.csv")
+		sma_meta = TestRulesHelper.ewma_meta_default
+		TestRulesHelper.test_sma_with_residue(
+			products,
+			sma_meta,
+		)
 
 
-def test_mock_sma():
-	sma_meta = TestRules.ewma_meta_default
-	TestRules.test_mock_sma_with_residue(
-		[{"name": "mock"}],
-		sma_meta,
-	)
+	def test_mock_ewma(self):
+		ewma_meta = TestRulesHelper.ewma_meta_default
+		TestRulesHelper.test_mock_ewma_with_residue(
+			[{"name": "mock"}],
+			ewma_meta
+		)
+
+
+	def test_mock_sma(self):
+		sma_meta = TestRulesHelper.ewma_meta_default
+		TestRulesHelper.test_mock_sma_with_residue(
+			[{"name": "mock"}],
+			sma_meta,
+		)
 
 
 if __name__ == "__main__":
-
-	products_list = btdl.BacktestDataLoader.get_products("data/Stocks/*1d_10y.csv")
-	test_ewma(products_list)
-	# test_sma(products_list)
-	# test_mock_sma()
+	unittest.main()

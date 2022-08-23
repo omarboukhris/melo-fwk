@@ -28,8 +28,6 @@ class TradingSystem:
 	- a policy for entering/exiting trades
 	"""
 
-	EMPTY_TRADE = Order.empty()
-
 	component_name = "TradingSystem"
 
 	def __init__(
@@ -59,7 +57,7 @@ class TradingSystem:
 		self.time_index = 0
 		self.order_book = []
 		self.forecast_history = []
-		self.current_trade = TradingSystem.EMPTY_TRADE
+		self.current_trade = Order.empty()
 		self.data_source = data_source
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights
@@ -72,7 +70,7 @@ class TradingSystem:
 		self.time_index = 0
 		self.order_book = []
 		self.forecast_history = []
-		self.current_trade = TradingSystem.EMPTY_TRADE
+		self.current_trade = Order.empty()
 
 	def open_trade(self, forecast: float, entry_time: str):
 		size = self.size_policy.position_size(forecast)
@@ -84,7 +82,7 @@ class TradingSystem:
 
 	def close_trade(self, forecast: float, exit_time: str):
 		self.current_trade.close_trade(forecast, exit_time)
-		self.update_balance()
+		self.mark_to_market()
 
 		# submit close order
 
@@ -92,7 +90,7 @@ class TradingSystem:
 
 		# add to order book and clean
 		self.order_book.append(self.current_trade)
-		self.current_trade = TradingSystem.EMPTY_TRADE
+		self.current_trade = Order.empty()
 
 	def forecast(self):
 		s = 0
@@ -110,11 +108,7 @@ class TradingSystem:
 		orderbook_dict = [order.to_dict() for order in self.order_book]
 		return pd.DataFrame(orderbook_dict)
 
-	def update_balance(self):
-		"""
-		implemented continous trading
-		should rename class to continuous trading system
-		"""
+	def mark_to_market(self):
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
 		profit["Balance"] = self.accout[-1]["Balance"]
@@ -148,15 +142,10 @@ class TradingSystem:
 		if not self.current_trade.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
 			self.open_trade(forecast, self.data_source.get_current_date())
 
-		# elif self.trading_policy.turnover_predicat(forecast):
-		# 	self.close_trade(forecast, self.data_source.get_current_date())
-		# 	self.open_trade(forecast, self.data_source.get_current_date())
-		# 	self.update_balance()  # or mark to marker
-
 		elif self.current_trade.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())
 
-		self.update_balance()  # or mark to market
+		self.mark_to_market()
 
 		try:
 			self.data_source.next()

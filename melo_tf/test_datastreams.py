@@ -4,7 +4,9 @@ import tqdm
 
 from typing import List
 
-class TestDataStreams:
+import unittest
+
+class TestDataStreamsHelper:
 
 	@staticmethod
 	def test_mock_datastream(products: List[dict]):
@@ -42,20 +44,26 @@ class TestDataStreams:
 			f"dates are different: {pdstream.get_open()} // {tick['Open']} in product {product['name']}"
 
 
+class DataStreamUnitTests(unittest.TestCase):
+
+	def test_mock_datastream(self):
+		TestDataStreamsHelper.test_mock_datastream(
+			BacktestDataLoader.get_sanitized_commodities()
+		)
+
+	def test_datastream_stocks(self):
+		TestDataStreamsHelper.test_datastream(
+			BacktestDataLoader.get_products("data/Stocks/*.csv"),
+			[str(i) for i in range(2000, 2022)]
+		)
+
+	def test_datastream_commodities(self):
+		TestDataStreamsHelper.test_datastream(
+			BacktestDataLoader.get_sanitized_commodities(),
+			[str(i) for i in range(2000, 2022)]
+		)
+
+
 if __name__ == "__main__":
-	TestDataStreams.test_mock_datastream(
-		BacktestDataLoader.get_sanitized_commodities()
-	)
-
-	TestDataStreams.test_datastream(
-		BacktestDataLoader.get_products("data/Stocks/*.csv"),
-		[str(i) for i in range(2000, 2022)]
-	)
-
-	TestDataStreams.test_datastream(
-		BacktestDataLoader.get_sanitized_commodities(),
-		[str(i) for i in range(2000, 2022)]
-	)
-
-
+	unittest.main()
 
