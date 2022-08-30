@@ -20,6 +20,14 @@ class BacktestDataLoader:
 		return BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
 
 	@staticmethod
+	def get_sanitized_commodity_hloc_datastream(product: str):
+		product_list = BacktestDataLoader.get_products(f"data/CommodityData/{product}_sanitized.csv")
+		assert len(product_list) == 1, \
+			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
+
+		return BacktestDataLoader.get_product_datastream(product_list[0])
+
+	@staticmethod
 	def get_products(path: str):
 		""" Globs historic data files and prepares them in a list
 		of instruments to trade
@@ -37,7 +45,7 @@ class BacktestDataLoader:
 	@staticmethod
 	def get_product_datastream(product: dict):
 		input_df = pd.read_csv(product["datasource"])
-		return input_df, ds.PandasDataStream(product["name"], input_df)
+		return input_df, ds.HLOCDataStream(input_df)
 
 	@staticmethod
 	def get_mock_datastream(_: dict):
@@ -49,4 +57,4 @@ class BacktestDataLoader:
 			"Low": [i for i in range(BacktestDataLoader.mock_datastream_length)],
 		}
 		mock_df = pd.DataFrame(mock_dict)
-		return mock_df, ds.PandasDataStream("mock", mock_df)
+		return mock_df, ds.HLOCDataStream(mock_df)

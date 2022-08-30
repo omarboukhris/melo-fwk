@@ -13,7 +13,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def test_empty_trading_system(self):
 		df = pd.read_csv("data/CommodityData/Cocoa_sanitized.csv")
 
-		pds = ds.PandasDataStream(name="test_empty_tsys", dataframe=df)
+		pds = ds.HLOCDataStream(dataframe=df)
 
 		tr_sys = ts.TradingSystem(
 			balance=10000,
@@ -32,8 +32,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 		def process_tick(_):
 			pass
 
-		pdstream = ds.PandasDataStream(
-			name="FB_test",
+		pdstream = ds.HLOCDataStream(
 			dataframe=pd.read_csv("data/CommodityData/Cocoa_sanitized.csv"))
 
 		for tick in pdstream:

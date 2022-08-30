@@ -20,7 +20,9 @@ def parse_cfg(filename: str):
 
 
 if __name__ == "__main__":
-	cfg = parse_cfg("../data/ConfigPoints/draft.yaml")
-	mysql = MySql(**cfg["mysqldatabase"])
-	print(mysql)
-	print(cfg["complexData"])
+	# cfg = parse_cfg("../data/ConfigPoints/draft.yaml")
+	# mysql = MySql(**cfg["mysqldatabase"])
+	# print(mysql)
+	# print(cfg["complexData"])
+	cfg = parse_cfg("../data/ConfigPoints/mvpWorkflow.yaml")
+	print(cfg)

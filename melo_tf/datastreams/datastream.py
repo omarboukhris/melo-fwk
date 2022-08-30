@@ -3,76 +3,16 @@ import pandas as pd
 
 import datetime as dt
 
-class DataStream:
-	def __init__(self, name: str):
-		self.name = name
-
-	def get_data(self) -> pd.DataFrame:
-		pass
-
-	def with_daily_returns(self):
-		pass
-
-	def get_current_date(self):
-		pass
-
-	def get_open(self):
-		pass
-
-	def get_close(self):
-		pass
-
-	def get_close_at_index(self, timestamp: str):
-		pass
-
-	def get_current_diff(self):
-		pass
-
-	def get_diff_from_index(self, timestamp: str):
-		pass
-
-	def get_high(self):
-		pass
-
-	def get_low(self):
-		pass
-
-	def get_current_time_index(self):
-		pass
-
-	def get_window(self):
-		pass
-
-	def limit_reached(self):
-		pass
-
-	def next(self):
-		"""
-		DataSource next() method should request live data from market with online datastream
-		"""
-
-		return self.__next__()
-
-	def __iter__(self):
-		return self
-
-	def __next__(self):
-		pass
-
-
-class PandasDataStream(DataStream):
-	"""This class is used to iterate over Yahoo Finance data wrapped in a Pandas Data Frame"""
+class HLOCDataStream:
+	"""This class is used to wrap HLOC Data Frames in a class and to offer some HLOC operations interface"""
 
 	def __init__(
 		self,
-		name: str,
 		dataframe: pd.DataFrame,
 		offset: int = 0,
 		reverse: bool = False,
 		date_label: str = "Date",
 		window_size: int = 70):
-
-		super(PandasDataStream, self).__init__(name)
 
 		self.dataframe = dataframe
 		self.offset = offset
@@ -94,15 +34,10 @@ class PandasDataStream(DataStream):
 		self.dataframe["Year"] = self.dataframe[self.date_label].apply(parse_date)
 
 	def with_daily_returns(self):
-		# daily_diff = []
-		# for i in range(len(self.dataframe)):
-		# 	daily_diff.append(self.get_diff_from_index(self.dataframe.iloc[i].loc["Date"]))
-		# self.dataframe["Daily_diff"] = daily_diff
-		self.dataframe["Daily_diff"] = self.dataframe["Open"] - self.dataframe["Close"]
+		self.dataframe["Daily_diff"] = self.dataframe["Close"].diff()
 
 	def get_data_by_year(self, y: int):
-		return PandasDataStream(
-			name=self.name,
+		return HLOCDataStream(
 			dataframe=self.dataframe.loc[
 				self.dataframe["Year"] == y,
 			],
@@ -149,21 +84,21 @@ class PandasDataStream(DataStream):
 		return self.get_diff_from_index(self.get_current_date())
 
 	def get_diff_from_index(self, timestamp: str):
-		""" Computes difference between two successive timestamps """
+		""" Fetch difference between two successive timestamps """
 		x = self.dataframe.index[self.dataframe[self.date_label] == timestamp].to_numpy()
-		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
+		assert len(x) == 1, f"(AssertionError) Timestamp is invalid, date not found or not unique {x}"
 
 		if x == 0:
 			return 0
-		t1, t2 = self.dataframe.iloc[x-1]["Close"].to_numpy(), self.dataframe.iloc[x]["Close"].to_numpy()
-		assert t1.shape == t2.shape and t1.shape == (1,), f"PandasDataStream.get_diff_from_index : {t1} vs {t2}"
+		diff = self.dataframe.iloc[x]["Daily_diff"].to_numpy()
+		assert diff.shape == (1,), f"PandasDataStream.get_diff_from_index : {t1} vs {t2}"
 
-		return (t2-t1)[0]
+		return diff[0] if diff[0] is not None else 0
 
-	def get_high(self):
+	def get_current_high(self):
 		return self.dataframe.iloc[self.time_idx]["High"]
 
-	def get_low(self):
+	def get_current_low(self):
 		return self.dataframe.iloc[self.time_idx]["Low"]
 
 	def get_current_time_index(self):
