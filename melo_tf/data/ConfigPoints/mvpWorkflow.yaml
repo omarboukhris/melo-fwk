@@ -1,38 +1,40 @@
 
 process: "full trade 1 product"
 
-type: "backtest" # or bt / prd-prod for production
+type: backtest # or bt / prd-prod for production
 # opt for optimisation ?
+# heatmap - cov mat
 
 product:
-  type: "commodity"
-  name: "Gold"
+  type: commodity
+  resolution: 1d
+  name: Gold
 
 strategy:
   - type: EWMATradingRule
-    fast_span: 20
-    slow_span: 80
+    fast-span: 20
+    slow-span: 80
     scale: 10
     cap: 20
 
   - type: SMATradingRule
-    fast_span: 20
-    slow_span: 80
+    fast-span: 20
+    slow-span: 80
     scale: 10
     cap: 20
 
-forecast-weigt:
+forecast-weight:
   - 0.5
   - 0.5
 
-vol-target: 0.5
+vol-target:
+  annual-vol-target: 0.5
+  trading-capital: 10000
 
 size-policy: VolTargetSizePolicy
 
-output:
-  - orderbook
-  - pnl
-  - sharpe-ratio
-# ...
-
-
+#output:
+#  - orderbook
+#  - pnl
+#  - sharpe-ratio
+## ...
