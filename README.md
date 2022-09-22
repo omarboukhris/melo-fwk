@@ -24,7 +24,7 @@ pip install dependencies then pip install this repo
 
 ## Usage
 
-Tutorial on Mql is coocking
+Tutorial on Mql is cooking
 
 ## Project status
 Ongoing
