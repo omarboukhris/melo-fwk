@@ -6,10 +6,10 @@ import numpy as np
 
 @dataclass(frozen=True)
 class EWMATradingRule:
-	fast_span: int
-	slow_span: int
-	scale: float
-	cap: float
+	fast_span: int = 0
+	slow_span: int = 0
+	scale: float = 0
+	cap: float = 0
 
 	def forecast(self, data: pd.DataFrame):
 		"""

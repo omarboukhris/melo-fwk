@@ -5,7 +5,7 @@ from process.policies import vol_target_policy
 from typing import List
 from copy import deepcopy
 
-from quantfactory_registry import quantflow_factory
+from melo_tf.mql_parser import quantflow_factory
 
 
 @dataclass(frozen=True)
@@ -61,12 +61,3 @@ output will be raw data :
 should code something like an output formatter
 
 """
-
-"""
-For cov_mat and portfolio opt:
-	default strategy buy and hold (const 0 < forcast)
-	default size policy const (0 < size) -> null voltarget
-
-"""
-
-

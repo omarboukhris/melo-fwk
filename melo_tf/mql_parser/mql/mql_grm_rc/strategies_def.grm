@@ -1,0 +1,21 @@
+
+StrategiesDef ->
+    strategies. are.
+        lpar. s:StrategyList rpar.
+    with. strategyconfig.
+        lpar. s:StrategyConfigList rpar.
+    and. forecastweights.
+        lpar. s:forecastWeightsList rpar.
+
+StrategyList ->
+    alphanum. |
+    alphanum. comma. |
+[]
+StrategyConfigList ->
+    alphanum. |
+    alphanum. comma. |
+[]
+forecastWeightsList ->
+    numeric. |
+    numeric. comma. |
+[]

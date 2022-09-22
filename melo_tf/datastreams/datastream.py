@@ -28,7 +28,7 @@ class HLOCDataStream:
 			except ValueError:
 				return dt.datetime.strptime(date, "%Y-%m-%d %H:%M:%S%z").year
 			except Exception as e:
-				print(date)
+				print(f"HLOCDataStream can't parse date [{date}]")
 				raise e
 
 		self.dataframe["Year"] = self.dataframe[self.date_label].apply(parse_date)

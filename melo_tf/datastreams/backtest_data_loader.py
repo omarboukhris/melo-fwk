@@ -3,8 +3,13 @@ import glob
 import pandas as pd
 import datastreams.datastream as ds
 
-class BacktestDataLoader:
+from pathlib import Path
 
+"""
+NOTE:  Hardcoded paths, update to pathlib, until then, just call it from module root
+"""
+class BacktestDataLoader:
+	parent_folder = Path(Path(__file__).parent)
 	mock_datastream_length = 1000
 
 	@staticmethod
@@ -35,7 +40,7 @@ class BacktestDataLoader:
 		:param path: to glob files from
 		:return: list of products with each product a key/value pair = {"name", "datasource"}
 		"""
-		product_path_list = glob.glob(path)
+		product_path_list = glob.glob(str(BacktestDataLoader.parent_folder / path))
 		output = []
 		for path in product_path_list:
 			product_name = path.split("/")[-1][:-4]

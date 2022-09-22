@@ -1,0 +1,7 @@
+
+ProductsDef -> !ProductsDefList trade. !instrument.
+ProductsDefList -> s:productType. lpar. s:ProductsList rpar.
+ProductsList ->
+    alphanum. |
+    alphanum. comma. |
+[]

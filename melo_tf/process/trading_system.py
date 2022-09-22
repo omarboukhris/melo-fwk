@@ -37,7 +37,7 @@ class TradingSystem:
 		trading_rules: list,
 		forecast_weights: list,
 		size_policy: ISizePolicy = ConstSizePolicy(),
-		trading_policy: ITradingPolicy = BaseTradingPolicy(),
+		trading_policy: ITradingPolicy = BaseTradingPolicy(),  # add it later to mql
 		logger: ILogger = ILogger(component_name)
 	):
 		self.logger = logger

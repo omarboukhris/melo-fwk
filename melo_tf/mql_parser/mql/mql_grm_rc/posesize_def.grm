@@ -1,0 +1,6 @@
+
+PositionSizing ->
+    voltarget. is. lpar. s:VolTargetCouple rpar.
+    with. sizepolicy. lpar. SizePolicy=alphanum. rpar.
+
+VolTargetCouple -> numeric. comma. numeric.

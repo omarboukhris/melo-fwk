@@ -1,0 +1,16 @@
+
+%import "mql_grm_rc/tokens.grm"
+%import "mql_grm_rc/products_def.grm"
+%import "mql_grm_rc/strategies_def.grm"
+%import "mql_grm_rc/posesize_def.grm"
+%import "mql_grm_rc/process_def.grm"
+
+AXIOM -> QuantQuery
+
+QuantQuery ->
+    with. !ProductsDef
+    where. !StrategiesDef
+    where. !PositionSizing
+    select. !ProcessDef
+    // add output piping and formatting
+
