@@ -1,10 +1,10 @@
-from melo_tf.mql_parser import quantflow_factory
+from mql import quantflow_factory
 
-from process import trading_system
+from melo_tf.process import trading_system
 
-from rules import ewma_rule, sma_rule
+from melo_tf.rules import ewma_rule, sma_rule
 
-from process.policies import vol_target_policy
+from melo_tf.process.policies import vol_target_policy
 
 
 quantflow_factory.QuantFlowFactory.register_workflow("backtest", trading_system.TradingSystem)

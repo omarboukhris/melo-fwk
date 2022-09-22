@@ -13,4 +13,6 @@ QuantQuery ->
     where. !PositionSizing
     select. !ProcessDef
     // add output piping and formatting
+    // add costs and trading policy
 
+    // one rule per workflow or pyramide model
