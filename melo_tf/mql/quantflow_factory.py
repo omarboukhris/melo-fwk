@@ -1,10 +1,15 @@
 
 class QuantFlowFactory:
 
+	products = dict()
 	strategies = dict()
 	workflows = dict()
 	size_policies = dict()
 	result_writers = dict()
+
+	@staticmethod
+	def register_product(product_label: str, product: tuple):
+		QuantFlowFactory.products[product_label] = product
 
 	@staticmethod
 	def register_strategy(strategy_label: str, strategy: callable):

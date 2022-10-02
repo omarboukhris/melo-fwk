@@ -1,5 +1,5 @@
 
-from backtest_data_loader import BacktestDataLoader
+from datastreams.backtest_data_loader import BacktestDataLoader
 
 class CommodityDataLoader:
 

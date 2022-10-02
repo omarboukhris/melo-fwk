@@ -12,7 +12,7 @@ strategyconfig.("strategyConfig")
 voltarget.("volTarget")
 sizepolicy.("sizePolicy")
 select.("select")
-instrument.("future|options|underlying|cfd")
+instrument.("single|sgl|index|idx")
 productType.("Commodities|Stock|Bonds|Forex")
 
 // operators

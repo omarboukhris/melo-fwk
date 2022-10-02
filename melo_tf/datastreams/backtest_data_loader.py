@@ -40,7 +40,8 @@ class BacktestDataLoader:
 		:param path: to glob files from
 		:return: list of products with each product a key/value pair = {"name", "datasource"}
 		"""
-		product_path_list = glob.glob(str(BacktestDataLoader.parent_folder / path))
+		btpath = str(BacktestDataLoader.parent_folder.parent / path)
+		product_path_list = glob.glob(btpath)
 		output = []
 		for path in product_path_list:
 			product_name = path.split("/")[-1][:-4]
@@ -50,7 +51,7 @@ class BacktestDataLoader:
 	@staticmethod
 	def get_product_datastream(product: dict):
 		input_df = pd.read_csv(product["datasource"])
-		return input_df, ds.HLOCDataStream(input_df)
+		return product["datasource"], ds.HLOCDataStream(input_df)
 
 	@staticmethod
 	def get_mock_datastream(_: dict):
