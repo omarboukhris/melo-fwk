@@ -80,8 +80,8 @@ quantflow_factory.QuantFlowFactory.register_strategy("ewmacross", ewma_rule.EWMA
 quantflow_factory.QuantFlowFactory.register_strategy("smacross", sma_rule.SMATradingRule)
 
 
-quantflow_factory.QuantFlowFactory.register_size_policy("voltargetsizepolicy", vol_target_policy.VolTargetSizePolicy)
-quantflow_factory.QuantFlowFactory.register_size_policy("constpolicy", vol_target_policy.ConstSizePolicy)
+quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", vol_target_policy.VolTargetSizePolicy)
+quantflow_factory.QuantFlowFactory.register_size_policy("ConstSizePolicy", vol_target_policy.ConstSizePolicy)
 
 # =============================================================
 # Products Factory Registration

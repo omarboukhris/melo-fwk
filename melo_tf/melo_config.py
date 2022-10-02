@@ -1,29 +1,9 @@
 
 from mql.mql_parser import MqlParser
-from quantfactory_registry import *
+from quantfactory_registry import quantflow_factory
+from process.policies.vol_target_policy import VolTarget
 
-
-class MeloConfigBuilder:
-
-	@staticmethod
-	def build_products(quant_query_dict: dict):
-		stripped_entry = MeloConfigBuilder.strip_single(quant_query_dict, "ProductsDef")
-		products_generator = MeloConfigBuilder.strip_single(stripped_entry, "ProductsDefList")["ProductsGenerator"]
-		instruments = stripped_entry["instrument"]  # if idx build index otherwise trade singles
-
-		output_products = []
-		for prods in products_generator:
-			products_type = MeloConfigBuilder.strip_single(prods, "productType")
-			products_name_list = MeloConfigBuilder.parse_list(prods, "ProductsList")
-			for product_name in products_name_list:
-				output_products.append(ProductConfigBuilder.get_product(products_type, product_name))
-
-		if instruments == "idx":
-			# build index
-			pass
-		# else: trade singles
-		return output_products
-
+class ConfigBuilderHelper:
 	@staticmethod
 	def strip(parsed_dict: dict, key: str):
 		assert key in parsed_dict.keys(), f"Key [{key}] not in Dictionary keys [{parsed_dict.keys()}]"
@@ -32,23 +12,59 @@ class MeloConfigBuilder:
 
 	@staticmethod
 	def strip_single(parsed_dict: dict, key: str):
-		return MeloConfigBuilder.strip(parsed_dict, key)[0]
+		return ConfigBuilderHelper.strip(parsed_dict, key)[0]
 
 	@staticmethod
 	def parse_list(parsed_dict: dict, key: str):
-		str_list = MeloConfigBuilder.strip_single(parsed_dict, key)
+		str_list = ConfigBuilderHelper.strip_single(parsed_dict, key)
 		return [e.strip() for e in str_list.split(",")]
+
+	@staticmethod
+	def parse_num_list(parsed_dict: dict, key: str):
+		str_list = ConfigBuilderHelper.strip_single(parsed_dict, key)
+		return [float(e.strip()) for e in str_list.split(",")]
+
+class SizePolicyConfigBuilder:
+	@staticmethod
+	def build_size_policy(quant_query_dict: dict):
+		position_size_dict = ConfigBuilderHelper.strip_single(quant_query_dict, "PositionSizing")
+
+		size_policy_factory_name = ConfigBuilderHelper.strip_single(position_size_dict, "SizePolicy")
+		assert size_policy_factory_name in quantflow_factory.QuantFlowFactory.size_policies.keys(), \
+			f"{size_policy_factory_name} key is not in [{quantflow_factory.QuantFlowFactory.size_policies.keys()}]"
+		_SizePolicyClass = quantflow_factory.QuantFlowFactory.size_policies[size_policy_factory_name]
+
+		vol_target_cfg = ConfigBuilderHelper.parse_num_list(position_size_dict, "VolTargetCouple")
+		vol_target = VolTarget(*vol_target_cfg)
+		return _SizePolicyClass(vol_target)
 
 
 class ProductConfigBuilder:
+	@staticmethod
+	def build_products(quant_query_dict: dict):
+		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProductsDef")
+		products_generator = ConfigBuilderHelper.strip_single(stripped_entry, "ProductsDefList")["ProductsGenerator"]
+		instruments = stripped_entry["instrument"]  # if idx build index otherwise trade singles
+
+		output_products = []
+		for prods in products_generator:
+			products_type = ConfigBuilderHelper.strip_single(prods, "productType")
+			products_name_list = ConfigBuilderHelper.parse_list(prods, "ProductsList")
+			for product_name in products_name_list:
+				output_products.append(ProductConfigBuilder._get_product(products_type, product_name))
+
+		if instruments == "idx":
+			# build index
+			pass
+		# else: trade singles
+		return output_products
 
 	@staticmethod
-	def get_product(products_type: str, product_name: str) -> tuple:
+	def _get_product(products_type: str, product_name: str) -> tuple:
 		product_factory_name = f"{products_type}.{product_name}"
 		assert product_factory_name in quantflow_factory.QuantFlowFactory.products.keys(), \
 			f"QuantFlowFactory: {product_factory_name} product key not in [{quantflow_factory.QuantFlowFactory.products.keys()}]"
 		return quantflow_factory.QuantFlowFactory.products[product_factory_name]
-
 
 
 if __name__ == "__main__":
@@ -61,5 +77,9 @@ if __name__ == "__main__":
 
 	mql_parser = MqlParser()
 	parsed_mql = mql_parser.parse_to_json(test_file_path)
-	quant_query = MeloConfigBuilder.strip_single(parsed_mql, "QuantQuery")
-	print(MeloConfigBuilder.build_products(quant_query))
+	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
+	print(quant_query)
+	print(ProductConfigBuilder.build_products(quant_query))
+	print(SizePolicyConfigBuilder.build_size_policy(quant_query))
+	# Strategies
+	# Estimator

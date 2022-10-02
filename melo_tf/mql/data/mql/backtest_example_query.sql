@@ -10,6 +10,6 @@ where strategies
 
 where volTarget
 	is (0.5, 100000)
-	with sizePolicy (s)
+	with sizePolicy (VolTargetSizePolicy)
 
 select backtestEstimator
