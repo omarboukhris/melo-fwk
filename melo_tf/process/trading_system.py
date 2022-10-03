@@ -64,17 +64,14 @@ class TradingSystem:
 		self.size_policy = size_policy
 		self.trading_policy = trading_policy
 
-		self.logger.info(f"Trading System for data source '{self.data_source.name}' initialized")
-
 	def reset(self):
 		self.time_index = 0
 		self.order_book = []
 		self.forecast_history = []
 		self.current_trade = Order.empty()
 
-	def open_trade(self, forecast: float, entry_time: str):
+	def open_trade(self, forecast: float, size: float, entry_time: str):
 		# adjust vol target and update size policy object ?
-		size = self.size_policy.position_size(forecast)
 		self.current_trade.open_trade(forecast, size, entry_time)
 
 		# submit open order
@@ -93,14 +90,16 @@ class TradingSystem:
 		self.order_book.append(self.current_trade)
 		self.current_trade = Order.empty()
 
-	def forecast(self):
-		s = 0
-		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
-			window = self.data_source.get_window()
-			if window is not None:
-				s += forecast_weight * trading_rule.forecast(window)
-		self.logger.info(f"Forcasting {s}")
-		return s
+	def forecast_and_size(self):
+		forecast, size = 0, 0
+		window = self.data_source.get_window()
+		self.size_policy.update_datastream(window)
+		if window is not None:
+			for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
+				forecast += forecast_weight * trading_rule.forecast(window)
+			size = self.size_policy.position_size(forecast)
+		self.logger.info(f"Forcasting {forecast}")
+		return forecast, size
 
 	def get_account_history(self):
 		return pd.DataFrame(self.accout)
@@ -134,14 +133,14 @@ class TradingSystem:
 		if self.simulation_ended():
 			return
 
-		forecast = self.forecast()
+		forecast, size = self.forecast_and_size()
 		self.forecast_history.append({
 			"Date": self.data_source.get_current_date(),
 			"Forecast": forecast
 		})
 
 		if not self.current_trade.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
-			self.open_trade(forecast, self.data_source.get_current_date())
+			self.open_trade(forecast, size, self.data_source.get_current_date())
 
 		elif self.current_trade.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())

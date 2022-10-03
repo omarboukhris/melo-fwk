@@ -12,10 +12,11 @@ class TestDataStreamsHelper:
 	def test_mock_datastream(products: List[dict]):
 		for product in tqdm.tqdm(products):
 			_, pdstream = BacktestDataLoader.get_mock_datastream({})
+			pdstream.with_daily_returns()
 
 			for tick in pdstream:
 
-				TestDataStreams.quick_sanity_check(pdstream, product, tick)
+				TestDataStreamsHelper.quick_sanity_check(pdstream, product, tick)
 				assert pdstream.get_diff_from_index(tick["Date"]) == 1
 
 	@staticmethod
@@ -32,7 +33,7 @@ class TestDataStreamsHelper:
 					continue
 
 				for tick in yearly_pdstream:
-					TestDataStreams.quick_sanity_check(pdstream, product, tick)
+					TestDataStreamsHelper.quick_sanity_check(pdstream, product, tick)
 					assert pdstream.get_diff_from_index(tick["Date"]) == y
 
 

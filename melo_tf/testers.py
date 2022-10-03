@@ -72,6 +72,7 @@ class TradingLoopHelper:
 	def run_trading_rule_loop(product):
 
 		df, pds = bdl.BacktestDataLoader.get_product_datastream(product)
+		pds.with_daily_returns()
 
 		ewma_params = {
 			"fast_span": 32,
@@ -90,9 +91,9 @@ class TradingLoopHelper:
 					"Date": pds.get_current_date(),
 				})
 
-		forcast_df = pd.DataFrame(output_forcast)
-		acc_plt = ForecastPlotter(forcast_df, df)
-		acc_plt.save_png(f"data/residual/{product['name']}_plot.png")
+		# forcast_df = pd.DataFrame(output_forcast)
+		# acc_plt = ForecastPlotter(forcast_df, df)
+		# acc_plt.save_png(f"data/residual/{product['name']}_plot.png")
 		# acc_plt.show()
 
 		# price_plt = PricePlotter(df)
@@ -103,6 +104,7 @@ class TradingLoopHelper:
 	@staticmethod
 	def run_trading_loop(product):
 		df, pds = bdl.BacktestDataLoader.get_product_datastream(product)
+		pds.with_daily_returns()
 
 		sma_params = {
 			"fast_span": 32,
@@ -124,9 +126,9 @@ class TradingLoopHelper:
 		# orderbook = tr_sys.get_order_book()
 
 		df_account = tr_sys.get_account_history()
-		account_plt = AccountPlotter(df_account, df)
+		# account_plt = AccountPlotter(df_account, df)
 		# account_plt.add_vlines(orderbook)
-		account_plt.save_png(f"data/residual/{product['name']}_plot.png")
+		# account_plt.save_png(f"data/residual/{product['name']}_plot.png")
 		# account_plt.show()
 		# df_account.to_csv("test_results/account.csv")
 		# orderbook.to_csv("test_results/book.csv")
