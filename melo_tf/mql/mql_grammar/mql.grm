@@ -8,11 +8,32 @@
 AXIOM -> QuantQuery
 
 QuantQuery ->
+    // User defines all params
+    // No default value used
+    create. QueryName=alphanum.
     with. !ProductsDef
     where. !StrategiesDef
     where. !PositionSizing
     select. !ProcessDef
+    |
+    // User defines Products
+    // default Strategy       : Buy and Hold OR Search
+    // default PositionSizing : 1 OR Search
+    create. QueryName=alphanum.
+    with. !ProductsDef
+    select. !ProcessDef
+    |
+    // User defines Products & Strategy
+    // default PositionSizing : 1 OR Search
+    create. QueryName=alphanum.
+    with. !ProductsDef
+    where. !StrategiesDef
+    select. !ProcessDef
+
+    // Which param to search for is defined
+    // by ProcessDef
+    // ====================
     // add output piping and formatting
     // add costs and trading policy
 
-    // one rule per workflow or pyramide model
+

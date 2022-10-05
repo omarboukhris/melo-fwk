@@ -66,9 +66,39 @@ class ProductConfigBuilder:
 		return quantflow_factory.QuantFlowFactory.products[product_factory_name]
 
 
+"""
+MeloQL - Interpreter Spec: Chronological Model Backtesting
+Cov Heat Map : 
+	N Products in Q Asset Class in 1 Portfolio
+	1 Mql query file for each asset class
+	output :
+		Cov Heat Map
+		Clustering
+		folders with template startoptim/vol queries
+	Notes: make structured query folder generator from heatmap/clustering (optional) result
+Strat/VolTarget Estimators :
+	M < Nq Products in Asset Class Q -> (K Strategies, VolTarget)
+	1 Mql query file by trading subsystem
+	output :
+		Optim Strat Config. location: tbd
+		Forecast Weights + Div Mult. location: tbd
+		VolTarget. location: tbd
+	Notes: make loader/writer for these estimators, register in factory
+Backtest Estimator :
+	M < N Correllated Products -> (K Strategies, VolTarget)
+	1 Mql query file by trading subsystem
+	output : 
+		Backtest Report
+Allocation Optim :
+	N Products in Q Asset Class in 1 Portfolio
+	1 Mql query file for whole portfolio
+	output :
+		Allocation Weights Optim. location: tbd
+"""
 if __name__ == "__main__":
 	# this should get out of folder to parent
 	# mql should be moved out too
+	# mql query config parsing example
 	from mql.mql_parser import MqlParser
 	from pathlib import Path
 

@@ -1,4 +1,6 @@
-create BacktestExample
+
+-- AllocOptim might need to be done on whole portfolio instead of subsystem
+create AllocOptimExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)
     Commodities (Oat, Cocoa)
@@ -13,4 +15,4 @@ where volTarget
 	is (0.5, 100000)
 	with sizePolicy (VolTargetSizePolicy)
 
-select backtestEstimator
+select AllocOptimEstimator

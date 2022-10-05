@@ -1,4 +1,4 @@
-create BacktestExample
+create PoseSizeOptimExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)
     Commodities (Oat, Cocoa)
@@ -10,7 +10,7 @@ where strategies
 	and forecastWeights (0.5, 0.5)
 
 where volTarget
-	is (0.5, 100000)
+	is (*, 100000)
 	with sizePolicy (VolTargetSizePolicy)
 
-select backtestEstimator
+select poseSizeOptimEstimator

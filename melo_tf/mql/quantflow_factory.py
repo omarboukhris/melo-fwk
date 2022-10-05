@@ -1,8 +1,11 @@
 
+import json, glob
+
 class QuantFlowFactory:
 
 	products = dict()
 	strategies = dict()
+	strat_configs = dict()
 	workflows = dict()
 	size_policies = dict()
 	result_writers = dict()
@@ -27,3 +30,9 @@ class QuantFlowFactory:
 	def register_result_writer(result_writer_label: str, result_writer: callable):
 		QuantFlowFactory.result_writers[result_writer_label] = result_writer
 
+	@staticmethod
+	def register_strat_configs(filepath: str):
+		config_files = glob.glob(filepath)
+		for config_file in config_files:
+			json_config = json.loads(config_file)
+			QuantFlowFactory.strat_configs[config_file] = json_config

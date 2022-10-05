@@ -46,7 +46,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 		for p in tqdm.tqdm(products):
 			TradingLoopHelper.run_trading_rule_loop(p)
 
-
 	def test_trading_system(self):
 		"""
 		2y 1h :

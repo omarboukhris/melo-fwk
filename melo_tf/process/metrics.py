@@ -3,32 +3,32 @@ import pandas as pd
 import numpy as np
 from dataclasses import dataclass
 
-#debug this
-
 @dataclass(frozen=True)
 class AccountMetrics:
 	account_df: pd.Series
 
 	def sharpe_ratio(self, rf: float = 0.0):
-		trading_days = len(self.account_df)
-		mean = self.account_df.mean() * trading_days - rf
-		sigma = self.account_df.std() * np.sqrt(trading_days)
+		mean = self.account_df.mean() - rf
+		sigma = self.account_df.std()
 		return mean / sigma
 
 	def sortino_ratio(self, rf: float = 0.0):
-		trading_days = len(self.account_df)
-		mean = self.account_df.mean() * trading_days - rf
-		std_neg = self.account_df[self.account_df < 0].std() * np.sqrt(trading_days)
-		return mean / std_neg
+		# needs rework ########################
+		rf_account = np.minimum(0, self.account_df - rf)**2
+		rf_account_mean = rf_account.mean()
+		mean = self.account_df.mean() - rf
+		# std_neg = self.account_df[self.account_df < 0].std()
+		# return mean / std_neg
+		return mean / rf_account_mean
 
 	def PnL(self):
 		return self.account_df.iat[-1]
 
 	def return_vol(self):
-		trading_days = len(self.account_df)
-		return self.account_df.std() * np.sqrt(trading_days)
+		return self.account_df.std()
 
 	def get_drawdown(self):
+		# this is bugged ########################
 		comp_ret = (self.account_df + 1).cumprod()
 		peak = comp_ret.expanding(min_periods=1).max()
 		dd = (comp_ret / peak) - 1
@@ -38,8 +38,7 @@ class AccountMetrics:
 		return self.get_drawdown().min()
 
 	def calmar_ratio(self):
-		trading_days = len(self.account_df)
-		calmars = self.account_df.mean() * trading_days / abs(self.max_drawdown())
+		calmars = self.account_df.mean() / abs(self.max_drawdown())
 		return calmars
 
 	@staticmethod
