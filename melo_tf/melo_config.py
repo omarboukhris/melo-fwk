@@ -1,5 +1,4 @@
 
-from mql.mql_parser import MqlParser
 from quantfactory_registry import quantflow_factory
 from process.policies.vol_target_policy import VolTarget
 
@@ -68,16 +67,17 @@ class ProductConfigBuilder:
 
 
 if __name__ == "__main__":
+	# this should get out of folder to parent
+	# mql should be moved out too
+	from mql.mql_parser import MqlParser
 	from pathlib import Path
 
-	test_file_path = str(
-		Path(__file__).parent /
-		"mql/data/mql/backtest_example_query.sql"
-	)
+	test_file_path = str(Path(__file__).parent / "mql/data/mql/backtest_example_query.sql")
 
 	mql_parser = MqlParser()
 	parsed_mql = mql_parser.parse_to_json(test_file_path)
 	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
+
 	print(quant_query)
 	print(ProductConfigBuilder.build_products(quant_query))
 	print(SizePolicyConfigBuilder.build_size_policy(quant_query))

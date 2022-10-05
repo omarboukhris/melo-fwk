@@ -101,8 +101,11 @@ class TradingSystem:
 		self.logger.info(f"Forcasting {forecast}")
 		return forecast, size
 
-	def get_account_history(self):
+	def get_account_dataframe(self):
 		return pd.DataFrame(self.accout)
+
+	def get_account_series(self):
+		return self.get_account_dataframe()["Balance"]
 
 	def get_order_book(self):
 		orderbook_dict = [order.to_dict() for order in self.order_book]

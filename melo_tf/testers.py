@@ -1,19 +1,22 @@
 
 import pandas as pd
 import tqdm
+
 from rules.ewma_rule import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
-from process import trading_system as ts
-from helpers.plots import ForecastPlotter, AccountPlotter
+from process import trading_system as ts, metrics
+from helpers.plots import ForecastPlotter, HLOCPricePlotter, AccountPlotter
 from datastreams import datastream as ds, backtest_data_loader as bdl
 
 import unittest
 
 class TradingSystemUnitTests(unittest.TestCase):
+
 	def test_empty_trading_system(self):
 		df = pd.read_csv("data/CommodityData/Cocoa_sanitized.csv")
 
 		pds = ds.HLOCDataStream(dataframe=df)
+		pds.with_daily_returns()
 
 		tr_sys = ts.TradingSystem(
 			balance=10000,
@@ -56,8 +59,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		# df = pd.read_csv("data/Commodity Data/Gold_sanitized.csv")
-		# products = bdl.BacktestDataLoader.get_products("data/Stocks/GOOG_1d_10y.csv")
 		products = bdl.BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
 		sum_ = 0.
 		for p in tqdm.tqdm(products):
@@ -71,7 +72,7 @@ class TradingLoopHelper:
 	@staticmethod
 	def run_trading_rule_loop(product):
 
-		df, pds = bdl.BacktestDataLoader.get_product_datastream(product)
+		_, pds = bdl.BacktestDataLoader.get_product_datastream(product)
 		pds.with_daily_returns()
 
 		ewma_params = {
@@ -91,15 +92,12 @@ class TradingLoopHelper:
 					"Date": pds.get_current_date(),
 				})
 
-		# forcast_df = pd.DataFrame(output_forcast)
-		# acc_plt = ForecastPlotter(forcast_df, df)
-		# acc_plt.save_png(f"data/residual/{product['name']}_plot.png")
-		# acc_plt.show()
+		forcast_df = pd.DataFrame(output_forcast)
+		acc_plt = ForecastPlotter(forcast_df, pds.get_data())
+		acc_plt.save_png(f"data/residual/{product['name']}_plot.png")
 
-		# price_plt = PricePlotter(df)
-		# price_plt.plot()
-		# price_plt.save_png("data/residual/test_trading_rule__price_plot")
-		# price_plt.show()
+		price_plt = HLOCPricePlotter(pds.get_data())
+		price_plt.save_png("data/residual/test_trading_rule__price_plot")
 
 	@staticmethod
 	def run_trading_loop(product):
@@ -122,14 +120,13 @@ class TradingLoopHelper:
 		)
 		tr_sys.run()
 
-		# print(tr_sys.sharpe_ratio())
+		# print(metrics.AccountMetrics.compute_all_metrics(tr_sys.get_account_series()))
 		# orderbook = tr_sys.get_order_book()
 
-		df_account = tr_sys.get_account_history()
-		# account_plt = AccountPlotter(df_account, df)
-		# account_plt.add_vlines(orderbook)
-		# account_plt.save_png(f"data/residual/{product['name']}_plot.png")
-		# account_plt.show()
+		df_account = tr_sys.get_account_dataframe()
+		account_plt = AccountPlotter(df_account, pds.get_data())
+		account_plt.save_png(f"data/residual/{product['name']}_plot.png")
+
 		# df_account.to_csv("test_results/account.csv")
 		# orderbook.to_csv("test_results/book.csv")
 		return df_account
