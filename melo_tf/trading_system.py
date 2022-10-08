@@ -87,7 +87,7 @@ class TradingSystem:
 
 	def open_trade(self, forecast: float, size: float, entry_time: str):
 		# adjust vol target and update size policy object ?
-		self.current_trade.open_trade(forecast, size, entry_time)
+		self.current_trade.open_trade(forecast, abs(size), entry_time)
 
 		# submit open order
 

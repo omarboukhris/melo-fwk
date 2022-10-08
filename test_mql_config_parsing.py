@@ -12,6 +12,8 @@ from pathlib import Path
 if __name__ == "__main__":
 	test_file_path = str(Path(__file__).parent / "mql/data/mql/backtest_example_query.sql")
 
+	quantfactory_registry.register_all()
+
 	mql_parser = MqlParser()
 	parsed_mql = mql_parser.parse_to_json(test_file_path)
 	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
