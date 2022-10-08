@@ -1,8 +1,8 @@
 
 from mql.mql_parser import MqlParser
 
-from melo_tf import quantfactory_registry
-from melo_tf.melo_config import \
+from melo_fwk import quantfactory_registry
+from melo_fwk.melo_config import \
 	ConfigBuilderHelper, \
 	ProductConfigBuilder, \
 	SizePolicyConfigBuilder

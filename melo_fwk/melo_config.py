@@ -1,5 +1,35 @@
 from mql import quantflow_factory
-from melo_tf.policies.vol_target_policy import VolTarget
+from melo_fwk.policies.vol_target_policy import VolTarget
+
+"""
+MeloQL - Interpreter Spec: Chronological Model Backtesting
+Cov Heat Map : 
+	N Products in Q Asset Class in 1 Portfolio
+	1 Mql query file for each asset class
+	output :
+		Cov Heat Map
+		Clustering
+		folders with template startoptim/vol queries
+	Notes: make structured query folder generator from heatmap/clustering (optional) result
+Strat/VolTarget Estimators :
+	M < Nq Products in Asset Class Q -> (K Strategies, VolTarget)
+	1 Mql query file by trading subsystem
+	output :
+		Optim Strat Config. location: tbd
+		Forecast Weights + Div Mult. location: tbd
+		VolTarget. location: tbd
+	Notes: make loader/writer for these estimators, register in factory
+Backtest Estimator :
+	M < N Correllated Products -> (K Strategies, VolTarget)
+	1 Mql query file by trading subsystem
+	output : 
+		Backtest Report
+Allocation Optim :
+	N Products in Q Asset Class in 1 Portfolio
+	1 Mql query file for whole portfolio
+	output :
+		Allocation Weights Optim. location: tbd
+"""
 
 class ConfigBuilderHelper:
 	@staticmethod
@@ -64,33 +94,3 @@ class ProductConfigBuilder:
 			f"QuantFlowFactory: {product_factory_name} product key not in [{quantflow_factory.QuantFlowFactory.products.keys()}]"
 		return {product_factory_name: quantflow_factory.QuantFlowFactory.get_product(product_factory_name)}
 
-
-"""
-MeloQL - Interpreter Spec: Chronological Model Backtesting
-Cov Heat Map : 
-	N Products in Q Asset Class in 1 Portfolio
-	1 Mql query file for each asset class
-	output :
-		Cov Heat Map
-		Clustering
-		folders with template startoptim/vol queries
-	Notes: make structured query folder generator from heatmap/clustering (optional) result
-Strat/VolTarget Estimators :
-	M < Nq Products in Asset Class Q -> (K Strategies, VolTarget)
-	1 Mql query file by trading subsystem
-	output :
-		Optim Strat Config. location: tbd
-		Forecast Weights + Div Mult. location: tbd
-		VolTarget. location: tbd
-	Notes: make loader/writer for these estimators, register in factory
-Backtest Estimator :
-	M < N Correllated Products -> (K Strategies, VolTarget)
-	1 Mql query file by trading subsystem
-	output : 
-		Backtest Report
-Allocation Optim :
-	N Products in Q Asset Class in 1 Portfolio
-	1 Mql query file for whole portfolio
-	output :
-		Allocation Weights Optim. location: tbd
-"""

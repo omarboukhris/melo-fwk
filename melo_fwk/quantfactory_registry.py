@@ -1,12 +1,12 @@
 from mql import quantflow_factory
 
-from melo_tf.datastreams.commodities import CommodityDataLoader
+from melo_fwk.datastreams.commodities import CommodityDataLoader
 
-from melo_tf import trading_system
+from melo_fwk import trading_system
 
-from melo_tf.rules import ewma_rule, sma_rule
+from melo_fwk.rules import ewma_rule, sma_rule
 
-from melo_tf.policies import vol_target_policy
+from melo_fwk.policies import vol_target_policy
 
 
 def register_all():

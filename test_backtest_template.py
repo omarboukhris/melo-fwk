@@ -1,12 +1,12 @@
 import tqdm
 
-from melo_tf.datastreams.commodities import CommodityDataLoader
+from melo_fwk.datastreams.commodities import CommodityDataLoader
 
-from melo_tf.rules.ewma_rule import EWMATradingRule
+from melo_fwk.rules.ewma_rule import EWMATradingRule
 
-from melo_tf.policies.vol_target_policy import VolTarget, VolTargetSizePolicy
+from melo_fwk.policies.vol_target_policy import VolTarget, VolTargetSizePolicy
 
-from melo_tf.trading_system import TradingSystem
+from melo_fwk.trading_system import TradingSystem
 
 import pandas as pd
 import numpy as np
@@ -67,7 +67,7 @@ for year in tqdm.tqdm(range(2004, 2020)):
 	))
 
 sr = [r.sharpe_ratio for r in results]
-balance = [r.final_balance for r in results]
+balance = [(r.sharpe_ratio, r.final_balance) for r in results]
 print(sr)
 print(np.array(sr).mean())
 print(balance)

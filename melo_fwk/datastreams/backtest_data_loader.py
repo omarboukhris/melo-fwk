@@ -1,7 +1,7 @@
 
 import glob
 import pandas as pd
-import melo_tf.datastreams.datastream as ds
+import melo_fwk.datastreams.datastream as ds
 
 from dataclasses import dataclass
 from pathlib import Path

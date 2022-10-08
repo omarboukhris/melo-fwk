@@ -1,18 +1,18 @@
 import pandas as pd
 import tqdm
 
-from melo_tf.rules.ewma_rule import EWMATradingRule
+from melo_fwk.rules.ewma_rule import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
-from melo_tf import trading_system as ts
-from melo_tf.plots.plots import AccountPlotter
-from melo_tf.datastreams import datastream as ds, backtest_data_loader as bdl
+from melo_fwk import trading_system as ts
+from melo_fwk.plots.plots import AccountPlotter
+from melo_fwk.datastreams import datastream as ds, backtest_data_loader as bdl
 
 import unittest
 
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_empty_trading_system(self):
-		df = pd.read_csv("melo_tf/data/CommodityData/Cocoa_sanitized.csv")
+		df = pd.read_csv("melo_fwk/data/CommodityData/Cocoa_sanitized.csv")
 
 		pds = ds.HLOCDataStream(dataframe=df)
 		pds.with_daily_returns()
@@ -41,7 +41,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		products = bdl.BacktestDataLoader.get_products("melo_tf/data/CommodityData/*_sanitized.csv")
+		products = bdl.BacktestDataLoader.get_products("melo_fwk/data/CommodityData/*_sanitized.csv")
 		sum_ = 0.
 		for product in tqdm.tqdm(products):
 			loaded_prod = bdl.BacktestDataLoader.get_product_datastream(product)

@@ -6,9 +6,9 @@ import tqdm
 from melodb.loggers import ILogger
 from melodb.Order import Order
 
-from melo_tf.datastreams.datastream import HLOCDataStream
-from melo_tf.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
-from melo_tf.policies.vol_target_policy import ConstSizePolicy, ISizePolicy
+from melo_fwk.datastreams.datastream import HLOCDataStream
+from melo_fwk.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
+from melo_fwk.policies.vol_target_policy import ConstSizePolicy, ISizePolicy
 
 
 class TradingSystem:
