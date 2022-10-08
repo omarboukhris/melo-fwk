@@ -1,5 +1,6 @@
 
-import json, glob
+import json
+import glob
 
 class QuantFlowFactory:
 
@@ -15,20 +16,36 @@ class QuantFlowFactory:
 		QuantFlowFactory.products[product_label] = product
 
 	@staticmethod
+	def get_product(product_label: str):
+		return QuantFlowFactory.products[product_label]
+
+	@staticmethod
 	def register_strategy(strategy_label: str, strategy: callable):
 		QuantFlowFactory.strategies[strategy_label] = strategy
 
 	@staticmethod
-	def register_workflow(workflow_label: str, workflow: callable):
-		QuantFlowFactory.workflows[workflow_label] = workflow
+	def get_strategy(strategy_label: str):
+		return QuantFlowFactory.strategies[strategy_label]
 
 	@staticmethod
 	def register_size_policy(size_policy_label: str, size_policy: callable):
 		QuantFlowFactory.size_policies[size_policy_label] = size_policy
 
 	@staticmethod
-	def register_result_writer(result_writer_label: str, result_writer: callable):
-		QuantFlowFactory.result_writers[result_writer_label] = result_writer
+	def get_size_policy(size_policy_label: str):
+		return QuantFlowFactory.size_policies[size_policy_label]
+
+	@staticmethod
+	def register_workflow(workflow_label: str, workflow: callable):
+		QuantFlowFactory.workflows[workflow_label] = workflow
+
+	@staticmethod
+	def get_workflow(workflow_label: str):
+		return QuantFlowFactory.workflows[workflow_label]
+
+	@staticmethod
+	def get_result_writer(result_writer_label: str):
+		return QuantFlowFactory.result_writers[result_writer_label]
 
 	@staticmethod
 	def register_strat_configs(filepath: str):
@@ -36,3 +53,7 @@ class QuantFlowFactory:
 		for config_file in config_files:
 			json_config = json.loads(config_file)
 			QuantFlowFactory.strat_configs[config_file] = json_config
+
+	@staticmethod
+	def get_strat_configs(config_file: str):
+		return QuantFlowFactory.strat_configs[config_file]

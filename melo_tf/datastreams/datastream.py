@@ -21,6 +21,12 @@ class HLOCDataStream:
 		self.date_label = date_label
 		self.window_size = window_size
 
+	@staticmethod
+	def get_empty():
+		return HLOCDataStream(
+			dataframe=pd.DataFrame([{"Date": "1970-01-01"}])
+		)
+
 	def parse_date_column(self):
 		def parse_date(date: str):
 			try:
@@ -36,11 +42,11 @@ class HLOCDataStream:
 	def with_daily_returns(self):
 		self.dataframe["Daily_diff"] = self.dataframe["Close"].diff()
 
-	def get_data_by_year(self, y: int):
+	def get_data_by_year(self, y: str):
 		return HLOCDataStream(
 			dataframe=self.dataframe.loc[
 				self.dataframe["Year"] == y,
-			],
+			].reset_index(drop=True),
 			offset=self.offset,
 			reverse=self.reverse,
 			date_label=self.date_label,
@@ -58,8 +64,8 @@ class HLOCDataStream:
 
 	def limit_reached(self):
 		return (
-			(self.reverse and self.time_idx == -len(self.dataframe)-1) or
-			(not self.reverse and self.time_idx == len(self.dataframe))
+			(self.reverse and self.time_idx <= -len(self.dataframe)-1) or
+			(not self.reverse and self.time_idx >= len(self.dataframe))
 		)
 
 	def get_current_date(self):
@@ -91,7 +97,7 @@ class HLOCDataStream:
 		if x == 0:
 			return 0
 		diff = self.dataframe.iloc[x]["Daily_diff"].to_numpy()
-		assert diff.shape == (1,), f"PandasDataStream.get_diff_from_index : {t1} vs {t2}"
+		assert diff.shape == (1,), f"PandasDataStream.get_diff_from_index : {diff.shape} != (1,)"
 
 		return diff[0] if diff[0] is not None else 0
 
@@ -120,7 +126,10 @@ class HLOCDataStream:
 
 	def __next__(self):
 		self.time_idx += -1 if self.reverse else 1
-		if not self.limit_reached():
-			return self.dataframe.iloc[self.time_idx]
+		if not self.limit_reached() and self.time_idx in self.dataframe.index:
+			try:
+				return self.dataframe.iloc[self.time_idx]
+			except IndexError as e:
+				pass
 		else:
 			raise StopIteration()

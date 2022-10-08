@@ -1,6 +1,9 @@
 
-from datastreams.backtest_data_loader import BacktestDataLoader
+from melo_tf.datastreams.backtest_data_loader import BacktestDataLoader
+from melo_tf.datastreams.datastream import HLOCDataStream
+
 import tqdm
+import pandas as pd
 
 from typing import List
 
@@ -11,30 +14,30 @@ class TestDataStreamsHelper:
 	@staticmethod
 	def test_mock_datastream(products: List[dict]):
 		for product in tqdm.tqdm(products):
-			_, pdstream = BacktestDataLoader.get_mock_datastream({})
-			pdstream.with_daily_returns()
+			loaded_prod = BacktestDataLoader.get_mock_datastream({})
+			loaded_prod.datastream.with_daily_returns()
 
-			for tick in pdstream:
+			for tick in loaded_prod.datastream:
 
-				TestDataStreamsHelper.quick_sanity_check(pdstream, product, tick)
-				assert pdstream.get_diff_from_index(tick["Date"]) == 1
+				TestDataStreamsHelper.quick_sanity_check(loaded_prod.datastream, product, tick)
+				assert loaded_prod.datastream.get_diff_from_index(tick["Date"]) == 1
 
 	@staticmethod
 	def test_datastream(products: List[dict], years: List[str]):
 		for product in tqdm.tqdm(products):
-			_, pdstream = BacktestDataLoader.get_product_datastream(product)
-			pdstream.parse_date_column()
-			pdstream.with_daily_returns()
+			loaded_prod = BacktestDataLoader.get_product_datastream(product)
+			loaded_prod.datastream.parse_date_column()
+			loaded_prod.datastream.with_daily_returns()
 			# print(pdstream.get_data()[["Date", "Close", "Daily_diff"]])
 
 			for y in years:
-				yearly_pdstream = pdstream.get_data_by_year(y)
+				yearly_pdstream = loaded_prod.datastream.get_data_by_year(y)
 				if yearly_pdstream.get_data().empty:
 					continue
 
 				for tick in yearly_pdstream:
-					TestDataStreamsHelper.quick_sanity_check(pdstream, product, tick)
-					assert pdstream.get_diff_from_index(tick["Date"]) == y
+					TestDataStreamsHelper.quick_sanity_check(loaded_prod.datastream, product, tick)
+					assert loaded_prod.datastream.get_diff_from_index(tick["Date"]) == y
 
 
 	@staticmethod
@@ -46,6 +49,16 @@ class TestDataStreamsHelper:
 
 
 class DataStreamUnitTests(unittest.TestCase):
+
+	def test_datastream(self):
+		def process_tick(_):
+			pass
+
+		pdstream = HLOCDataStream(
+			dataframe=pd.read_csv("melo_tf/data/CommodityData/Cocoa_sanitized.csv"))
+
+		for tick in pdstream:
+			process_tick(tick)
 
 	def test_mock_datastream(self):
 		TestDataStreamsHelper.test_mock_datastream(

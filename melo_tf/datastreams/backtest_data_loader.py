@@ -1,13 +1,16 @@
 
 import glob
 import pandas as pd
-import datastreams.datastream as ds
+import melo_tf.datastreams.datastream as ds
 
+from dataclasses import dataclass
 from pathlib import Path
 
-"""
-NOTE:  Hardcoded paths, update to pathlib, until then, just call it from module root
-"""
+@dataclass(frozen=True)
+class Product:
+	filepath: str
+	datastream: ds.HLOCDataStream
+
 class BacktestDataLoader:
 	parent_folder = Path(Path(__file__).parent)
 	mock_datastream_length = 1000
@@ -49,9 +52,9 @@ class BacktestDataLoader:
 		return output
 
 	@staticmethod
-	def get_product_datastream(product: dict):
+	def get_product_datastream(product: dict) -> Product:
 		input_df = pd.read_csv(product["datasource"])
-		return product["datasource"], ds.HLOCDataStream(input_df)
+		return Product(product["datasource"], ds.HLOCDataStream(input_df))
 
 	@staticmethod
 	def get_mock_datastream(_: dict):
@@ -63,4 +66,4 @@ class BacktestDataLoader:
 			"Low": [i for i in range(BacktestDataLoader.mock_datastream_length)],
 		}
 		mock_df = pd.DataFrame(mock_dict)
-		return mock_df, ds.HLOCDataStream(mock_df)
+		return Product("mock_df", ds.HLOCDataStream(mock_df))

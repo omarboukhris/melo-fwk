@@ -40,21 +40,24 @@ class ConstSizePolicy(ISizePolicy):
 
 class VolTargetSizePolicy(ISizePolicy):
 
-	def __init__(self, risk_policy: VolTarget):
+	def __init__(self, risk_policy: VolTarget, unit_leverage: int = 100):
 		super(VolTargetSizePolicy, self).__init__()
 		self.risk_policy = risk_policy
+		self.unit_leverage = unit_leverage
 
 	def price_vol(self, lookback: int = 36) -> float:
 		daily_return = self.datastream.get_data()["Daily_diff"]
-		ewma_vol = daily_return.ewm(span=lookback).mean().to_numpy()
+		# ewma_vol = daily_return.ewm(span=lookback).std().to_numpy()
 		current_price = self.datastream.get_close()
-		price_vol_vect = ewma_vol * current_price
+		# price_vol_vect = ewma_vol * current_price
+
+		price_vol_vect = daily_return * current_price
 		if len(price_vol_vect) == 0:
 			raise Exception(f"Price volatility vector's size is 0 : {price_vol_vect}")
-		return price_vol_vect[-1]
+		return price_vol_vect.to_numpy()[-1]
 
 	def block_value(self) -> float:
-		return self.datastream.get_close() * 0.01  # * unit_leverage  # = how many shares the contract controls
+		return self.datastream.get_close() * 0.01 * self.unit_leverage  # = how many shares the contract controls
 
 	def instrument_vol(self) -> float:
 		return self.block_value() * self.price_vol()

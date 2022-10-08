@@ -1,6 +1,5 @@
-
-from quantfactory_registry import quantflow_factory
-from process.policies.vol_target_policy import VolTarget
+from mql import quantflow_factory
+from melo_tf.policies.vol_target_policy import VolTarget
 
 class ConfigBuilderHelper:
 	@staticmethod
@@ -31,7 +30,7 @@ class SizePolicyConfigBuilder:
 		size_policy_factory_name = ConfigBuilderHelper.strip_single(position_size_dict, "SizePolicy")
 		assert size_policy_factory_name in quantflow_factory.QuantFlowFactory.size_policies.keys(), \
 			f"{size_policy_factory_name} key is not in [{quantflow_factory.QuantFlowFactory.size_policies.keys()}]"
-		_SizePolicyClass = quantflow_factory.QuantFlowFactory.size_policies[size_policy_factory_name]
+		_SizePolicyClass = quantflow_factory.QuantFlowFactory.get_size_policy(size_policy_factory_name)
 
 		vol_target_cfg = ConfigBuilderHelper.parse_num_list(position_size_dict, "VolTargetCouple")
 		vol_target = VolTarget(*vol_target_cfg)
@@ -59,11 +58,11 @@ class ProductConfigBuilder:
 		return output_products
 
 	@staticmethod
-	def _get_product(products_type: str, product_name: str) -> tuple:
+	def _get_product(products_type: str, product_name: str) -> dict:
 		product_factory_name = f"{products_type}.{product_name}"
 		assert product_factory_name in quantflow_factory.QuantFlowFactory.products.keys(), \
 			f"QuantFlowFactory: {product_factory_name} product key not in [{quantflow_factory.QuantFlowFactory.products.keys()}]"
-		return quantflow_factory.QuantFlowFactory.products[product_factory_name]
+		return {product_factory_name: quantflow_factory.QuantFlowFactory.get_product(product_factory_name)}
 
 
 """
@@ -95,21 +94,3 @@ Allocation Optim :
 	output :
 		Allocation Weights Optim. location: tbd
 """
-if __name__ == "__main__":
-	# this should get out of folder to parent
-	# mql should be moved out too
-	# mql query config parsing example
-	from mql.mql_parser import MqlParser
-	from pathlib import Path
-
-	test_file_path = str(Path(__file__).parent / "mql/data/mql/backtest_example_query.sql")
-
-	mql_parser = MqlParser()
-	parsed_mql = mql_parser.parse_to_json(test_file_path)
-	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
-
-	print(quant_query)
-	print(ProductConfigBuilder.build_products(quant_query))
-	print(SizePolicyConfigBuilder.build_size_policy(quant_query))
-	# Strategies
-	# Estimator
