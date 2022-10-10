@@ -3,27 +3,16 @@ import tqdm
 from melo_fwk.datastreams.commodities import CommodityDataLoader
 
 from melo_fwk.rules.ewma_rule import EWMATradingRule
+from melo_fwk.rules.sma_rule import SMATradingRule
 
 from melo_fwk.policies.vol_target_policy import VolTarget, VolTargetSizePolicy
 
 from melo_fwk.trading_system import TradingSystem
 
-import pandas as pd
 import numpy as np
 
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class TradingSystemAnnualResult:
-	final_balance: float
-	sharpe_ratio: float
-	forecast_df: pd.DataFrame
-	size_df: pd.DataFrame
-	account_df: pd.DataFrame
-	vol_target: VolTarget
-
-
 product = CommodityDataLoader.Gold
+# do this by default
 product.datastream.parse_date_column()
 product.datastream.with_daily_returns()
 
@@ -33,22 +22,27 @@ strat = [
 		slow_span=64,
 		scale=8.,
 		cap=20,
+	),
+	SMATradingRule(
+		fast_span=4,
+		slow_span=32,
+		scale=10.,
+		cap=20,
 	)
 ]
-fw = [1.]
+fw = [0.4, 0.6]
 
 results = []
 
-trading_subsys = TradingSystem.start(60000)
+balance = 60000
 
 for year in tqdm.tqdm(range(2004, 2020)):
 	vol_target = VolTarget(
-		annual_vol_target=0.3,
-		trading_capital=trading_subsys.balance())
+		annual_vol_target=1e-1,
+		trading_capital=balance)
 	size_policy = VolTargetSizePolicy(risk_policy=vol_target)
 
 	trading_subsys = TradingSystem(
-		balance=trading_subsys.balance(),
 		data_source=product.datastream.get_data_by_year(year),
 		trading_rules=strat,
 		forecast_weights=fw,
@@ -56,18 +50,13 @@ for year in tqdm.tqdm(range(2004, 2020)):
 	)
 
 	trading_subsys.run()
+	tsar = trading_subsys.get_tsar()
+	results.append(tsar)
+	balance += tsar.annual_delta()
 
-	results.append(TradingSystemAnnualResult(
-		vol_target=vol_target,
-		final_balance=trading_subsys.balance(),
-		sharpe_ratio=trading_subsys.volatility_normalized_PnL(),
-		forecast_df=trading_subsys.forecast_dataframe(),
-		size_df=trading_subsys.position_dataframe(),
-		account_df=trading_subsys.account_dataframe()
-	))
-
-sr = [r.sharpe_ratio for r in results]
-balance = [(r.sharpe_ratio, r.final_balance) for r in results]
+sr = [r.account_metrics.sharpe_ratio() for r in results]
+balance = [(r.account_metrics.sharpe_ratio(), r.annual_delta()) for r in results]
 print(sr)
 print(np.array(sr).mean())
 print(balance)
+print([r.annual_delta() + r.vol_target.trading_capital for r in results])

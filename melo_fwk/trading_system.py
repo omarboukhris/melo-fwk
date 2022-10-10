@@ -8,8 +8,23 @@ from melodb.Order import Order
 
 from melo_fwk.datastreams.datastream import HLOCDataStream
 from melo_fwk.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
-from melo_fwk.policies.vol_target_policy import ConstSizePolicy, ISizePolicy
+from melo_fwk.policies.vol_target_policy import ConstSizePolicy, ISizePolicy, VolTarget
+from melo_fwk.metrics.metrics import AccountMetrics
 
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class TradingSystemAnnualResult:
+	account_metrics: AccountMetrics
+	forecast_df: pd.DataFrame
+	size_df: pd.DataFrame
+	account_df: pd.DataFrame
+	vol_target: VolTarget
+
+	def annual_delta(self):
+		assert len(self.account_df) > 1, \
+			"(TradingSystemAnnualReport) final_balance: account data frame is empty"
+		return self.account_df.iloc[-1]["Balance"]
 
 class TradingSystem:
 	"""Class for backtesting offline a trading system.
@@ -17,10 +32,6 @@ class TradingSystem:
 	To backtest for a whole portfolio, you need a TradingSystem per asset,
 	then sum up after each iteration.
 	Sub-classes can implement multi-threaded execution if needed.
-
-	TODO:
-		Implement an TradeExecutor to execute trades online (demo/live) and offline (backtest)
-		=> warping of open/close_trade methods
 
 	Needs :
 	- a data source for historic price data
@@ -33,7 +44,6 @@ class TradingSystem:
 
 	def __init__(
 		self,
-		balance: float,
 		data_source: HLOCDataStream,
 		trading_rules: list,
 		forecast_weights: list,
@@ -52,7 +62,7 @@ class TradingSystem:
 		self.accout = [
 			{
 				"Date": data_source.get_current_date(),
-				"Balance": balance,
+				"Balance": 0,
 			}
 		]
 		self.time_index = 0
@@ -68,12 +78,7 @@ class TradingSystem:
 
 	@staticmethod
 	def default():
-		return TradingSystem.start(0)
-
-	@staticmethod
-	def start(balance: float):
 		return TradingSystem(
-			balance=balance,
 			data_source=HLOCDataStream.get_empty(),
 			trading_rules=[],
 			forecast_weights=[]
@@ -116,9 +121,6 @@ class TradingSystem:
 		self.logger.info(f"Forcasting {forecast}")
 		return forecast, size
 
-	def balance(self):
-		return self.accout[-1]["Balance"]
-
 	def get_account_dataframe(self):
 		return pd.DataFrame(self.accout)
 
@@ -141,15 +143,11 @@ class TradingSystem:
 		return self.data_source.limit_reached()
 
 	def trade_next(self):
+		""" Run a trading iteration :
+			- Compute forecast and size
+			- Check trade entry & exit conditions
+			- Mark to Market
 		"""
-		The way this method trades makes it impossible to get out of a bad trade in time,
-		turnover rate is usually bad
-		Should redefine enter/exit trade methods or even better, write a proper predicat
-		component to get more "complex" behaviour
-		:return:
-		"""
-
-		"""This method trades sequentially one product at a time"""
 
 		if self.simulation_ended():
 			return
@@ -178,7 +176,7 @@ class TradingSystem:
 			pass
 
 	def volatility_normalized_PnL(self):
-		account = np.array(self.account_dataframe()["Balance"]) - self.accout[0]["Balance"]
+		account = np.array(self.account_dataframe()["Balance"])
 		return account.mean()/account.std()
 
 	def forecast_dataframe(self):
@@ -187,8 +185,20 @@ class TradingSystem:
 	def account_dataframe(self):
 		return pd.DataFrame(self.accout)
 
+	def account_series(self):
+		return pd.DataFrame(self.accout)["Balance"]
+
 	def position_dataframe(self):
 		return pd.DataFrame(self.pose_size_history)
+
+	def get_tsar(self):
+		return TradingSystemAnnualResult(
+			vol_target=self.size_policy.risk_policy,
+			account_metrics=AccountMetrics(self.account_series()),
+			forecast_df=self.forecast_dataframe(),
+			size_df=self.position_dataframe(),
+			account_df=self.account_dataframe()
+		)
 
 	def run(self):
 		# while not self.simulation_ended():

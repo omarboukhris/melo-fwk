@@ -8,18 +8,19 @@ class AccountMetrics:
 	account_df: pd.Series
 
 	def sharpe_ratio(self, rf: float = 0.0):
-		mean = self.account_df.mean() - rf
+		mean = self.account_df.mean() - self.account_df.iat[0] - rf
 		sigma = self.account_df.std()
 		return mean / sigma
 
 	def sortino_ratio(self, rf: float = 0.0):
 		# needs rework ########################
-		rf_account = np.minimum(0, self.account_df - rf)**2
-		rf_account_mean = rf_account.mean()
 		mean = self.account_df.mean() - rf
-		# std_neg = self.account_df[self.account_df < 0].std()
-		# return mean / std_neg
-		return mean / rf_account_mean
+		std_neg = self.account_df[self.account_df < 0].std()
+		return mean / std_neg
+		# rf_account = np.minimum(0, self.account_df - self.account_df.iat[0] - rf)**2
+		# rf_account_mean = rf_account.mean()
+		# mean = self.account_df.mean() - rf
+		# return mean / rf_account_mean
 
 	def PnL(self):
 		return self.account_df.iat[-1]

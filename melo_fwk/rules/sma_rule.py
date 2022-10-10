@@ -17,9 +17,9 @@ class SMATradingRule:
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
 		fast_sma = data["Close"].rolling(int(self.fast_span)).mean().to_numpy()
-		slow_sma = data["Close"].rolling(int(self.slow_span)).mean().to_numpy()
+		slow_sma = data["Close"].rolling(int(self.slow_span)).mean().mean()
 
-		std = data["Close"].rolling(25).std().to_numpy()
+		std = data["Close"].rolling(25).mean().std()
 
 		sma = fast_sma - slow_sma
 

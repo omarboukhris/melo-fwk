@@ -1,35 +1,39 @@
+
 from mql import quantflow_factory
 from melo_fwk.policies.vol_target_policy import VolTarget
 
-"""
-MeloQL - Interpreter Spec: Chronological Model Backtesting
-Cov Heat Map : 
-	N Products in Q Asset Class in 1 Portfolio
-	1 Mql query file for each asset class
-	output :
-		Cov Heat Map
-		Clustering
-		folders with template startoptim/vol queries
-	Notes: make structured query folder generator from heatmap/clustering (optional) result
-Strat/VolTarget Estimators :
-	M < Nq Products in Asset Class Q -> (K Strategies, VolTarget)
-	1 Mql query file by trading subsystem
-	output :
-		Optim Strat Config. location: tbd
-		Forecast Weights + Div Mult. location: tbd
-		VolTarget. location: tbd
-	Notes: make loader/writer for these estimators, register in factory
-Backtest Estimator :
-	M < N Correllated Products -> (K Strategies, VolTarget)
-	1 Mql query file by trading subsystem
-	output : 
-		Backtest Report
-Allocation Optim :
-	N Products in Q Asset Class in 1 Portfolio
-	1 Mql query file for whole portfolio
-	output :
-		Allocation Weights Optim. location: tbd
-"""
+import yaml
+import glob
+
+from pathlib import Path
+
+from dataclasses import dataclass, field
+
+@dataclass(frozen=False)
+class StratConfigRegistry:
+	mql_query_path: str
+	config_points_registry: dict = field(init=False)
+
+	def __post_init__(self):
+		config_points_filenames = glob.glob(str(
+			Path(self.mql_query_path) / "strat_config_points") + "/*")
+
+		self.config_points_registry = {}
+		for config_point_fn in config_points_filenames:
+			with open(config_point_fn, "r") as stream:
+				try:
+					for strat_config in yaml.safe_load(stream):
+						self.config_points_registry = dict(
+							self.config_points_registry,
+							**strat_config)
+				except yaml.YAMLError as exc:
+					print(exc)
+
+	def get_strat_config(self, key: str):
+		return self.config_points_registry[key]
+
+	def __str__(self):
+		return str(self.config_points_registry)
 
 class ConfigBuilderHelper:
 	@staticmethod
@@ -66,6 +70,26 @@ class SizePolicyConfigBuilder:
 		vol_target = VolTarget(*vol_target_cfg)
 		return _SizePolicyClass(vol_target)
 
+class StrategyConfigBuilder:
+	@staticmethod
+	def build_strategy(quant_query_dict: dict, strat_config_registry: StratConfigRegistry):
+		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")
+		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyList").split(",")
+		strat_config_points = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyConfigList").split(",")
+
+		strategies = []
+		for strat, config in zip(strategies_kw, strat_config_points):
+			# branch in case config is search space not config point
+			strategies.append(
+				quantflow_factory.QuantFlowFactory.get_strategy(strat.strip())(
+					**strat_config_registry.get_strat_config(config.strip())
+				)
+			)
+
+		forecast_weights_str = ConfigBuilderHelper.strip_single(stripped_entry, "forecastWeightsList")
+		forecast_weights = [float(fw_str) for fw_str in forecast_weights_str.split(",")]
+
+		return strategies, forecast_weights
 
 class ProductConfigBuilder:
 	@staticmethod

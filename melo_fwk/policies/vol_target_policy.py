@@ -22,8 +22,9 @@ class VolTarget:
 
 
 class ISizePolicy:
-	def __init__(self):
+	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.)):
 		self.datastream = None
+		self.risk_policy = risk_policy
 
 	def update_datastream(self, datastream):
 		self.datastream = datastream
@@ -32,17 +33,16 @@ class ISizePolicy:
 		pass
 
 class ConstSizePolicy(ISizePolicy):
-	def __init__(self):
-		super(ConstSizePolicy, self).__init__()
+	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.)):
+		super(ConstSizePolicy, self).__init__(risk_policy)
 
 	def position_size(self, forecast: float) -> float:
 		return 1.0
 
 class VolTargetSizePolicy(ISizePolicy):
 
-	def __init__(self, risk_policy: VolTarget, unit_leverage: int = 100):
-		super(VolTargetSizePolicy, self).__init__()
-		self.risk_policy = risk_policy
+	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), unit_leverage: int = 100):
+		super(VolTargetSizePolicy, self).__init__(risk_policy)
 		self.unit_leverage = unit_leverage
 
 	def price_vol(self, lookback: int = 36) -> float:

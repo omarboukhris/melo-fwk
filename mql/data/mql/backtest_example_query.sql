@@ -6,7 +6,7 @@ with
 
 where strategies
 	are (ewma, sma)
-	with strategyConfig (ewmaConfig, smaConfig)
+	with strategyConfig (ewma_strat_0, sma_strat_0)
 	and forecastWeights (0.5, 0.5)
 
 where volTarget
