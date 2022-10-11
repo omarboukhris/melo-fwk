@@ -1,5 +1,8 @@
 
-ProductsDef -> !ProductsDefList trade. !instrument.
+ProductsDef ->
+    !ProductsDefList trade. !instrument.
+    from. timeperiod=numeric. to. timeperiod=numeric.
+
 ProductsDefList ->
     !ProductsGenerator |
     !ProductsGenerator comma. |

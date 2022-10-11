@@ -2,7 +2,7 @@ from mql import quantflow_factory
 
 from melo_fwk.datastreams.commodities import CommodityDataLoader
 
-from melo_fwk import trading_system
+from melo_fwk.backtest_estimator import BacktestEstimator
 
 from melo_fwk.rules import ewma_rule, sma_rule
 
@@ -15,7 +15,7 @@ def register_all():
 	register_products()
 
 def register_estimator():
-	quantflow_factory.QuantFlowFactory.register_workflow("backtest", trading_system.TradingSystem)
+	quantflow_factory.QuantFlowFactory.register_workflow("BacktestEstimator", BacktestEstimator)
 
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma_rule.EWMATradingRule)

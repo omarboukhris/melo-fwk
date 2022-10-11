@@ -1,5 +1,4 @@
 
-import numpy as np
 import pandas as pd
 import tqdm
 
@@ -67,8 +66,7 @@ class TradingSystem:
 		]
 		self.time_index = 0
 		self.order_book = []
-		self.forecast_history = []
-		self.pose_size_history = []
+		self.positions_history = []
 		self.current_trade = Order.empty()
 		self.data_source = data_source
 		self.trading_rules = trading_rules
@@ -83,12 +81,6 @@ class TradingSystem:
 			trading_rules=[],
 			forecast_weights=[]
 		)
-
-	def reset(self):
-		self.time_index = 0
-		self.order_book = []
-		self.forecast_history = []
-		self.current_trade = Order.empty()
 
 	def open_trade(self, forecast: float, size: float, entry_time: str):
 		# adjust vol target and update size policy object ?
@@ -121,16 +113,6 @@ class TradingSystem:
 		self.logger.info(f"Forcasting {forecast}")
 		return forecast, size
 
-	def get_account_dataframe(self):
-		return pd.DataFrame(self.accout)
-
-	def get_account_series(self):
-		return self.get_account_dataframe()["Balance"]
-
-	def get_order_book(self):
-		orderbook_dict = [order.to_dict() for order in self.order_book]
-		return pd.DataFrame(orderbook_dict)
-
 	def mark_to_market(self):
 		profit = dict()
 		profit["Date"] = self.data_source.get_current_date()
@@ -153,13 +135,10 @@ class TradingSystem:
 			return
 
 		forecast, size = self.forecast_and_size()
-		self.forecast_history.append({
+		self.positions_history.append({
 			"Date": self.data_source.get_current_date(),
-			"Forecast": forecast
-		})
-		self.pose_size_history.append({
-			"Date": self.data_source.get_current_date(),
-			"PositionSize": size
+			"Forecast": forecast,
+			"PositionSize": size,
 		})
 
 		if not self.current_trade.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
@@ -175,31 +154,6 @@ class TradingSystem:
 		except StopIteration:
 			pass
 
-	def volatility_normalized_PnL(self):
-		account = np.array(self.account_dataframe()["Balance"])
-		return account.mean()/account.std()
-
-	def forecast_dataframe(self):
-		return pd.DataFrame(self.forecast_history)
-
-	def account_dataframe(self):
-		return pd.DataFrame(self.accout)
-
-	def account_series(self):
-		return pd.DataFrame(self.accout)["Balance"]
-
-	def position_dataframe(self):
-		return pd.DataFrame(self.pose_size_history)
-
-	def get_tsar(self):
-		return TradingSystemAnnualResult(
-			vol_target=self.size_policy.risk_policy,
-			account_metrics=AccountMetrics(self.account_series()),
-			forecast_df=self.forecast_dataframe(),
-			size_df=self.position_dataframe(),
-			account_df=self.account_dataframe()
-		)
-
 	def run(self):
 		# while not self.simulation_ended():
 		for _ in self.data_source:
@@ -209,3 +163,29 @@ class TradingSystem:
 		# while not self.simulation_ended():
 		for _ in tqdm.tqdm(self.data_source):
 			self.trade_next()
+
+
+	def order_book_dataframe(self):
+		orderbook_dict = [order.to_dict() for order in self.order_book]
+		return pd.DataFrame(orderbook_dict)
+
+	def forecast_dataframe(self):
+		return pd.DataFrame(self.positions_history)[["Date", "Forecast"]]
+
+	def account_dataframe(self):
+		return pd.DataFrame(self.accout)
+
+	def account_series(self):
+		return pd.DataFrame(self.accout)["Balance"]
+
+	def position_dataframe(self):
+		return pd.DataFrame(self.positions_history)[["Date", "PositionSize"]]
+
+	def get_tsar(self):
+		return TradingSystemAnnualResult(
+			vol_target=self.size_policy.risk_policy,
+			account_metrics=AccountMetrics(self.account_series()),
+			forecast_df=self.forecast_dataframe(),
+			size_df=self.position_dataframe(),
+			account_df=self.account_dataframe()
+		)

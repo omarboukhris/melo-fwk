@@ -2,14 +2,9 @@
 import glob
 import pandas as pd
 import melo_fwk.datastreams.datastream as ds
+from melo_fwk.datastreams.product import Product
 
-from dataclasses import dataclass
 from pathlib import Path
-
-@dataclass(frozen=True)
-class Product:
-	filepath: str
-	datastream: ds.HLOCDataStream
 
 class BacktestDataLoader:
 	parent_folder = Path(Path(__file__).parent)

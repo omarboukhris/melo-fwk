@@ -18,7 +18,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 		pds.with_daily_returns()
 
 		tr_sys = ts.TradingSystem(
-			balance=10000,
 			data_source=pds,
 			trading_rules=[],
 			forecast_weights=[]
@@ -41,7 +40,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		products = bdl.BacktestDataLoader.get_products("melo_fwk/data/CommodityData/*_sanitized.csv")
+		products = bdl.BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
 		sum_ = 0.
 		for product in tqdm.tqdm(products):
 			loaded_prod = bdl.BacktestDataLoader.get_product_datastream(product)
@@ -56,7 +55,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 			sma = EWMATradingRule(**sma_params)
 
 			tr_sys = ts.TradingSystem(
-				balance=0,
 				data_source=loaded_prod.datastream,
 				trading_rules=[sma],
 				forecast_weights=[1.]
@@ -66,9 +64,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 			# print(metrics.AccountMetrics.compute_all_metrics(tr_sys.get_account_series()))
 			# orderbook = tr_sys.get_order_book()
 
-			df_account = tr_sys.get_account_dataframe()
+			df_account = tr_sys.account_dataframe()
 			account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
-			account_plt.save_png(f"data/residual/{product['name']}_plot.png")
+			account_plt.save_png(f"melo_fwk/data/residual/{product['name']}_plot.png")
 
 			sum_ += df_account["Balance"].iloc[-1]
 

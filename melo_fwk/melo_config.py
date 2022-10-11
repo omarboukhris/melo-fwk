@@ -56,6 +56,17 @@ class ConfigBuilderHelper:
 		str_list = ConfigBuilderHelper.strip_single(parsed_dict, key)
 		return [float(e.strip()) for e in str_list.split(",")]
 
+class EstimatorConfigBuilder:
+	@staticmethod
+	def build_estimator(quant_query_dict: dict):
+		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProcessDef")
+		estimator_kw = ConfigBuilderHelper.strip_single(stripped_entry, "Estimator")
+		estimator_param_list = ConfigBuilderHelper.strip_single(stripped_entry, "EstimatorParamList").split(",")
+		estimator_param_list = [estimator_param.strip() for estimator_param in estimator_param_list]
+		
+		_EstimatorObj = quantflow_factory.QuantFlowFactory.get_workflow(estimator_kw)
+		return _EstimatorObj, estimator_param_list
+		
 class SizePolicyConfigBuilder:
 	@staticmethod
 	def build_size_policy(quant_query_dict: dict):
@@ -68,7 +79,7 @@ class SizePolicyConfigBuilder:
 
 		vol_target_cfg = ConfigBuilderHelper.parse_num_list(position_size_dict, "VolTargetCouple")
 		vol_target = VolTarget(*vol_target_cfg)
-		return _SizePolicyClass(vol_target)
+		return _SizePolicyClass  # (vol_target)
 
 class StrategyConfigBuilder:
 	@staticmethod
@@ -97,19 +108,20 @@ class ProductConfigBuilder:
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProductsDef")
 		products_generator = ConfigBuilderHelper.strip_single(stripped_entry, "ProductsDefList")["ProductsGenerator"]
 		instruments = stripped_entry["instrument"]  # if idx build index otherwise trade singles
+		time_period = [int(year) for year in stripped_entry["timeperiod"]]
 
-		output_products = []
+		output_products = {}
 		for prods in products_generator:
 			products_type = ConfigBuilderHelper.strip_single(prods, "productType")
 			products_name_list = ConfigBuilderHelper.parse_list(prods, "ProductsList")
 			for product_name in products_name_list:
-				output_products.append(ProductConfigBuilder._get_product(products_type, product_name))
+				output_products.update(ProductConfigBuilder._get_product(products_type, product_name))
 
 		if instruments == "idx":
 			# build index
 			pass
 		# else: trade singles
-		return output_products
+		return output_products, time_period
 
 	@staticmethod
 	def _get_product(products_type: str, product_name: str) -> dict:

@@ -1,3 +1,13 @@
 
-ProcessDef -> Estimator=alphanum.
+ProcessDef ->
+    Estimator=alphanum. lt. s:EstimatorParamList gt. |
+    Estimator=alphanum.
+
+EstimatorParamList ->
+    alphanum. |
+    alphanum. comma. |
+[]
+
 // add output pipes here
+
+

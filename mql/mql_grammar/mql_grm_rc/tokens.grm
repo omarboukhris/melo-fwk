@@ -2,6 +2,8 @@
 // keywords
 create.("create")
 with.("with")
+from.("from")
+to.("to")
 where.("where")
 is.("is")
 are.("are")
