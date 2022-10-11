@@ -1,5 +1,5 @@
-
--- AllocOptim might need to be done on whole portfolio instead of subsystem
+-- deprecated
+-- AllocOptim will need to be done on whole portfolio instead of subsystem
 create AllocOptimExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)

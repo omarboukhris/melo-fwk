@@ -37,7 +37,7 @@ class ConstSizePolicy(ISizePolicy):
 		super(ConstSizePolicy, self).__init__(risk_policy)
 
 	def position_size(self, forecast: float) -> float:
-		return 1.0
+		return forecast/abs(forecast)
 
 class VolTargetSizePolicy(ISizePolicy):
 

@@ -9,22 +9,24 @@ class BacktestEstimator:
 
 	def __init__(
 		self,
-		balance: float,
 		products: dict,
 		time_period: list,
-		strategies: list = None,  # change to buy and hold
-		forecast_weights: list = None,  # change to [1.0] by default
+		strategies: list = None,
+		forecast_weights: list = None,
+		vol_target: VolTarget = VolTarget(0., 0.),
 		size_policy_class_: callable = ConstSizePolicy,
 		estimator_params: list = None
 	):
+		strategies = [] if strategies is None else strategies
+		forecast_weights = [] if forecast_weights is None else forecast_weights
 		assert len(strategies) == len(forecast_weights), \
 			"(BacktestEstimator) Strategies and Forecast weight do not correspond."
 
 		self.products = products
-		self.balance = balance
 		self.time_period = time_period
 		self.strategies = strategies
 		self.forecast_weights = forecast_weights
+		self.vol_target = vol_target
 		self.size_policy_class_ = size_policy_class_
 		self.reinvest = "reinvest" in estimator_params
 
@@ -35,15 +37,15 @@ class BacktestEstimator:
 		return out_dict
 
 	def _trade_product(self, product: Product):
-		balance = self.balance
+		balance = self.vol_target.trading_capital
 		results = []
 		product.datastream.with_daily_returns()
 		product.datastream.parse_date_column()
 
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
 			vol_target = VolTarget(
-				annual_vol_target=1e-1,
-				trading_capital=balance if self.reinvest else self.balance)
+				annual_vol_target=self.vol_target.annual_vol_target,
+				trading_capital=balance if self.reinvest else self.vol_target.trading_capital)
 			size_policy = self.size_policy_class_(risk_policy=vol_target)
 
 			trading_subsys = TradingSystem(

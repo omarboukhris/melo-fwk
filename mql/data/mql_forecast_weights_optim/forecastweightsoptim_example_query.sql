@@ -7,9 +7,6 @@ from 2004 to 2008
 
 where strategies
 	are (ewma, sma)
-	with strategyConfig (
-	    ewmaConfig.search_space,
-	    smaConfig.search_space)
-	and forecastWeights (*)
+	with strategyConfig (ewma_strat_0, sma_strat_0)
 
-select ForecastWeightsOptim
+select ForecastWeightsEstimator

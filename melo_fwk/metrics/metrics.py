@@ -42,6 +42,16 @@ class AccountMetrics:
 		calmars = self.account_df.mean() / abs(self.max_drawdown())
 		return calmars
 
+	def get_metric_by_name(self, name: str, rf: float = 0.):
+		if name in ["sharpe", "sr"]:
+			return self.sharpe_ratio(rf)
+		if name in ["sortino", "sor"]:
+			return self.sortino_ratio(rf)
+		if name in ["drawdown", "ddown"]:
+			return self.max_drawdown()
+		if name in ["calmar", "cr"]:
+			return self.calmar_ratio()
+
 	@staticmethod
 	def compute_all_metrics(series: pd.Series, rf: float = 0.0):
 		account_metrics = AccountMetrics(series)

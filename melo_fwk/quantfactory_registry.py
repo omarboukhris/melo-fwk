@@ -1,8 +1,9 @@
-from mql import quantflow_factory
+from melo_fwk.helpers import quantflow_factory
 
 from melo_fwk.datastreams.commodities import CommodityDataLoader
 
 from melo_fwk.backtest_estimator import BacktestEstimator
+from melo_fwk.fw_optim_estimator import ForecastWeightsEstimator
 
 from melo_fwk.rules import ewma_rule, sma_rule
 
@@ -16,6 +17,7 @@ def register_all():
 
 def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_workflow("BacktestEstimator", BacktestEstimator)
+	quantflow_factory.QuantFlowFactory.register_workflow("ForecastWeightsEstimator", ForecastWeightsEstimator)
 
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma_rule.EWMATradingRule)
@@ -24,7 +26,7 @@ def register_strats():
 
 def register_size_policies():
 	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", vol_target_policy.VolTargetSizePolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("ConstSizePolicy", vol_target_policy.ConstSizePolicy)
+	quantflow_factory.QuantFlowFactory.register_size_policy("default", vol_target_policy.ConstSizePolicy)
 
 def register_products():
 	# =============================================================
