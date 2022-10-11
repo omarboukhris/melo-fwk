@@ -3,7 +3,7 @@ import tqdm
 
 from melo_fwk.rules.ewma_rule import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
-from melo_fwk import trading_system as ts
+from melo_fwk.utils import trading_system as ts
 from melo_fwk.plots.plots import AccountPlotter
 from melo_fwk.datastreams import datastream as ds, backtest_data_loader as bdl
 

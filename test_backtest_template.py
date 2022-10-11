@@ -7,7 +7,7 @@ from melo_fwk.rules.sma_rule import SMATradingRule
 
 from melo_fwk.policies.vol_target_policy import VolTarget, VolTargetSizePolicy
 
-from melo_fwk.trading_system import TradingSystem
+from melo_fwk.utils.trading_system import TradingSystem
 
 import numpy as np
 

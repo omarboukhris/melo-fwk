@@ -1,9 +1,9 @@
-from melo_fwk.helpers import quantflow_factory
+from melo_fwk.utils import quantflow_factory
 
 from melo_fwk.datastreams.commodities import CommodityDataLoader
 
-from melo_fwk.backtest_estimator import BacktestEstimator
-from melo_fwk.fw_optim_estimator import ForecastWeightsEstimator
+from melo_fwk.estimators.backtest_estimator import BacktestEstimator
+from melo_fwk.estimators.fw_optim_estimator import ForecastWeightsEstimator
 
 from melo_fwk.rules import ewma_rule, sma_rule
 

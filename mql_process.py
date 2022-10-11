@@ -23,6 +23,17 @@ class MqlConfigBuilder:
 		self.strategies_config = StrategyConfigBuilder.build_strategy(quant_query, self.strat_config_registry)
 		self.estimator_config_ = EstimatorConfigBuilder.build_estimator(quant_query)
 
+	def build_estimator(self):
+		return self.estimator_config_[0](
+			products=self.products_config[0],
+			time_period=self.products_config[1],
+			strategies=self.strategies_config[0],
+			forecast_weights=self.strategies_config[1],
+			vol_target=self.vol_target,
+			size_policy_class_=self.size_policy_class_,
+			estimator_params=self.estimator_config_[1]
+		)
+
 	def __str__(self):
 		return str({
 			"products": self.products_config,
@@ -50,15 +61,7 @@ class MqlProcess:
 		)
 
 	def run_process(self):
-		estimator_obj_ = self.mql_config.estimator_config_[0](
-			products=self.mql_config.products_config[0],
-			time_period=self.mql_config.products_config[1],
-			strategies=self.mql_config.strategies_config[0],
-			forecast_weights=self.mql_config.strategies_config[1],
-			vol_target=self.mql_config.vol_target,
-			size_policy_class_=self.mql_config.size_policy_class_,
-			estimator_params=self.mql_config.estimator_config_[1]
-		)
+		estimator_obj_ = self.mql_config.build_estimator()
 		output = estimator_obj_.run()
 		# add result writer process here
 		return output

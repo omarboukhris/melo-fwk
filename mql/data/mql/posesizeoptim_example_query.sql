@@ -10,8 +10,6 @@ where strategies
 	with strategyConfig (ewmaConfig, smaConfig)
 	and forecastWeights (0.5, 0.5)
 
-where volTarget
-	is (*, 100000)
-	with sizePolicy (VolTargetSizePolicy)
+where sizePolicy (VolTargetSizePolicy)
 
-select poseSizeOptimEstimator
+select poseSizeOptimEstimator (100000)
