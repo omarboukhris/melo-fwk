@@ -2,7 +2,7 @@ import tqdm
 import numpy as np
 
 from melo_fwk.policies.vol_target_policy import ConstSizePolicy, VolTarget
-from melo_fwk.utils.trading_system import TradingSystem
+from melo_fwk.trading_system import TradingSystem
 
 import scipy.optimize as opt
 
@@ -34,6 +34,17 @@ class ForecastWeightsEstimator:
 		self.size_policy_class_ = size_policy_class_
 		self.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
 
+	def run(self):
+		results = []
+		self.product.datastream.with_daily_returns()
+		self.product.datastream.parse_date_column()
+
+		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+			self.current_year = year
+			results.append(opt.minimize(self.trade_with_weights, self.forecast_weights))
+
+		return results
+
 	def trade_with_weights(self, weights):
 		size_policy = self.size_policy_class_(risk_policy=self.vol_target)
 
@@ -49,14 +60,3 @@ class ForecastWeightsEstimator:
 
 		return tsar.account_metrics.get_metric_by_name(self.metric)
 
-
-	def run(self):
-		results = []
-		self.product.datastream.with_daily_returns()
-		self.product.datastream.parse_date_column()
-
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
-			self.current_year = year
-			results.append(opt.minimize(self.trade_with_weights, self.forecast_weights))
-
-		return results

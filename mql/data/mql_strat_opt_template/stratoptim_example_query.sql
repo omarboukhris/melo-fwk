@@ -8,7 +8,7 @@ from 2004 to 2008
 where strategies
 	are (ewma, sma)
 	with strategyConfig (
-	    ewmaConfig.search_space,
-	    smaConfig.search_space)
+	    ewma.search_space,
+	    sma)
 
 select StratOptimEstimator

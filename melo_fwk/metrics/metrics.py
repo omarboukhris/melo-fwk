@@ -17,9 +17,9 @@ class AccountMetrics:
 		mean = self.account_df.mean() - rf
 		std_neg = self.account_df[self.account_df < 0].std()
 		return mean / std_neg
-		# rf_account = np.minimum(0, self.account_df - self.account_df.iat[0] - rf)**2
+		# rf_account = np.minimum(0, self.account_series - self.account_series.iat[0] - rf)**2
 		# rf_account_mean = rf_account.mean()
-		# mean = self.account_df.mean() - rf
+		# mean = self.account_series.mean() - rf
 		# return mean / rf_account_mean
 
 	def PnL(self):

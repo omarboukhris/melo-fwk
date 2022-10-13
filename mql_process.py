@@ -16,6 +16,13 @@ from pathlib import Path
 
 class MqlConfigBuilder:
 	def __init__(self, quant_query_path: Path, quant_query: dict):
+		"""
+		Should rework into config builder factory
+		ex: parse strat vs strat metadata
+
+		:param quant_query_path:
+		:param quant_query:
+		"""
 		self.products_config = ProductConfigBuilder.build_products(quant_query)
 		self.size_policy_class_ = SizePolicyConfigBuilder.build_size_policy(quant_query)
 		self.vol_target = VolTargetConfigBuilder.build_vol_target(quant_query)
@@ -61,6 +68,11 @@ class MqlProcess:
 		)
 
 	def run_process(self):
+		""" Relies heavily on reflection. A pain to debug
+		Estimators should:
+			- Implement the same constructor (see any estimator)
+			- Implement a run() method() that returns any result
+		"""
 		estimator_obj_ = self.mql_config.build_estimator()
 		output = estimator_obj_.run()
 		# add result writer process here
@@ -76,10 +88,15 @@ if __name__ == "__main__":
 	# asset select
 	# alloc opt
 
+	from melo_fwk.plots.tsar_plots import TsarPlotter
 
 	mql_proc = MqlProcess(mql_query_path=test_file_path)
 	print(mql_proc.mql_config)
-
 	result = mql_proc.run_process()
-	print(result)
+
+	# find a way to add output writers into mql grammar
+	# maybe link output writers and estimators ?
+	# Backtest estimator
+	# tsar_plotter = TsarPlotter(result)
+	# tsar_plotter.save_fig()
 

@@ -2,12 +2,12 @@ import tqdm
 
 from melo_fwk.datastreams.commodities import CommodityDataLoader
 
-from melo_fwk.rules.ewma_rule import EWMATradingRule
-from melo_fwk.rules.sma_rule import SMATradingRule
+from melo_fwk.rules.ewma import EWMATradingRule
+from melo_fwk.rules.sma import SMATradingRule
 
 from melo_fwk.policies.vol_target_policy import VolTarget, VolTargetSizePolicy
 
-from melo_fwk.utils.trading_system import TradingSystem
+from melo_fwk.trading_system import TradingSystem
 
 import numpy as np
 

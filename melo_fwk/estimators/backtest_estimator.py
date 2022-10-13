@@ -3,7 +3,7 @@ import tqdm
 
 from melo_fwk.datastreams.product import Product
 from melo_fwk.policies.vol_target_policy import ConstSizePolicy, VolTarget
-from melo_fwk.utils.trading_system import TradingSystem
+from melo_fwk.trading_system import TradingSystem
 
 class BacktestEstimator:
 
@@ -38,7 +38,7 @@ class BacktestEstimator:
 
 	def _trade_product(self, product: Product):
 		balance = self.vol_target.trading_capital
-		results = []
+		results = dict()
 		product.datastream.with_daily_returns()
 		product.datastream.parse_date_column()
 
@@ -57,7 +57,7 @@ class BacktestEstimator:
 
 			trading_subsys.run()
 			tsar = trading_subsys.get_tsar()
-			results.append(tsar)
+			results.update({f"{product.filepath}_{year}": tsar})
 			balance += tsar.annual_delta()
 
 		return results

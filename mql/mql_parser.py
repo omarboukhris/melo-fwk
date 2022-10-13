@@ -19,7 +19,7 @@ class MqlParser:
 if __name__ == "__main__":
 	mql_testfile_path = str(
 		Path(__file__).parent /
-		"data/mql/backtest_example_query.sql")
+		"data/mql_strat_opt_template/stratoptim_example_query.sql")
 	print(mql_testfile_path)
 	parser = MqlParser()
 	parsed = parser.parse_to_json(mql_testfile_path)

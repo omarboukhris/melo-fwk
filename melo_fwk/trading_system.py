@@ -15,15 +15,17 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class TradingSystemAnnualResult:
 	account_metrics: AccountMetrics
-	forecast_df: pd.DataFrame
-	size_df: pd.DataFrame
-	account_df: pd.DataFrame
+	dates: pd.Series
+	price_series: pd.Series
+	forecast_series: pd.Series
+	size_series: pd.Series
+	account_series: pd.Series
 	vol_target: VolTarget
 
 	def annual_delta(self):
-		assert len(self.account_df) > 1, \
+		assert len(self.account_series) > 1, \
 			"(TradingSystemAnnualReport) final_balance: account data frame is empty"
-		return self.account_df.iloc[-1]["Balance"]
+		return self.account_series.iloc[-1]
 
 class TradingSystem:
 	"""Class for backtesting offline a trading system.
@@ -36,6 +38,7 @@ class TradingSystem:
 	- a data source for historic price data
 	- a set of trading rules
 	- a set of forcast weights (sum(w_i) == 1)
+	- a pose sizing policy
 	- a policy for entering/exiting trades
 	"""
 
@@ -58,15 +61,15 @@ class TradingSystem:
 		assert len(trading_rules) == len(forecast_weights), \
 			self.logger.error("(AssertionError) Number of TradingRules must match forcast weights")
 
-		self.accout = [
-			{
-				"Date": data_source.get_current_date(),
-				"Balance": 0,
-			}
-		]
 		self.time_index = 0
 		self.order_book = []
-		self.positions_history = []
+		self.tsar_history = [{
+			"Date": data_source.get_current_date(),
+			"Price": data_source.get_close(),
+			"Forecast": 0.,
+			"PositionSize": 0.,
+			"Balance": 2.,
+		}]
 		self.current_trade = Order.empty()
 		self.data_source = data_source
 		self.trading_rules = trading_rules
@@ -114,12 +117,10 @@ class TradingSystem:
 		return forecast, size
 
 	def mark_to_market(self):
-		profit = dict()
-		profit["Date"] = self.data_source.get_current_date()
-		profit["Balance"] = self.accout[-1]["Balance"]
+		balance = self.tsar_history[-1]["Balance"]
 		open_close_diff = self.data_source.get_current_diff() * self.current_trade.quantity  # * self.leverage
-		profit["Balance"] += open_close_diff if self.current_trade.is_position_long() else -open_close_diff
-		self.accout.append(profit)
+		balance += open_close_diff if self.current_trade.is_position_long() else -open_close_diff
+		return balance
 
 	def simulation_ended(self):
 		return self.data_source.limit_reached()
@@ -135,11 +136,6 @@ class TradingSystem:
 			return
 
 		forecast, size = self.forecast_and_size()
-		self.positions_history.append({
-			"Date": self.data_source.get_current_date(),
-			"Forecast": forecast,
-			"PositionSize": size,
-		})
 
 		if not self.current_trade.is_trade_open() and self.trading_policy.enter_trade_predicat(forecast):
 			self.open_trade(forecast, size, self.data_source.get_current_date())
@@ -147,7 +143,13 @@ class TradingSystem:
 		elif self.current_trade.is_trade_open() and self.trading_policy.exit_trade_predicat(forecast):
 			self.close_trade(forecast, self.data_source.get_current_date())
 
-		self.mark_to_market()
+		self.tsar_history.append({
+			"Date": self.data_source.get_current_date(),
+			"Price": self.data_source.get_close(),
+			"Forecast": forecast,
+			"PositionSize": size,
+			"Balance": self.mark_to_market()
+		})
 
 		try:
 			self.data_source.next()
@@ -164,28 +166,41 @@ class TradingSystem:
 		for _ in tqdm.tqdm(self.data_source):
 			self.trade_next()
 
+	def dates_df(self):
+		return pd.DataFrame(self.tsar_history)["Date"]
 
 	def order_book_dataframe(self):
 		orderbook_dict = [order.to_dict() for order in self.order_book]
 		return pd.DataFrame(orderbook_dict)
 
 	def forecast_dataframe(self):
-		return pd.DataFrame(self.positions_history)[["Date", "Forecast"]]
+		return pd.DataFrame(self.tsar_history)[["Date", "Forecast"]]
+
+	def forecast_series(self):
+		return pd.DataFrame(self.tsar_history)["Forecast"]
 
 	def account_dataframe(self):
-		return pd.DataFrame(self.accout)
+		return pd.Series(self.tsar_history)[["Date", "Balance"]]
 
 	def account_series(self):
-		return pd.DataFrame(self.accout)["Balance"]
+		return pd.DataFrame(self.tsar_history)["Balance"]
 
 	def position_dataframe(self):
-		return pd.DataFrame(self.positions_history)[["Date", "PositionSize"]]
+		return pd.DataFrame(self.tsar_history)[["Date", "PositionSize"]]
+
+	def position_series(self):
+		return pd.DataFrame(self.tsar_history)["PositionSize"]
+
+	def price_series(self):
+		return pd.DataFrame(self.tsar_history)["Price"]
 
 	def get_tsar(self):
 		return TradingSystemAnnualResult(
 			vol_target=self.size_policy.risk_policy,
 			account_metrics=AccountMetrics(self.account_series()),
-			forecast_df=self.forecast_dataframe(),
-			size_df=self.position_dataframe(),
-			account_df=self.account_dataframe()
+			dates=self.dates_df(),
+			price_series=self.price_series(),
+			forecast_series=self.forecast_series(),
+			size_series=self.position_series(),
+			account_series=self.account_series()
 		)

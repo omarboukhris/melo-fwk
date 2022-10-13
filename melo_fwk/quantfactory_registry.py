@@ -3,9 +3,10 @@ from melo_fwk.utils import quantflow_factory
 from melo_fwk.datastreams.commodities import CommodityDataLoader
 
 from melo_fwk.estimators.backtest_estimator import BacktestEstimator
+from melo_fwk.estimators.strat_optim_estimator import StratOptimEstimator
 from melo_fwk.estimators.fw_optim_estimator import ForecastWeightsEstimator
 
-from melo_fwk.rules import ewma_rule, sma_rule
+from melo_fwk.rules import ewma, sma
 
 from melo_fwk.policies import vol_target_policy
 
@@ -17,11 +18,12 @@ def register_all():
 
 def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_workflow("BacktestEstimator", BacktestEstimator)
+	quantflow_factory.QuantFlowFactory.register_workflow("StratOptimEstimator", StratOptimEstimator)
 	quantflow_factory.QuantFlowFactory.register_workflow("ForecastWeightsEstimator", ForecastWeightsEstimator)
 
 def register_strats():
-	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma_rule.EWMATradingRule)
-	quantflow_factory.QuantFlowFactory.register_strategy("sma", sma_rule.SMATradingRule)
+	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma.EWMATradingRule)
+	quantflow_factory.QuantFlowFactory.register_strategy("sma", sma.SMATradingRule)
 
 
 def register_size_policies():

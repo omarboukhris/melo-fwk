@@ -20,6 +20,8 @@ StrategyList ->
 StrategyConfigList ->
     alphanum. |
     alphanum. comma. |
+    alphanum. pt. alphanum. |
+    alphanum. pt. alphanum. comma. |
 []
 forecastWeightsList ->
     numeric. |
