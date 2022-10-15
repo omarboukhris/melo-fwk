@@ -1,8 +1,8 @@
-# Melo Trading Framework
+# Melo Framework
 
 ## Requirements
 
-pandas, matplotlib, yfinance, numpy, melodb, pyparse (list will be updated with time)
+pandas, matplotlib, yfinance, numpy, melodb, pyparse, scikit-optimize, sckit-learn, scipy (list will be updated with time)
 
 ## Getting started
 
@@ -11,12 +11,22 @@ Deep knowledge of statistics, finance, software programming and engineering shou
 
 ## Name
 
-Melo-tf and Melo-ql, respectively melo trading framework and melo query language
+Melo-fwk and Melo-ql, respectively melo framework and melo query language
 
 ## Description
 
-Melo-tf & Melo-ql form a backtesting ecosystem used for trading simulations, strategies design.
+Melo-fwk & Melo-ql form a backtesting ecosystem used for trading simulations and quantitative strategy design.
 Strategies and trading policies can easily be extended (WIP).
+
+### Add Data Loader
+
+### Add Strategy
+
+### Add Estimator
+
+### Add Position Size Policy
+
+### Add Trading Policy
 
 ## Installation
 
@@ -25,6 +35,7 @@ pip install dependencies then pip install this repo
 ## Usage
 
 Tutorial on Mql is cooking
+
 
 ## Project status
 Ongoing
