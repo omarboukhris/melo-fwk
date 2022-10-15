@@ -1,40 +1,19 @@
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
-
-from dataclasses import dataclass, field
+from melo_fwk.utils import yaml_io
+from dataclasses import dataclass
 from pathlib import Path
 
-import yaml
 import glob
 
 
-@dataclass(frozen=False)
+@dataclass(frozen=True)
 class StratConfigRegistry:
-	mql_query_path: str
-	config_points_registry: dict = field(init=False)
+	config_points_registry: dict
 
-	def __post_init__(self):
-		"""
-		Register config points for current mql query
-		"""
-		config_points_filenames = glob.glob(str(
-			Path(self.mql_query_path) / "strat_config_points") + "/*")
-
-		self.config_points_registry = {}
-		for config_point_fn in config_points_filenames:
-			with open(config_point_fn, "r") as stream:
-				try:
-					for strat_config in yaml.safe_load(stream):
-						self.config_points_registry = dict(
-							self.config_points_registry,
-							**strat_config)
-				except yaml.YAMLError as exc:
-					print(exc)
-
-	@staticmethod
-	def sanitize_key(key: str):
-		return ".".join([elm.strip() for elm in key.split(".")])
+	def __str__(self):
+		return str(self.config_points_registry)
 
 	def get_strat_config(self, key: str):
 		"""
@@ -47,8 +26,26 @@ class StratConfigRegistry:
 		else:
 			return self.config_points_registry[key]
 
-	def __str__(self):
-		return str(self.config_points_registry)
+
+	@staticmethod
+	def build_registry(mql_query_path: str):
+		"""
+		Register config points for current mql query
+		"""
+		config_points_filenames = glob.glob(
+			str(Path(mql_query_path) / "strat_config_points") + "/*")
+
+		config_points_registry = {}
+		for config_point_fn in config_points_filenames:
+			config_points = yaml_io.read_strat_config_point(config_point_fn)
+			config_points_registry.update(config_points)
+
+		return StratConfigRegistry(config_points_registry=config_points_registry)
+
+
+	@staticmethod
+	def sanitize_key(key: str):
+		return ".".join([elm.strip() for elm in key.split(".")])
 
 
 class StrategyConfigBuilder:

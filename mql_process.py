@@ -1,6 +1,6 @@
 
 from melo_fwk.config.config_helper import ConfigBuilderHelper
-from melo_fwk.config.melo_config import MeloConfigBuilder
+from melo_fwk.config.melo_config import MeloConfig
 from melo_fwk import quantfactory_registry
 
 from mql.mql_parser import MqlParser
@@ -11,14 +11,17 @@ def run_mql_process(mql_query_path: Path):
 	"""
 	Estimators should:
 		- Implement the same constructor (see any estimator)
-		- Implement a run() method() that returns any result
+		- Implement a run() method that returns any result
+	Note:
+		Reporter associated to the estimator should be able
+		to process its result
 	"""
 
 	mql_parser = MqlParser()
 	parsed_mql = mql_parser.parse_to_json(str(mql_query_path))
 	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
 
-	mql_config = MeloConfigBuilder(
+	mql_config = MeloConfig.build(
 		quant_query_path=mql_query_path,
 		quant_query=quant_query
 	)
@@ -50,6 +53,7 @@ if __name__ == "__main__":
 	# asset select
 	# alloc opt
 
+	# register melo components in factory
 	quantfactory_registry.register_all()
 
 	mql_proc_output = run_mql_process(mql_query_path=templates["backtest"])
