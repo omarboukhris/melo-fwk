@@ -5,7 +5,7 @@ import tqdm
 from melodb.loggers import ILogger
 from melodb.Order import Order
 
-from melo_fwk.datastreams.datastream import HLOCDataStream
+from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
 from melo_fwk.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
 from melo_fwk.policies.vol_target_policy import ConstSizePolicy, ISizePolicy, VolTarget
 from melo_fwk.metrics.metrics import AccountMetrics
@@ -180,7 +180,7 @@ class TradingSystem:
 		return pd.DataFrame(self.tsar_history)["Forecast"]
 
 	def account_dataframe(self):
-		return pd.Series(self.tsar_history)[["Date", "Balance"]]
+		return pd.DataFrame(self.tsar_history)[["Date", "Balance"]]
 
 	def account_series(self):
 		return pd.DataFrame(self.tsar_history)["Balance"]
@@ -203,4 +203,15 @@ class TradingSystem:
 			forecast_series=self.forecast_series(),
 			size_series=self.position_series(),
 			account_series=self.account_series()
+		)
+
+	def get_negative_tsar(self):
+		return TradingSystemAnnualResult(
+			vol_target=self.size_policy.risk_policy,
+			account_metrics=AccountMetrics(self.account_series()*-1),
+			dates=self.dates_df(),
+			price_series=self.price_series(),
+			forecast_series=self.forecast_series(),
+			size_series=self.position_series(),
+			account_series=self.account_series()*-1
 		)

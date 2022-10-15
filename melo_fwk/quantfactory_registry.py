@@ -13,6 +13,7 @@ from melo_fwk.policies import vol_target_policy
 def register_all():
 	register_estimator()
 	register_strats()
+	register_search_spaces()
 	register_size_policies()
 	register_products()
 
@@ -25,6 +26,9 @@ def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma.EWMATradingRule)
 	quantflow_factory.QuantFlowFactory.register_strategy("sma", sma.SMATradingRule)
 
+def register_search_spaces():
+	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", ewma.EWMATradingRule.search_space)
+	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", sma.SMATradingRule.search_space)
 
 def register_size_policies():
 	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", vol_target_policy.VolTargetSizePolicy)

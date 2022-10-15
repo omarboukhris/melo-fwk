@@ -1,7 +1,7 @@
 
 import glob
 import pandas as pd
-import melo_fwk.datastreams.datastream as ds
+import melo_fwk.datastreams.hloc_datastream as ds
 from melo_fwk.datastreams.product import Product
 
 from pathlib import Path
@@ -12,19 +12,19 @@ class BacktestDataLoader:
 
 	@staticmethod
 	def get_stocks():
-		return BacktestDataLoader.get_products("data/Stocks/*.csv")
+		return BacktestDataLoader.get_products("assets/Stocks/*.csv")
 
 	@staticmethod
 	def get_commodities():
-		return BacktestDataLoader.get_products("data/CommodityData/*.csv")
+		return BacktestDataLoader.get_products("assets/CommodityData/*.csv")
 
 	@staticmethod
 	def get_sanitized_commodities():
-		return BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
+		return BacktestDataLoader.get_products("assets/CommodityData/*_sanitized.csv")
 
 	@staticmethod
 	def get_sanitized_commodity_hloc_datastream(product: str):
-		product_list = BacktestDataLoader.get_products(f"data/CommodityData/{product}_sanitized.csv")
+		product_list = BacktestDataLoader.get_products(f"assets/CommodityData/{product}_sanitized.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
 
@@ -38,7 +38,7 @@ class BacktestDataLoader:
 		:param path: to glob files from
 		:return: list of products with each product a key/value pair = {"name", "datasource"}
 		"""
-		btpath = str(BacktestDataLoader.parent_folder.parent / path)
+		btpath = str(BacktestDataLoader.parent_folder / path)
 		product_path_list = glob.glob(btpath)
 		output = []
 		for path in product_path_list:

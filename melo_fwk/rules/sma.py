@@ -11,6 +11,13 @@ class SMATradingRule:
 	scale: float
 	cap: float
 
+	search_space = {
+		"fast_span": [i for i in range(4, 60)],
+		"slow_span": [i for i in range(8, 100)],
+		"scale": [6.5],
+		"cap": [20]
+	}
+
 	def forecast(self, data: pd.DataFrame):
 		"""
 		data as pandas.dataframe :

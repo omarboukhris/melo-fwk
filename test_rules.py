@@ -12,7 +12,7 @@ import unittest
 class TradingRuleUnitTests(unittest.TestCase):
 
 	def test_trading_rule(self):
-		products = bdl.BacktestDataLoader.get_products("melo_fwk/data/CommodityData/*_sanitized.csv")
+		products = bdl.BacktestDataLoader.get_products("melo_fwk/datastreams/assets/CommodityData/*_sanitized.csv")
 		for product in tqdm.tqdm(products):
 			_, pds = bdl.BacktestDataLoader.get_product_datastream(product)
 			pds.with_daily_returns()

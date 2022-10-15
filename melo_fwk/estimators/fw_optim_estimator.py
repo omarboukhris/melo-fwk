@@ -56,7 +56,7 @@ class ForecastWeightsEstimator:
 		)
 
 		trading_subsys.run()
-		tsar = trading_subsys.get_tsar()
+		tsar = trading_subsys.get_negative_tsar()
 
 		return tsar.account_metrics.get_metric_by_name(self.metric)
 

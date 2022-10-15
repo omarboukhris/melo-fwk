@@ -1,102 +1,57 @@
 
+from melo_fwk.config.config_helper import ConfigBuilderHelper
+from melo_fwk.config.melo_config import MeloConfigBuilder
 from melo_fwk import quantfactory_registry
-from melo_fwk.melo_config import \
-	ConfigBuilderHelper, \
-	ProductConfigBuilder, \
-	StratConfigRegistry, \
-	StrategyConfigBuilder, \
-	SizePolicyConfigBuilder, \
-	VolTargetConfigBuilder, \
-	EstimatorConfigBuilder
 
 from mql.mql_parser import MqlParser
 
 from pathlib import Path
 
+def run_mql_process(mql_query_path: Path):
+	"""
+	Estimators should:
+		- Implement the same constructor (see any estimator)
+		- Implement a run() method() that returns any result
+	"""
 
-class MqlConfigBuilder:
-	def __init__(self, quant_query_path: Path, quant_query: dict):
-		"""
-		Should rework into config builder factory
-		ex: parse strat vs strat metadata
+	mql_parser = MqlParser()
+	parsed_mql = mql_parser.parse_to_json(str(mql_query_path))
+	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
 
-		:param quant_query_path:
-		:param quant_query:
-		"""
-		self.products_config = ProductConfigBuilder.build_products(quant_query)
-		self.size_policy_class_ = SizePolicyConfigBuilder.build_size_policy(quant_query)
-		self.vol_target = VolTargetConfigBuilder.build_vol_target(quant_query)
-		self.strat_config_registry = StratConfigRegistry(str(quant_query_path.parent))
-		self.strategies_config = StrategyConfigBuilder.build_strategy(quant_query, self.strat_config_registry)
-		self.estimator_config_ = EstimatorConfigBuilder.build_estimator(quant_query)
+	mql_config = MeloConfigBuilder(
+		quant_query_path=mql_query_path,
+		quant_query=quant_query
+	)
+	print(mql_config)
 
-	def build_estimator(self):
-		return self.estimator_config_[0](
-			products=self.products_config[0],
-			time_period=self.products_config[1],
-			strategies=self.strategies_config[0],
-			forecast_weights=self.strategies_config[1],
-			vol_target=self.vol_target,
-			size_policy_class_=self.size_policy_class_,
-			estimator_params=self.estimator_config_[1]
-		)
+	estimator_obj_ = mql_config.build_estimator()
+	output = estimator_obj_.run()
 
-	def __str__(self):
-		return str({
-			"products": self.products_config,
-			"size_policy": self.size_policy_class_,
-			"vol_target": self.vol_target,
-			"strat_config_registry": self.strat_config_registry,
-			"strategies_config": self.strategies_config,
-			"estimator_config": self.estimator_config_
-		})
-
-class MqlProcess:
-
-	def __init__(self, mql_query_path: Path):
-		self.mql_query_path = mql_query_path
-
-		quantfactory_registry.register_all()
-
-		mql_parser = MqlParser()
-		parsed_mql = mql_parser.parse_to_json(str(self.mql_query_path))
-		quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
-
-		self.mql_config = MqlConfigBuilder(
-			quant_query_path=self.mql_query_path,
-			quant_query=quant_query
-		)
-
-	def run_process(self):
-		""" Relies heavily on reflection. A pain to debug
-		Estimators should:
-			- Implement the same constructor (see any estimator)
-			- Implement a run() method() that returns any result
-		"""
-		estimator_obj_ = self.mql_config.build_estimator()
-		output = estimator_obj_.run()
-		# add result writer process here
-		return output
-
-
-if __name__ == "__main__":
-	# backtest
-	# test_file_path = Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql"
-	# fw opt
-	test_file_path = Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql"
-	# strat opt
-	# asset select
-	# alloc opt
-
-	from melo_fwk.plots.tsar_plots import TsarPlotter
-
-	mql_proc = MqlProcess(mql_query_path=test_file_path)
-	print(mql_proc.mql_config)
-	result = mql_proc.run_process()
+	# add result writer process here
 
 	# find a way to add output writers into mql grammar
+	# and return None or simple status code
 	# maybe link output writers and estimators ?
 	# Backtest estimator
 	# tsar_plotter = TsarPlotter(result)
 	# tsar_plotter.save_fig()
+
+	return output
+
+
+if __name__ == "__main__":
+
+	templates = {
+		"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
+		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+		"strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
+	}
+	# still missing :
+	# asset select
+	# alloc opt
+
+	quantfactory_registry.register_all()
+
+	mql_proc_output = run_mql_process(mql_query_path=templates["backtest"])
+	print(mql_proc_output)
 

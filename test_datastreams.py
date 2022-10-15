@@ -1,6 +1,6 @@
 
 from melo_fwk.datastreams.backtest_data_loader import BacktestDataLoader
-from melo_fwk.datastreams.datastream import HLOCDataStream
+from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
 
 import tqdm
 import pandas as pd
@@ -55,7 +55,7 @@ class DataStreamUnitTests(unittest.TestCase):
 			pass
 
 		pdstream = HLOCDataStream(
-			dataframe=pd.read_csv("melo_fwk/data/CommodityData/Cocoa_sanitized.csv"))
+			dataframe=pd.read_csv("melo_fwk/datastreams/assets/CommodityData/Cocoa_sanitized.csv"))
 
 		for tick in pdstream:
 			process_tick(tick)

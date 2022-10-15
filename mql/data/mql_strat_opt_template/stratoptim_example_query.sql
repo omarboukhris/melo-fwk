@@ -9,6 +9,7 @@ where strategies
 	are (ewma, sma)
 	with strategyConfig (
 	    ewma.search_space,
-	    sma)
+	    sma.search_space
+    )
 
 select StratOptimEstimator

@@ -1,3 +1,4 @@
+import math
 
 import pandas as pd
 import numpy as np
@@ -10,13 +11,15 @@ class AccountMetrics:
 	def sharpe_ratio(self, rf: float = 0.0):
 		mean = self.account_df.mean() - self.account_df.iat[0] - rf
 		sigma = self.account_df.std()
-		return mean / sigma
+		sharpe_r = mean / sigma if sigma != 0 else 0.
+		return 0. if math.isnan(sharpe_r) else sharpe_r
 
 	def sortino_ratio(self, rf: float = 0.0):
 		# needs rework ########################
 		mean = self.account_df.mean() - rf
 		std_neg = self.account_df[self.account_df < 0].std()
-		return mean / std_neg
+		sortino_r = mean / std_neg if std_neg != 0 else 0.
+		return 0. if math.isnan(sortino_r) else sortino_r
 		# rf_account = np.minimum(0, self.account_series - self.account_series.iat[0] - rf)**2
 		# rf_account_mean = rf_account.mean()
 		# mean = self.account_series.mean() - rf

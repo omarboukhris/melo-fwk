@@ -7,6 +7,7 @@ class QuantFlowFactory:
 	products = dict()
 	strategies = dict()
 	strat_configs = dict()
+	search_spaces = dict()
 	workflows = dict()
 	size_policies = dict()
 	result_writers = dict()
@@ -26,6 +27,14 @@ class QuantFlowFactory:
 	@staticmethod
 	def get_strategy(strategy_label: str):
 		return QuantFlowFactory.strategies[strategy_label]
+
+	@staticmethod
+	def register_search_space(search_space_label: str, search_space):
+		QuantFlowFactory.search_spaces[search_space_label] = search_space
+
+	@staticmethod
+	def get_search_space(search_space_label: str):
+		return QuantFlowFactory.search_spaces[search_space_label]
 
 	@staticmethod
 	def register_size_policy(size_policy_label: str, size_policy: callable):

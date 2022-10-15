@@ -5,16 +5,17 @@ from melo_fwk.rules.ewma import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
 from melo_fwk import trading_system as ts
 from melo_fwk.plots.plots import AccountPlotter
-from melo_fwk.datastreams import datastream as ds, backtest_data_loader as bdl
+from melo_fwk.datastreams import hloc_datastream as ds, backtest_data_loader as bdl
 
 import unittest
 
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_empty_trading_system(self):
-		df = pd.read_csv("melo_fwk/data/CommodityData/Cocoa_sanitized.csv")
-
-		pds = ds.HLOCDataStream(dataframe=df)
+		products = bdl.BacktestDataLoader.get_products("assets/CommodityData/Cocoa_sanitized.csv")
+		assert len(products) != 0, "(TradingSystemUnitTests) Did not find any product"
+		loaded_prod = bdl.BacktestDataLoader.get_product_datastream(products[0])
+		pds = loaded_prod.datastream
 		pds.with_daily_returns()
 
 		tr_sys = ts.TradingSystem(
@@ -40,7 +41,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		products = bdl.BacktestDataLoader.get_products("data/CommodityData/*_sanitized.csv")
+		products = bdl.BacktestDataLoader.get_products("assets/CommodityData/*_sanitized.csv")
 		sum_ = 0.
 		for product in tqdm.tqdm(products):
 			loaded_prod = bdl.BacktestDataLoader.get_product_datastream(product)
@@ -66,7 +67,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 			df_account = tr_sys.account_dataframe()
 			account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
-			account_plt.save_png(f"melo_fwk/data/residual/{product['name']}_plot.png")
+			account_plt.save_png(f"data/residual/{product['name']}_plot.png")
 
 			sum_ += df_account["Balance"].iloc[-1]
 
