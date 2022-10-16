@@ -3,7 +3,7 @@ import tqdm
 
 from melo_fwk.datastreams.product import Product
 from melo_fwk.policies.vol_target_policy import ConstSizePolicy, VolTarget
-from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems.trading_vect_system import TradingVectSystem
 
 class BacktestEstimator:
 
@@ -48,14 +48,14 @@ class BacktestEstimator:
 				trading_capital=balance if self.reinvest else self.vol_target.trading_capital)
 			size_policy = self.size_policy_class_(risk_policy=vol_target)
 
-			trading_subsys = TradingSystem(
+			trading_subsys = TradingVectSystem(
 				data_source=product.datastream.get_data_by_year(year),
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
 				size_policy=size_policy
 			)
 
-			trading_subsys.run()
+			trading_subsys.trade_vect()
 			tsar = trading_subsys.get_tsar()
 			# change output file path
 			results.update({f"{product.filepath}_{year}": tsar})

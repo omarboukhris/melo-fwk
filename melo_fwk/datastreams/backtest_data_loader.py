@@ -16,17 +16,25 @@ class BacktestDataLoader:
 
 	@staticmethod
 	def get_commodities():
-		return BacktestDataLoader.get_products("assets/CommodityData/*.csv")
+		return BacktestDataLoader.get_products("assets/Commodity/*.csv")
 
 	@staticmethod
 	def get_sanitized_commodities():
-		return BacktestDataLoader.get_products("assets/CommodityData/*_sanitized.csv")
+		return BacktestDataLoader.get_products("assets/Commodity/*_sanitized.csv")
 
 	@staticmethod
 	def get_sanitized_commodity_hloc_datastream(product: str):
-		product_list = BacktestDataLoader.get_products(f"assets/CommodityData/{product}_sanitized.csv")
+		product_list = BacktestDataLoader.get_products(f"assets/Commodity/{product}_sanitized.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
+
+		return BacktestDataLoader.get_product_datastream(product_list[0])
+
+	@staticmethod
+	def get_fx_hloc_datastream(product: str):
+		product_list = BacktestDataLoader.get_products(f"assets/Fx/{product}_1d_10y.csv")
+		assert len(product_list) == 1, \
+			f"BacktestDataLoader.get_fx_hloc_datastream, product = {product_list}"
 
 		return BacktestDataLoader.get_product_datastream(product_list[0])
 

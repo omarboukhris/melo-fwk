@@ -1,8 +1,8 @@
-import numpy as np
-import pandas as pd
 
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
+import numpy as np
+import pandas as pd
 
 class TradingVectSystem(BaseTradingSystem):
 
@@ -19,8 +19,7 @@ class TradingVectSystem(BaseTradingSystem):
 		return f_series
 
 	def get_daily_pnl(self, pose_series: pd.Series):
-		open_close_diff = self.data_source.get_daily_diff_vect() * pose_series  # * self.leverage
-		daily_pnl_series = open_close_diff if self.current_trade.is_position_long() else -open_close_diff
+		daily_pnl_series = self.data_source.get_daily_diff_vect() * pose_series  # * self.block_size
 		return daily_pnl_series
 
 	def trade_vect(self):
@@ -28,6 +27,7 @@ class TradingVectSystem(BaseTradingSystem):
 		forecast_series = self.forecast_cumsum()
 		pose_series = self.size_policy.position_size_vect(forecast_series)
 		daily_pnl = self.get_daily_pnl(pose_series)
+		# orderbook building ??
 
 		self.tsar_history = {
 			"Date": self.data_source.get_dates(),

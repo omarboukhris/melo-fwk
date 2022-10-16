@@ -55,7 +55,7 @@ class DataStreamUnitTests(unittest.TestCase):
 			pass
 
 		pdstream = HLOCDataStream(
-			dataframe=pd.read_csv("melo_fwk/datastreams/assets/CommodityData/Cocoa_sanitized.csv"))
+			dataframe=pd.read_csv("melo_fwk/datastreams/assets/Commodity/Cocoa_sanitized.csv"))
 
 		for tick in pdstream:
 			process_tick(tick)

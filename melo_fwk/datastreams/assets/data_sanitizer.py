@@ -13,7 +13,7 @@ def clean_df(df: pd.DataFrame):
 
 
 if __name__ == "__main__":
-	files = glob.glob("CommodityData/*.csv")
+	files = glob.glob("Commodity/*.csv")
 
 	for csv_file in tqdm.tqdm(files):
 		loaded_df = pd.read_csv(csv_file)
