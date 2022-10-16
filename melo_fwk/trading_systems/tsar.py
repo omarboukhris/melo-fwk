@@ -14,6 +14,7 @@ class TradingSystemAnnualResult:
 	forecast_series: pd.Series
 	size_series: pd.Series
 	account_series: pd.Series
+	daily_pnl_series: pd.Series
 	vol_target: VolTarget
 
 	def annual_delta(self):

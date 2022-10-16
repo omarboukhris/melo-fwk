@@ -57,6 +57,7 @@ class BacktestEstimator:
 
 			trading_subsys.run()
 			tsar = trading_subsys.get_tsar()
+			# change output file path
 			results.update({f"{product.filepath}_{year}": tsar})
 			balance += tsar.annual_delta()
 

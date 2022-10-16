@@ -61,9 +61,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 			)
 			tr_sys.run()
 
-			# print(metrics.AccountMetrics.compute_all_metrics(tr_sys.get_account_series()))
-			# orderbook = tr_sys.get_order_book()
-
 			df_account = tr_sys.account_dataframe()
 			account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
 			account_plt.save_png(f"data/residual/{product['name']}_plot.png")

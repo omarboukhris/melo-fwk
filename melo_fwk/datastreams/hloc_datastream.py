@@ -62,6 +62,10 @@ class HLOCDataStream:
 		""" Get the whole dataframe """
 		return self.dataframe
 
+	def get_dates(self):
+		""" Get the whole dataframe """
+		return self.dataframe["Date"]
+
 	def limit_reached(self):
 		return (
 			(self.reverse and self.time_idx <= -len(self.dataframe)-1) or
@@ -74,9 +78,17 @@ class HLOCDataStream:
 
 	def get_open(self):
 		""" Get current open price """
+		return self.dataframe["Open"]
+
+	def get_current_open(self):
+		""" Get current open price """
 		return self.dataframe.iloc[self.time_idx]["Open"]
 
 	def get_close(self):
+		""" Get current close price """
+		return self.dataframe["Close"]
+
+	def get_current_close(self):
 		""" Get current close price """
 		return self.dataframe.iloc[self.time_idx]["Close"]
 

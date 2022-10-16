@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from melodb.loggers import ILogger
 from melodb.Order import Order
@@ -33,7 +34,7 @@ class BaseTradingSystem:
 
 		self.time_index = 0
 		self.order_book = []
-		self.tsar_history = None
+		self.tsar_history = []
 		self.current_trade = Order.empty()
 		self.data_source = data_source
 		self.trading_rules = trading_rules
@@ -64,10 +65,15 @@ class BaseTradingSystem:
 		return pd.DataFrame(self.tsar_history)["Forecast"]
 
 	def account_dataframe(self):
-		return pd.DataFrame(self.tsar_history)[["Date", "Balance"]]
+		return pd.DataFrame(self.tsar_history)[["Date", "Daily_PnL"]]
+
+	def daily_pnl_series(self):
+		return pd.DataFrame(self.tsar_history)["Daily_PnL"]
 
 	def account_series(self):
-		return pd.DataFrame(self.tsar_history)["Balance"]
+		daily_pnl = self.daily_pnl_series()
+		# daily_balance = [daily_pnl.iloc[:i].cumsum() for i in range(len(daily_pnl))]
+		return pd.Series(daily_pnl.cumsum())
 
 	def position_dataframe(self):
 		return pd.DataFrame(self.tsar_history)[["Date", "PositionSize"]]
@@ -86,16 +92,18 @@ class BaseTradingSystem:
 			price_series=self.price_series(),
 			forecast_series=self.forecast_series(),
 			size_series=self.position_series(),
-			account_series=self.account_series()
+			account_series=self.account_series(),
+			daily_pnl_series=self.daily_pnl_series()
 		)
 
 	def get_negative_tsar(self):
 		return TradingSystemAnnualResult(
 			vol_target=self.size_policy.risk_policy,
-			account_metrics=AccountMetrics(self.account_series()*-1),
+			account_metrics=AccountMetrics(self.account_series() * -1),
 			dates=self.dates_df(),
 			price_series=self.price_series(),
 			forecast_series=self.forecast_series(),
 			size_series=self.position_series(),
-			account_series=self.account_series()*-1
+			account_series=self.account_series() * -1,
+			daily_pnl_series=self.daily_pnl_series() * -1
 		)
