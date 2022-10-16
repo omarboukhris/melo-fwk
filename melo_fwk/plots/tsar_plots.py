@@ -1,8 +1,7 @@
 
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
-
 import pandas as pd
+from matplotlib.gridspec import GridSpec
 
 import tqdm
 
@@ -19,7 +18,7 @@ class TsarPlotter:
 					tsar.account_series,
 					tsar.daily_pnl_series,
 					tsar.forecast_series,
-					pd.DataFrame({"Size": tsar.size_series}, index=tsar.dates),
+					tsar.size_series.set_axis(tsar.dates),
 				]
 				column_list = ["Price", "Account", "Daily_PnL", "Forecast", "Size"]
 				label_list = ["Price", "Account", "Daily PnL", "Forecast", "Size"]
