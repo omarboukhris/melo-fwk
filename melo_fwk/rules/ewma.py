@@ -19,26 +19,32 @@ class EWMATradingRule:
 		"cap": [20]
 	}
 
-	def forecast(self, data: pd.DataFrame):
+	def forecast_vect(self, data: pd.DataFrame):
 		"""
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_ewma = data["Close"].ewm(span=int(self.fast_span)).mean().to_numpy()
-		slow_ewma = data["Close"].ewm(span=int(self.slow_span)).mean().to_numpy()
+		fast_ewma = data["Close"].ewm(span=int(self.fast_span)).mean()
+		slow_ewma = data["Close"].ewm(span=int(self.slow_span)).mean()
 
-		std = data["Close"].ewm(span=36).std().to_numpy()
+		std = data["Close"].ewm(span=36).std()
 
 		ewma = fast_ewma - slow_ewma
 
 		np.seterr(invalid="ignore")
 		forecast_vect = self.scale * (ewma / std)
 		np.seterr(invalid="warn")
+		return forecast_vect
 
-		forecast_value = forecast_vect[-1]
-		if forecast_value > 0:
-			forecast_value = min(forecast_value, self.cap)
-		else:
-			forecast_value = max(forecast_value, -self.cap)
+	def forecast_vect_cap(self, data: pd.DataFrame):
+		f_vect = self.forecast_vect(data)
+		f_series = pd.Series([
+			min(f_val, self.cap) if f_val > 0 else max(f_val, -self.cap)
+			for f_val in f_vect
+		])
+		return f_series
 
-		return forecast_value
+	def forecast(self, data: pd.DataFrame):
+		cap_f_vect = self.forecast_vect_cap(data)
+		assert len(cap_f_vect) > 0, "(EWMATradingRule) empty forecast vector"
+		return cap_f_vect.iat[-1]

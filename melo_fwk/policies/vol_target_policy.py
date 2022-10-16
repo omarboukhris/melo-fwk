@@ -2,6 +2,9 @@
 from dataclasses import dataclass
 from math import sqrt
 
+import pandas as pd
+
+
 @dataclass(frozen=True)
 class VolTarget:
 	yearly_trading_days = 256
@@ -32,12 +35,18 @@ class ISizePolicy:
 	def position_size(self, forecast: float) -> float:
 		pass
 
+	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
+		pass
+
 class ConstSizePolicy(ISizePolicy):
 	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.)):
 		super(ConstSizePolicy, self).__init__(risk_policy)
 
 	def position_size(self, forecast: float) -> float:
 		return forecast/abs(forecast) if forecast != 0 else 0
+
+	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
+		raise NotImplementedError()
 
 class VolTargetSizePolicy(ISizePolicy):
 
@@ -49,15 +58,13 @@ class VolTargetSizePolicy(ISizePolicy):
 		daily_return = self.datastream.get_data()["Daily_diff"]
 		# ewma_vol = daily_return.ewm(span=lookback).std().to_numpy()
 		current_price = self.datastream.get_close()
-		# price_vol_vect = ewma_vol * current_price
 
+		# price_vol_vect = ewma_vol * current_price
 		price_vol_vect = daily_return * current_price
-		if len(price_vol_vect) == 0:
-			raise Exception(f"Price volatility vector's size is 0 : {price_vol_vect}")
-		return price_vol_vect.to_numpy()[-1]
+		return price_vol_vect
 
 	def block_value(self) -> float:
-		return self.datastream.get_close() * 0.01 * self.unit_leverage  # = how many shares the contract controls
+		return self.datastream * 0.01 * self.unit_leverage  # = how many shares the contract controls
 
 	def instrument_vol(self) -> float:
 		return self.block_value() * self.price_vol()
@@ -66,6 +73,9 @@ class VolTargetSizePolicy(ISizePolicy):
 		return self.instrument_vol() / self.risk_policy.daily_cash_vol_target()
 
 	def position_size(self, forecast: float) -> float:
+		return self.vol_scalar() * forecast / 10.
+
+	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
 		return self.vol_scalar() * forecast / 10.
 
 

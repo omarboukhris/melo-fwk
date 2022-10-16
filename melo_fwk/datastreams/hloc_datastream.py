@@ -86,6 +86,9 @@ class HLOCDataStream:
 		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
 		return x[0]
 
+	def get_daily_diff_vect(self):
+		return self.dataframe["Daily_diff"]
+
 	def get_current_diff(self):
 		return self.get_diff_from_index(self.get_current_date())
 

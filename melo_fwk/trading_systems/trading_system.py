@@ -10,22 +10,7 @@ from melo_fwk.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
 from melo_fwk.policies.vol_target_policy import ConstSizePolicy, ISizePolicy, VolTarget
 from melo_fwk.metrics.metrics import AccountMetrics
 
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class TradingSystemAnnualResult:
-	account_metrics: AccountMetrics
-	dates: pd.Series
-	price_series: pd.Series
-	forecast_series: pd.Series
-	size_series: pd.Series
-	account_series: pd.Series
-	vol_target: VolTarget
-
-	def annual_delta(self):
-		assert len(self.account_series) > 1, \
-			"(TradingSystemAnnualReport) final_balance: account data frame is empty"
-		return self.account_series.iloc[-1]
+from melo_fwk.trading_systems.tsar import TradingSystemAnnualResult
 
 class TradingSystem:
 	"""Class for backtesting offline a trading system.
@@ -108,7 +93,7 @@ class TradingSystem:
 	def forecast_and_size(self):
 		forecast, size = 0, 0
 		window = self.data_source.get_window()
-		self.size_policy.update_datastream(self.data_source)
+		self.size_policy.update_datastream(window)
 		if window is not None:
 			for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
 				forecast += forecast_weight * trading_rule.forecast(window)

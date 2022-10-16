@@ -1,11 +1,10 @@
-import pandas as pd
 import tqdm
 
 from melo_fwk.rules.ewma import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
-from melo_fwk import trading_system as ts
+from melo_fwk.trading_systems import trading_system as ts
 from melo_fwk.plots.plots import AccountPlotter
-from melo_fwk.datastreams import hloc_datastream as ds, backtest_data_loader as bdl
+from melo_fwk.datastreams import backtest_data_loader as bdl
 
 import unittest
 
