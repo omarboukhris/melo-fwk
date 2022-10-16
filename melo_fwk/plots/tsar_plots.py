@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
+import pandas as pd
+
 import tqdm
 
 class TsarPlotter:
@@ -11,29 +13,29 @@ class TsarPlotter:
 	def save_fig(self):
 
 		for product_name, tsar_entry in tqdm.tqdm(self.tsar_list.items()):
-			for filename, tsar in tsar_entry.items():
+			for filename, tsar in tqdm.tqdm(tsar_entry.items()):
+				series_list = [
+					tsar.price_series,
+					tsar.account_series,
+					tsar.daily_pnl_series,
+					tsar.forecast_series,
+					pd.DataFrame({"Size": tsar.size_series}, index=tsar.dates),
+				]
+				column_list = ["Price", "Account", "Daily_PnL", "Forecast", "Size"]
+				label_list = ["Price", "Account", "Daily PnL", "Forecast", "Size"]
+				colors_list = ["green", "red", "black", "blue", "cyan"]
 
-				fig = plt.figure(figsize=(30, 20))
+				fig = plt.figure(figsize=(21, 14))
 				gs = GridSpec(nrows=5, ncols=2)
-				ax0 = fig.add_subplot(gs[0, :])
-				ax1 = fig.add_subplot(gs[1, :])
-				ax2 = fig.add_subplot(gs[2, :])
-				ax3 = fig.add_subplot(gs[3, :])
-				ax4 = fig.add_subplot(gs[4, :])
+
+				for i, series, column, label, colors in zip(range(len(column_list)), series_list, column_list, label_list, colors_list):
+
+					ax = fig.add_subplot(gs[i, :])
+					series.fillna(0).plot(y=column, ax=ax, color=colors)
+					ax.set_ylabel(label)
+					ax.grid()
 
 				plt.subplots_adjust(hspace=.0)
-
-				tsar.price_series.plot(y="Price", ax=ax0, color="green")
-				tsar.account_series.plot(y="Account", ax=ax1, color="red")
-				tsar.daily_pnl_series.plot(y="Daily_PnL", ax=ax2, color="black")
-				tsar.forecast_series.plot(y="Forecast", ax=ax3, color="blue")
-				tsar.size_series.plot(y="Size", ax=ax4, color="cyan")
-
-				ax0.grid()
-				ax1.grid()
-				ax2.grid()
-				ax3.grid()
-				ax4.grid()
-
+				plt.xlabel("Time")
 				plt.savefig(f"{filename}.png")
 				plt.close()

@@ -39,7 +39,7 @@ results = {}
 
 balance = 60000
 
-for year in tqdm.tqdm(range(2015, 2020)):
+for year in tqdm.tqdm(range(2015, 2022)):
 	vol_target = VolTarget(
 		annual_vol_target=0.5,
 		trading_capital=balance)

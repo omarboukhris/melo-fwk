@@ -19,7 +19,7 @@ class VolTargetSizePolicy(ISizePolicy):
 
 	def block_value(self, lookback: int = 36) -> pd.Series:
 		# 1% price differencial
-		return self.datastream.get_close().ewm(span=lookback).mean() * self.block_size
+		return self.datastream.get_close().ewm(span=lookback).mean()  # * self.block_size
 		# block_size = how many shares the contract controls
 
 	def instrument_vol(self, lookback: int = 36) -> pd.Series:
