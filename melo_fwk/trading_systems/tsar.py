@@ -1,6 +1,6 @@
 
 from melo_fwk.metrics.metrics import AccountMetrics
-from melo_fwk.policies.vol_target_policy import VolTarget
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 from dataclasses import dataclass
 
 import pandas as pd

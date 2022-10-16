@@ -1,14 +1,16 @@
+import melo_fwk.policies.vol_target_policies.base_size_policy
 from melo_fwk.utils import quantflow_factory
 
-from melo_fwk.datastreams.commodities import CommodityDataLoader
+from melo_fwk.market_data.commodities import CommodityDataLoader
 
-from melo_fwk.estimators.backtest_estimator import BacktestEstimator
-from melo_fwk.estimators.strat_optim_estimator import StratOptimEstimator
-from melo_fwk.estimators.fw_optim_estimator import ForecastWeightsEstimator
+from melo_fwk.melo_estimators.backtest_estimator import BacktestEstimator
+from melo_fwk.melo_estimators.strat_optim_estimator import StratOptimEstimator
+from melo_fwk.melo_estimators.fw_optim_estimator import ForecastWeightsEstimator
 
 from melo_fwk.rules import ewma, sma
 
-from melo_fwk.policies import vol_target_policy
+from melo_fwk.policies.vol_target_policies import vol_target_size_policy
+
 
 def register_all():
 	register_estimator()
@@ -32,7 +34,8 @@ def register_search_spaces():
 
 def register_size_policies():
 	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", vol_target_policy.VolTargetSizePolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("default", vol_target_policy.ConstSizePolicy)
+	quantflow_factory.QuantFlowFactory.register_size_policy("default",
+															melo_fwk.policies.vol_target_policies.base_size_policy.ConstSizePolicy)
 
 def register_products():
 	# =============================================================

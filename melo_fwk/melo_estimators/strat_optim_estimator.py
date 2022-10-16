@@ -1,9 +1,10 @@
 import pandas as pd
 import tqdm
 
-from melo_fwk.datastreams.product import Product
-from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
-from melo_fwk.policies.vol_target_policy import ISizePolicy, ConstSizePolicy, VolTarget
+from melo_fwk.market_data.product import Product
+from melo_fwk.market_data.utils.hloc_datastream import HLOCDataStream
+from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 from melo_fwk.trading_systems.trading_system import TradingSystem
 
 from skopt import BayesSearchCV

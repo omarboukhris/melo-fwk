@@ -1,8 +1,9 @@
 
 import tqdm
 
-from melo_fwk.datastreams.product import Product
-from melo_fwk.policies.vol_target_policy import ConstSizePolicy, VolTarget
+from melo_fwk.market_data.product import Product
+from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 from melo_fwk.trading_systems.trading_vect_system import TradingVectSystem
 
 class BacktestEstimator:

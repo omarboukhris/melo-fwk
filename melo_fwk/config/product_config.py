@@ -1,6 +1,6 @@
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.datastreams.index_builder import IndexBuilder
+from melo_fwk.market_data.utils.index_builder import IndexBuilder
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 
 class ProductConfigBuilder:

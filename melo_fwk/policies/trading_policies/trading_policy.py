@@ -3,17 +3,13 @@
 class ITradingPolicy:
 
 	def __init__(self):
-		self.forecasts = []
+		pass
 
 	def enter_trade_predicat(self, forecast: float):
-		self.forecasts.append(forecast)
+		pass
 
 	def exit_trade_predicat(self, forecast: float):
-		self.forecasts.append(forecast)
-
-	def turnover_predicat(self, forecast: float):
-		self.forecasts.append(forecast)
-
+		pass
 
 class BaseTradingPolicy(ITradingPolicy):
 
@@ -24,16 +20,10 @@ class BaseTradingPolicy(ITradingPolicy):
 		self.threshold = threshold
 
 	def enter_trade_predicat(self, forecast: float):
-		self.forecasts.append(forecast)
 		return not (-self.threshold < forecast < self.threshold)
 
 	def exit_trade_predicat(self, forecast: float):
 		return not self.enter_trade_predicat(forecast)
-
-	def turnover_predicat(self, forecast: float):
-		self.forecasts.append(forecast)
-		turnover = forecast * self.forecasts[-1] < 0
-		return turnover
 
 
 

@@ -1,6 +1,6 @@
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.policies.vol_target_policy import VolTarget
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 
 

@@ -1,7 +1,8 @@
 import tqdm
 import numpy as np
 
-from melo_fwk.policies.vol_target_policy import ConstSizePolicy, VolTarget
+from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 from melo_fwk.trading_systems.trading_system import TradingSystem
 
 import scipy.optimize as opt

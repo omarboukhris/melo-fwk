@@ -1,13 +1,12 @@
 import pandas as pd
-import numpy as np
 
 from melodb.loggers import ILogger
 from melodb.Order import Order
 
-from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
+from melo_fwk.market_data.utils.hloc_datastream import HLOCDataStream
 
-from melo_fwk.policies.trading_policy import BaseTradingPolicy, ITradingPolicy
-from melo_fwk.policies.vol_target_policy import ConstSizePolicy, ISizePolicy
+from melo_fwk.policies.trading_policies.trading_policy import BaseTradingPolicy, ITradingPolicy
+from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
 
 from melo_fwk.metrics.metrics import AccountMetrics
 
@@ -51,7 +50,7 @@ class BaseTradingSystem:
 		)
 
 
-	def dates_df(self):
+	def dates_dataframe(self):
 		return pd.DataFrame(self.tsar_history)["Date"]
 
 	def order_book_dataframe(self):
@@ -64,11 +63,17 @@ class BaseTradingSystem:
 	def forecast_series(self):
 		return pd.DataFrame(self.tsar_history)["Forecast"]
 
-	def account_dataframe(self):
+	def daily_pnl_dataframe(self):
 		return pd.DataFrame(self.tsar_history)[["Date", "Daily_PnL"]]
 
 	def daily_pnl_series(self):
 		return pd.DataFrame(self.tsar_history)["Daily_PnL"]
+
+	def account_dataframe(self):
+		return pd.DataFrame({
+			"Date": self.dates_dataframe(),
+			"Balance": self.account_series(),
+		})
 
 	def account_series(self):
 		daily_pnl = self.daily_pnl_series()
@@ -88,7 +93,7 @@ class BaseTradingSystem:
 		return TradingSystemAnnualResult(
 			vol_target=self.size_policy.risk_policy,
 			account_metrics=AccountMetrics(self.account_series()),
-			dates=self.dates_df(),
+			dates=self.dates_dataframe(),
 			price_series=self.price_series(),
 			forecast_series=self.forecast_series(),
 			size_series=self.position_series(),
@@ -100,7 +105,7 @@ class BaseTradingSystem:
 		return TradingSystemAnnualResult(
 			vol_target=self.size_policy.risk_policy,
 			account_metrics=AccountMetrics(self.account_series() * -1),
-			dates=self.dates_df(),
+			dates=self.dates_dataframe(),
 			price_series=self.price_series(),
 			forecast_series=self.forecast_series(),
 			size_series=self.position_series(),

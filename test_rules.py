@@ -5,16 +5,16 @@ import tqdm
 from melo_fwk.rules.ewma import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
 from melo_fwk.plots.plots import ForecastPlotter, HLOCPricePlotter
-from melo_fwk.datastreams import backtest_data_loader as bdl
+from melo_fwk.market_data.utils import market_data_loader as bdl
 
 import unittest
 
 class TradingRuleUnitTests(unittest.TestCase):
 
 	def test_vectorized_trading_rule(self):
-		products = bdl.BacktestDataLoader.get_products("assets/CommodityData/*_sanitized.csv")
+		products = bdl.MarketDataLoader.get_products("assets/Commodity/*_sanitized.csv")
 		for product in tqdm.tqdm(products):
-			product_hloc = bdl.BacktestDataLoader.get_product_datastream(product)
+			product_hloc = bdl.MarketDataLoader.get_product_datastream(product)
 			product_hloc.datastream.with_daily_returns()
 
 			ewma_params = {
@@ -36,9 +36,9 @@ class TradingRuleUnitTests(unittest.TestCase):
 
 
 	def test_trading_rule(self):
-		products = bdl.BacktestDataLoader.get_products("assets/CommodityData/*_sanitized.csv")
-		for product in tqdm.tqdm(products[:1]):
-			product_hloc = bdl.BacktestDataLoader.get_product_datastream(product)
+		products = bdl.MarketDataLoader.get_products("assets/Commodity/*_sanitized.csv")
+		for product in tqdm.tqdm(products):
+			product_hloc = bdl.MarketDataLoader.get_product_datastream(product)
 			product_hloc.datastream.with_daily_returns()
 
 			ewma_params = {

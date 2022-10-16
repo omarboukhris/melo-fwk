@@ -1,6 +1,6 @@
 
-from melo_fwk.datastreams.backtest_data_loader import BacktestDataLoader
-from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
+from melo_fwk.market_data.utils.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.utils.hloc_datastream import HLOCDataStream
 
 import tqdm
 import pandas as pd
@@ -14,7 +14,7 @@ class TestDataStreamsHelper:
 	@staticmethod
 	def test_mock_datastream(products: List[dict]):
 		for product in tqdm.tqdm(products):
-			loaded_prod = BacktestDataLoader.get_mock_datastream({})
+			loaded_prod = MarketDataLoader.get_mock_datastream({})
 			loaded_prod.datastream.with_daily_returns()
 
 			for tick in loaded_prod.datastream:
@@ -25,7 +25,7 @@ class TestDataStreamsHelper:
 	@staticmethod
 	def test_datastream(products: List[dict], years: List[str]):
 		for product in tqdm.tqdm(products):
-			loaded_prod = BacktestDataLoader.get_product_datastream(product)
+			loaded_prod = MarketDataLoader.get_product_datastream(product)
 			loaded_prod.datastream.parse_date_column()
 			loaded_prod.datastream.with_daily_returns()
 			# print(pdstream.get_data()[["Date", "Close", "Daily_diff"]])
@@ -44,7 +44,7 @@ class TestDataStreamsHelper:
 	def quick_sanity_check(pdstream, product, tick):
 		assert pdstream.get_current_date() == tick["Date"], \
 			f"dates are different: {pdstream.get_current_date()} // {tick['Date']} in product {product['name']}"
-		assert pdstream.get_open() == tick["Open"], \
+		assert pdstream.get_current_open() == tick["Open"], \
 			f"dates are different: {pdstream.get_open()} // {tick['Open']} in product {product['name']}"
 
 
@@ -55,25 +55,25 @@ class DataStreamUnitTests(unittest.TestCase):
 			pass
 
 		pdstream = HLOCDataStream(
-			dataframe=pd.read_csv("melo_fwk/datastreams/assets/Commodity/Cocoa_sanitized.csv"))
+			dataframe=pd.read_csv("melo_fwk/market_data/assets/Commodity/Cocoa_sanitized.csv"))
 
 		for tick in pdstream:
 			process_tick(tick)
 
 	def test_mock_datastream(self):
 		TestDataStreamsHelper.test_mock_datastream(
-			BacktestDataLoader.get_sanitized_commodities()
+			MarketDataLoader.get_sanitized_commodities()
 		)
 
 	def test_datastream_stocks(self):
 		TestDataStreamsHelper.test_datastream(
-			BacktestDataLoader.get_products("data/Stocks/*.csv"),
+			MarketDataLoader.get_products("data/Stocks/*.csv"),
 			[str(i) for i in range(2000, 2022)]
 		)
 
 	def test_datastream_commodities(self):
 		TestDataStreamsHelper.test_datastream(
-			BacktestDataLoader.get_sanitized_commodities(),
+			MarketDataLoader.get_sanitized_commodities(),
 			[str(i) for i in range(2000, 2022)]
 		)
 

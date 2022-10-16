@@ -4,7 +4,7 @@ from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuil
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder, VolTargetConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
 
-from melo_fwk.policies.vol_target_policy import VolTarget
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 
 from pathlib import Path
 
