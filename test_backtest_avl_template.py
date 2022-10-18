@@ -49,7 +49,7 @@ for year in tqdm.tqdm(range(2015, 2020)):
 		size_policy=size_policy
 	)
 
-	trading_subsys.trade_vect()
+	trading_subsys.run()
 	tsar = trading_subsys.get_tsar()
 	results.update({f"Gold_{year}": tsar})
 	balance += tsar.annual_delta()

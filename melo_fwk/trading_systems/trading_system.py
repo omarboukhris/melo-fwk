@@ -1,6 +1,5 @@
 
 import tqdm
-import pandas as pd
 
 from melodb.Order import Order
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem

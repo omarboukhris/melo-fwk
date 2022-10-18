@@ -3,6 +3,8 @@ import pandas as pd
 
 import datetime as dt
 
+pd.options.mode.chained_assignment = None
+
 class HLOCDataStream:
 	"""This class is used to wrap HLOC Data Frames in a class and to offer some HLOC operations interface"""
 
@@ -17,7 +19,8 @@ class HLOCDataStream:
 		dataframe: pd.DataFrame,
 		offset: int = 0,
 		reverse: bool = False,
-		date_label: str = "Date"
+		date_label: str = "Date",
+		parse_date: bool = True
 	):
 
 		self.dataframe = dataframe
@@ -26,8 +29,9 @@ class HLOCDataStream:
 		self.time_idx = -self.offset if self.reverse else self.offset
 		self.date_label = date_label
 
-		self._parse_date_column()
 		self._with_daily_returns()
+		if parse_date:
+			self._parse_date_column()
 
 	def _parse_date_column(self):
 		def parse_date(date: str):

@@ -40,7 +40,7 @@ class StrategyEstimator:
 			"Date": X.index,
 			"Close": X
 		})
-		product_hloc = HLOCDataStream(product_df)
+		product_hloc = HLOCDataStream(product_df, parse_date=False)
 
 		trading_subsys = TradingVectSystem(
 			data_source=product_hloc,
@@ -49,7 +49,7 @@ class StrategyEstimator:
 			size_policy=StrategyEstimator.size_policy
 		)
 
-		trading_subsys.trade_vect()
+		trading_subsys.run()
 		tsar = trading_subsys.get_tsar()
 		estimated_result = tsar.get_metric_by_name(StrategyEstimator.metric)
 		return estimated_result

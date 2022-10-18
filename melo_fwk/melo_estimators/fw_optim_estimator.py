@@ -76,7 +76,7 @@ class ForecastWeightsEstimator:
 				size_policy=size_policy
 			)
 
-			trading_subsys.trade_vect()
+			trading_subsys.run()
 			tsar = trading_subsys.get_tsar()
 
 			returns.update({type(strategy): tsar.account_series})

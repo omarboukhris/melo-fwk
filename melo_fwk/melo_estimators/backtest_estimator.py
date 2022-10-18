@@ -54,7 +54,7 @@ class BacktestEstimator:
 				size_policy=size_policy
 			)
 
-			trading_subsys.trade_vect()
+			trading_subsys.run()
 			tsar = trading_subsys.get_tsar()
 			# change output file path
 			results.update({f"{product.name}_{year}": tsar})

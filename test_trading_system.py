@@ -115,7 +115,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
-			tr_sys.trade_vect()
+			tr_sys.run()
 
 			# df_account = tr_sys.account_dataframe()
 			# account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())

@@ -22,7 +22,7 @@ class TradingVectSystem(BaseTradingSystem):
 		daily_pnl_series = self.data_source.get_daily_diff_vect() * pose_series  # * self.block_size
 		return daily_pnl_series
 
-	def trade_vect(self):
+	def run(self):
 
 		forecast_series = self.forecast_cumsum()
 		pose_series = self.size_policy.position_size_vect(forecast_series).fillna(0)

@@ -11,7 +11,7 @@ class TradingAVLSystem(TradingVectSystem):
 		super(TradingAVLSystem, self).__init__(**kwargs)
 		self.size_policy.update_datastream(self.data_source)
 
-	def trade_vect(self):
+	def run(self):
 
 		forecast_series = self.forecast_cumsum()
 		current_vol_target = self.size_policy.risk_policy
