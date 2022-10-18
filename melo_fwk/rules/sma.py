@@ -23,17 +23,17 @@ class SMATradingRule:
 		data as pandas.dataframe :
 			['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
 		"""
-		fast_sma = data["Close"].rolling(int(self.fast_span)).mean().to_numpy()
-		slow_sma = data["Close"].rolling(int(self.slow_span)).mean().mean()
+		fast_sma = data["Close"].rolling(int(self.fast_span)).mean()
+		slow_sma = data["Close"].rolling(int(self.slow_span)).mean()
 
-		std = data["Close"].rolling(25).mean().std()
+		std = data["Close"].rolling(25).std()
 
 		sma = fast_sma - slow_sma
 
 		np.seterr(invalid="ignore")
 		forecast_vect = self.scale * (sma / std)
 		np.seterr(invalid="warn")
-		return forecast_vect
+		return forecast_vect.fillna(0)
 
 	def forecast_vect_cap(self, data: pd.DataFrame):
 		f_vect = self.forecast_vect(data)
@@ -45,5 +45,5 @@ class SMATradingRule:
 
 	def forecast(self, data: pd.DataFrame):
 		cap_f_vect = self.forecast_vect_cap(data)
-		assert len(cap_f_vect) > 0, "(EWMATradingRule) empty forecast vector"
+		assert len(cap_f_vect) > 0, "(SMATradingRule) empty forecast vector"
 		return cap_f_vect.iat[-1]

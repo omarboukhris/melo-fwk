@@ -13,12 +13,13 @@ def clean_df(df: pd.DataFrame):
 
 
 if __name__ == "__main__":
-	files = glob.glob("Commodity/*.csv")
+	files = glob.glob("CommodityRaw/*.csv")
 
 	for csv_file in tqdm.tqdm(files):
 		loaded_df = pd.read_csv(csv_file)
-		sanitized_df = clean_df(loaded_df)
-		output_filename = csv_file.replace(".csv", "_sanitized.csv")
+		# sanitized_df = clean_df(loaded_df)
+		sanitized_df = loaded_df.interpolate()
+		output_filename = csv_file.replace("CommodityRaw", "Commodity")
 		sanitized_df.to_csv(output_filename)
 
 

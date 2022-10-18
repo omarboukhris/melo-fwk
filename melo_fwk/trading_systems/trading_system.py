@@ -26,7 +26,7 @@ class TradingSystem(BaseTradingSystem):
 		super(TradingSystem, self).__init__(**kwargs)
 		self.tsar_history = [{
 			"Date": self.data_source.get_current_date(),
-			"Price": self.data_source.get_close(),
+			"Price": self.data_source.get_current_close(),
 			"Forecast": 0.,
 			"PositionSize": 0.,
 			"Daily_PnL": 0.,
@@ -90,7 +90,7 @@ class TradingSystem(BaseTradingSystem):
 
 		self.tsar_history.append({
 			"Date": self.data_source.get_current_date(),
-			"Price": self.data_source.get_close(),
+			"Price": self.data_source.get_current_close(),
 			"Forecast": forecast,
 			"PositionSize": size,
 			"Daily_PnL": self.get_daily_pnl()

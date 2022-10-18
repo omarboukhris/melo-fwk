@@ -55,14 +55,14 @@ class DataStreamUnitTests(unittest.TestCase):
 			pass
 
 		pdstream = HLOCDataStream(
-			dataframe=pd.read_csv("melo_fwk/market_data/assets/Commodity/Cocoa_sanitized.csv"))
+			dataframe=pd.read_csv("melo_fwk/market_data/assets/Commodity/Cocoa.csv"))
 
 		for tick in pdstream:
 			process_tick(tick)
 
 	def test_mock_datastream(self):
 		TestDataStreamsHelper.test_mock_datastream(
-			MarketDataLoader.get_sanitized_commodities()
+			MarketDataLoader.get_commodities()
 		)
 
 	def test_datastream_stocks(self):
@@ -73,7 +73,7 @@ class DataStreamUnitTests(unittest.TestCase):
 
 	def test_datastream_commodities(self):
 		TestDataStreamsHelper.test_datastream(
-			MarketDataLoader.get_sanitized_commodities(),
+			MarketDataLoader.get_commodities(),
 			[str(i) for i in range(2000, 2022)]
 		)
 

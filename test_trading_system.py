@@ -1,5 +1,9 @@
+import pandas as pd
 import tqdm
 
+from melo_fwk.plots.tsar_plots import TsarPlotter
+from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
+from melo_fwk.policies.vol_target_policies.vol_target_size_policy import VolTargetSizePolicy
 from melo_fwk.rules.ewma import EWMATradingRule
 # from rules.sma_rule import SMATradingRule
 from melo_fwk.trading_systems import trading_system as ts
@@ -12,7 +16,7 @@ import unittest
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_empty_trading_system(self):
-		products = bdl.MarketDataLoader.get_products("assets/Commodity/Cocoa_sanitized.csv")
+		products = bdl.MarketDataLoader.get_products("assets/Commodity/Cocoa.csv")
 		assert len(products) != 0, "(TradingSystemUnitTests) Did not find any product"
 		loaded_prod = bdl.MarketDataLoader.get_product_datastream(products[0])
 		pds = loaded_prod.datastream
@@ -41,7 +45,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		products = bdl.MarketDataLoader.get_products("assets/Commodity/*_sanitized.csv")
+		products = bdl.MarketDataLoader.get_commodities()
 		sum_ = 0.
 		for product in tqdm.tqdm(products):
 			loaded_prod = bdl.MarketDataLoader.get_product_datastream(product)
@@ -84,34 +88,56 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		products = bdl.MarketDataLoader.get_products("assets/Commodity/*_sanitized.csv")
+		# products = bdl.MarketDataLoader.get_fx()
+		products = bdl.MarketDataLoader.get_commodities()
 		sum_ = 0.
-		for product in tqdm.tqdm(products):
+		results = {}
+
+		for i, product in tqdm.tqdm(enumerate(products)):
 			loaded_prod = bdl.MarketDataLoader.get_product_datastream(product)
 			loaded_prod.datastream.with_daily_returns()
 
 			sma_params = {
-				"fast_span": 32,
-				"slow_span": 128,
-				"scale": 20,
+				"fast_span": 16,
+				"slow_span": 64,
+				"scale": 12,
 				"cap": 20,
 			}
 			sma = EWMATradingRule(**sma_params)
+			vol_target = VolTarget(
+				annual_vol_target=0.5,
+				trading_capital=10000)
+			size_policy = VolTargetSizePolicy(risk_policy=vol_target)
 
 			tr_sys = tv.TradingVectSystem(
 				data_source=loaded_prod.datastream,
 				trading_rules=[sma],
-				forecast_weights=[1.]
+				forecast_weights=[1.],
+				size_policy=size_policy
 			)
 			tr_sys.trade_vect()
 
-			df_account = tr_sys.account_dataframe()
-			account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
-			account_plt.save_png(f"data/residual/{product['name']}_plot_vect.png")
+			# df_account = tr_sys.account_dataframe()
+			# account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
+			# account_plt.save_png(f"data/residual/{product['name']}_plot_vect.png")
 
-			sum_ += df_account["Balance"].iloc[-1]
+			tsar = tr_sys.get_tsar()
+			results.update({f"all_{i}": tsar})
+			sum_ += tsar.annual_delta()
 
-		starting_balance = 10000
+		account_df = pd.DataFrame({
+			"Date": results["all_1"].dates,
+			"Balance": [0. for _ in results["all_1"].dates]
+		})
+		for tsar in results.values():
+			account_df["Balance"] += tsar.account_series
+		account_plt = AccountPlotter(account_df)
+		account_plt.save_png(f"data/residual/all_plot_vect.png")
+
+		tsar_plotter = TsarPlotter({"pname": results})
+		tsar_plotter.save_fig(export_folder="data/residual")
+
+		starting_balance = 10000 * len(results)
 		print(f"starting balance : {starting_balance}")
 		print(f"final balance : {starting_balance + sum_}")
 

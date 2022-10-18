@@ -11,6 +11,9 @@ class ISizePolicy:
 	def update_datastream(self, datastream):
 		self.datastream = datastream
 
+	def update_risk_policy(self, risk_policy: VolTarget):
+		self.risk_policy = risk_policy
+
 	def position_size(self, forecast: float) -> float:
 		pass
 

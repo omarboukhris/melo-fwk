@@ -1,7 +1,7 @@
-import melo_fwk.policies.vol_target_policies.base_size_policy
 from melo_fwk.utils import quantflow_factory
 
 from melo_fwk.market_data.commodities import CommodityDataLoader
+from melo_fwk.market_data.fx import FxDataLoader
 
 from melo_fwk.melo_estimators.backtest_estimator import BacktestEstimator
 from melo_fwk.melo_estimators.strat_optim_estimator import StratOptimEstimator
@@ -9,7 +9,8 @@ from melo_fwk.melo_estimators.fw_optim_estimator import ForecastWeightsEstimator
 
 from melo_fwk.rules import ewma, sma
 
-from melo_fwk.policies.vol_target_policies import vol_target_size_policy
+from melo_fwk.policies.vol_target_policies.vol_target_size_policy import VolTargetSizePolicy
+from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
 
 
 def register_all():
@@ -33,9 +34,8 @@ def register_search_spaces():
 	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", sma.SMATradingRule.search_space)
 
 def register_size_policies():
-	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", vol_target_policy.VolTargetSizePolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("default",
-															melo_fwk.policies.vol_target_policies.base_size_policy.ConstSizePolicy)
+	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", VolTargetSizePolicy)
+	quantflow_factory.QuantFlowFactory.register_size_policy("default", ConstSizePolicy)
 
 def register_products():
 	# =============================================================
@@ -43,39 +43,18 @@ def register_products():
 	# =============================================================
 	# Commodities
 	# -------------------------------------------------------------
-	# oil
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.BrentCrudeOil", CommodityDataLoader.BrentCrudeOil)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.CrudeOil", CommodityDataLoader.CrudeOil)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.HeatingOil", CommodityDataLoader.HeatingOil)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.NaturalGas", CommodityDataLoader.NaturalGas)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.RBOBGasoline", CommodityDataLoader.RBOBGasoline)
+	for prod_name in CommodityDataLoader.get_product_pool():
+		quantflow_factory.QuantFlowFactory.register_product(
+			f"Commodities.{prod_name}",
+			CommodityDataLoader.get_product_by_name(prod_name)
+		)
 
-	# agricultural
-	# plants
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Cocoa", CommodityDataLoader.Cocoa)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Coffee", CommodityDataLoader.Coffee)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Corn", CommodityDataLoader.Corn)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Cotton", CommodityDataLoader.Cotton)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Soybean", CommodityDataLoader.Soybean)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.SoybeanMeal", CommodityDataLoader.SoybeanMeal)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.SoybeanOil", CommodityDataLoader.SoybeanOil)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Sugar", CommodityDataLoader.Sugar)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Wheat", CommodityDataLoader.Wheat)
+	# -------------------------------------------------------------
+	# Fx
+	# -------------------------------------------------------------
+	for prod_name in FxDataLoader.get_product_pool():
+		quantflow_factory.QuantFlowFactory.register_product(
+			f"Fx.{prod_name}",
+			FxDataLoader.get_product_by_name(prod_name)
+		)
 
-	# animals
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.FeederCattla", CommodityDataLoader.FeederCattla)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.LiveCattle", CommodityDataLoader.LiveCattle)
-
-	# metals
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Copper", CommodityDataLoader.Copper)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Gold", CommodityDataLoader.Gold)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Palladium", CommodityDataLoader.Palladium)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Platinum", CommodityDataLoader.Platinum)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Silver", CommodityDataLoader.Silver)
-
-	# unclassified
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.LeanHogs", CommodityDataLoader.LeanHogs)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Lumber", CommodityDataLoader.Lumber)
-	quantflow_factory.QuantFlowFactory.register_product("Commodities.Oat", CommodityDataLoader.Oat)
-
-	# =============================================================

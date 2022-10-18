@@ -18,7 +18,7 @@ if __name__ == "__main__":
 	filenames = ["Stocks/AAPL", "Stocks/GOOG", "Stocks/GOOGL", "Stocks/BTCEUR", "Stocks/ETHEUR", "Stocks/EURUSD", "Stocks/FB"]
 	settings = [
 		{
-			"period": "10y",
+			"period": "20y",
 			"interval": "1d",
 		},
 		{
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 		},
 	]
 
-	idx, ext_id = 1, 1
+	idx, ext_id = 5, 0
 
 	download_and_store(
 		stocks[idx],

@@ -11,15 +11,13 @@ class HLOCDataStream:
 		dataframe: pd.DataFrame,
 		offset: int = 0,
 		reverse: bool = False,
-		date_label: str = "Date",
-		window_size: int = 70):
+		date_label: str = "Date"):
 
 		self.dataframe = dataframe
 		self.offset = offset
 		self.reverse = reverse
 		self.time_idx = -self.offset if self.reverse else self.offset
 		self.date_label = date_label
-		self.window_size = window_size
 
 	@staticmethod
 	def get_empty():
@@ -102,7 +100,7 @@ class HLOCDataStream:
 		return self.dataframe["Daily_diff"]
 
 	def get_current_diff(self):
-		return self.get_diff_from_index(self.get_current_date())
+		return self.dataframe.iloc[self.time_idx]["Daily_diff"]
 
 	def get_diff_from_index(self, timestamp: str):
 		""" Fetch difference between two successive timestamps """
@@ -125,11 +123,11 @@ class HLOCDataStream:
 	def get_current_time_index(self):
 		return self.time_idx
 
-	def get_window(self):
-		if self.reverse and self.time_idx > -len(self.dataframe) + self.window_size:
-			return self.dataframe[self.time_idx - self.window_size: self.time_idx]
-		elif not self.reverse and self.time_idx < len(self.dataframe) - self.window_size:
-			return self.dataframe[self.time_idx: self.time_idx + self.window_size]
+	def get_window(self, window_size: int = 70):
+		if self.reverse and self.time_idx > -len(self.dataframe) + window_size:
+			return self.dataframe[self.time_idx - window_size: self.time_idx]
+		elif not self.reverse and self.time_idx < len(self.dataframe) - window_size:
+			return self.dataframe[self.time_idx: self.time_idx + window_size]
 		else:
 			return None
 

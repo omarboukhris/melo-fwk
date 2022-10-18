@@ -24,7 +24,7 @@ class IndexBuilder:
 		IndexBuilder.i += 1
 		return {
 			"|".join(products.keys()): Product(
-				filepath=f"idx.{IndexBuilder.i}",
+				name=f"idx.{IndexBuilder.i}",
 				datastream=HLOCDataStream(merged_df[["Date", "Close"]])
 			)
 		}

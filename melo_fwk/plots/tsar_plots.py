@@ -9,7 +9,7 @@ class TsarPlotter:
 	def __init__(self, tsar_list: dict):
 		self.tsar_list = tsar_list
 
-	def save_fig(self):
+	def save_fig(self, export_folder: str):
 
 		for product_name, tsar_entry in tqdm.tqdm(self.tsar_list.items()):
 			for filename, tsar in tqdm.tqdm(tsar_entry.items()):
@@ -36,5 +36,5 @@ class TsarPlotter:
 
 				plt.subplots_adjust(hspace=.0)
 				plt.xlabel("Time")
-				plt.savefig(f"{filename}.png")
+				plt.savefig(f"{export_folder}/{filename}.png")
 				plt.close()

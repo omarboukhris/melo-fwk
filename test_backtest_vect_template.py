@@ -1,6 +1,7 @@
 import tqdm
 
 from melo_fwk.market_data.commodities import CommodityDataLoader
+from melo_fwk.market_data.fx import FxDataLoader
 
 from melo_fwk.rules.ewma import EWMATradingRule
 from melo_fwk.rules.sma import SMATradingRule
@@ -39,7 +40,7 @@ results = {}
 
 balance = 60000
 
-for year in tqdm.tqdm(range(2015, 2022)):
+for year in tqdm.tqdm(range(2015, 2020)):
 	vol_target = VolTarget(
 		annual_vol_target=0.5,
 		trading_capital=balance)
@@ -58,4 +59,5 @@ for year in tqdm.tqdm(range(2015, 2022)):
 	balance += tsar.annual_delta()
 
 tsar_plotter = TsarPlotter({"pname": results})
-tsar_plotter.save_fig()
+tsar_plotter.save_fig(export_folder="data/residual/")
+print(balance)

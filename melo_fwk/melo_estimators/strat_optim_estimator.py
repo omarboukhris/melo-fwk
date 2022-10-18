@@ -43,7 +43,7 @@ class StrategyEstimator:
 
 		trading_subsys.run()
 		tsar = trading_subsys.get_tsar()
-		estimated_result = tsar.account_metrics.get_metric_by_name(StrategyEstimator.metric)
+		estimated_result = tsar.get_metric_by_name(StrategyEstimator.metric)
 		return estimated_result
 
 
@@ -99,7 +99,7 @@ class StratOptimEstimator:
 					cv=3
 				)
 				opt.fit(X=product.datastream.get_data_by_year(year).get_data()["Close"])
-				results.update({f"{product.filepath}_{year}": opt})
+				results.update({f"{product.name}_{year}": opt})
 
 		# aggregate results and cross validate out of sample
 		# then return

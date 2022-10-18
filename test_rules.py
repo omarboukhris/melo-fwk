@@ -12,7 +12,7 @@ import unittest
 class TradingRuleUnitTests(unittest.TestCase):
 
 	def test_vectorized_trading_rule(self):
-		products = bdl.MarketDataLoader.get_products("assets/Commodity/*_sanitized.csv")
+		products = bdl.MarketDataLoader.get_commodities()
 		for product in tqdm.tqdm(products):
 			product_hloc = bdl.MarketDataLoader.get_product_datastream(product)
 			product_hloc.datastream.with_daily_returns()
@@ -36,7 +36,7 @@ class TradingRuleUnitTests(unittest.TestCase):
 
 
 	def test_trading_rule(self):
-		products = bdl.MarketDataLoader.get_products("assets/Commodity/*_sanitized.csv")
+		products = bdl.MarketDataLoader.get_commodities()
 		for product in tqdm.tqdm(products):
 			product_hloc = bdl.MarketDataLoader.get_product_datastream(product)
 			product_hloc.datastream.with_daily_returns()

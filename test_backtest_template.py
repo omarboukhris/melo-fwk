@@ -1,6 +1,7 @@
 import tqdm
 
 from melo_fwk.market_data.commodities import CommodityDataLoader
+from melo_fwk.plots.tsar_plots import TsarPlotter
 
 from melo_fwk.rules.ewma import EWMATradingRule
 from melo_fwk.rules.sma import SMATradingRule
@@ -33,11 +34,11 @@ strat = [
 ]
 fw = [0.4, 0.6]
 
-results = []
+results = {}
 
 balance = 60000
 
-for year in tqdm.tqdm(range(2004, 2008)):
+for year in tqdm.tqdm(range(2015, 2022)):
 	vol_target = VolTarget(
 		annual_vol_target=1e-1,
 		trading_capital=balance)
@@ -52,12 +53,9 @@ for year in tqdm.tqdm(range(2004, 2008)):
 
 	trading_subsys.run()
 	tsar = trading_subsys.get_tsar()
-	results.append(tsar)
+	results.update({f"Gold_{year}": tsar})
 	balance += tsar.annual_delta()
 
-sr = [r.account_metrics.sharpe_ratio() for r in results]
-balance = [(r.account_metrics.sharpe_ratio(), r.annual_delta()) for r in results]
-print(sr)
-print(np.array(sr).mean())
-print(balance)
-print([r.annual_delta() + r.vol_target.trading_capital for r in results])
+tsar_plotter = TsarPlotter({"pname": results})
+tsar_plotter.save_fig(export_folder="data/residual")
+

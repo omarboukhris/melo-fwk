@@ -8,8 +8,6 @@ from melo_fwk.market_data.utils.hloc_datastream import HLOCDataStream
 from melo_fwk.policies.trading_policies.trading_policy import BaseTradingPolicy, ITradingPolicy
 from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
 
-from melo_fwk.metrics.metrics import AccountMetrics
-
 from melo_fwk.trading_systems.tsar import TradingSystemAnnualResult
 
 
@@ -78,7 +76,7 @@ class BaseTradingSystem:
 	def account_series(self):
 		daily_pnl = self.daily_pnl_series()
 		# daily_balance = [daily_pnl.iloc[:i].cumsum() for i in range(len(daily_pnl))]
-		return pd.Series(daily_pnl.cumsum())
+		return daily_pnl.expanding(1).sum()
 
 	def position_dataframe(self):
 		return pd.DataFrame(self.tsar_history)[["Date", "PositionSize"]]
@@ -92,7 +90,6 @@ class BaseTradingSystem:
 	def get_tsar(self):
 		return TradingSystemAnnualResult(
 			vol_target=self.size_policy.risk_policy,
-			account_metrics=AccountMetrics(self.account_series()),
 			dates=self.dates_dataframe(),
 			price_series=self.price_series(),
 			forecast_series=self.forecast_series(),
@@ -104,7 +101,6 @@ class BaseTradingSystem:
 	def get_negative_tsar(self):
 		return TradingSystemAnnualResult(
 			vol_target=self.size_policy.risk_policy,
-			account_metrics=AccountMetrics(self.account_series() * -1),
 			dates=self.dates_dataframe(),
 			price_series=self.price_series(),
 			forecast_series=self.forecast_series(),

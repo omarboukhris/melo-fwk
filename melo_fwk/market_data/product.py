@@ -4,5 +4,5 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Product:
-	filepath: str
+	name: str
 	datastream: HLOCDataStream
