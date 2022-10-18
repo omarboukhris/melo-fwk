@@ -15,9 +15,6 @@ from melo_fwk.plots.tsar_plots import TsarPlotter
 
 product = CommodityDataLoader.Gold
 # product = FxDataLoader.EURUSD
-# do this by default
-product.datastream.parse_date_column()
-product.datastream.with_daily_returns()
 
 strat = [
 	EWMATradingRule(

@@ -6,12 +6,19 @@ import datetime as dt
 class HLOCDataStream:
 	"""This class is used to wrap HLOC Data Frames in a class and to offer some HLOC operations interface"""
 
+	@staticmethod
+	def get_empty():
+		return HLOCDataStream(
+			dataframe=pd.DataFrame([{"Date": "1970-01-01"}])
+		)
+
 	def __init__(
 		self,
 		dataframe: pd.DataFrame,
 		offset: int = 0,
 		reverse: bool = False,
-		date_label: str = "Date"):
+		date_label: str = "Date"
+	):
 
 		self.dataframe = dataframe
 		self.offset = offset
@@ -19,13 +26,10 @@ class HLOCDataStream:
 		self.time_idx = -self.offset if self.reverse else self.offset
 		self.date_label = date_label
 
-	@staticmethod
-	def get_empty():
-		return HLOCDataStream(
-			dataframe=pd.DataFrame([{"Date": "1970-01-01"}])
-		)
+		self._parse_date_column()
+		self._with_daily_returns()
 
-	def parse_date_column(self):
+	def _parse_date_column(self):
 		def parse_date(date: str):
 			try:
 				return dt.datetime.strptime(date, "%Y-%m-%d").year
@@ -37,7 +41,7 @@ class HLOCDataStream:
 
 		self.dataframe["Year"] = self.dataframe[self.date_label].apply(parse_date)
 
-	def with_daily_returns(self):
+	def _with_daily_returns(self):
 		self.dataframe["Daily_diff"] = self.dataframe["Close"].diff()
 
 	def get_data_by_year(self, y: str):
@@ -104,15 +108,7 @@ class HLOCDataStream:
 
 	def get_diff_from_index(self, timestamp: str):
 		""" Fetch difference between two successive timestamps """
-		x = self.dataframe.index[self.dataframe[self.date_label] == timestamp].to_numpy()
-		assert len(x) == 1, f"(AssertionError) Timestamp is invalid, date not found or not unique {x}"
-
-		if x == 0:
-			return 0
-		diff = self.dataframe.iloc[x]["Daily_diff"].to_numpy()
-		assert diff.shape == (1,), f"PandasDataStream.get_diff_from_index : {diff.shape} != (1,)"
-
-		return diff[0] if diff[0] is not None else 0
+		return self.dataframe.loc[self.dataframe[self.date_label] == timestamp, "Daily_diff"]
 
 	def get_current_high(self):
 		return self.dataframe.iloc[self.time_idx]["High"]

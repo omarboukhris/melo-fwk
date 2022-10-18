@@ -5,9 +5,18 @@ from melo_fwk.market_data.product import Product
 from melo_fwk.market_data.utils.hloc_datastream import HLOCDataStream
 from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
 from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
-from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems.trading_vect_system import TradingVectSystem
 
 from skopt import BayesSearchCV
+
+# ###################################################################
+# Optimzer shouldn't evaluate the same point twice
+# This filters warnings w/ message
+# "The objective has been evaluated at this point before."
+import warnings
+warnings.filterwarnings('ignore',
+	message='The objective has been evaluated at this point before.')
+# ###################################################################
 
 class StrategyEstimator:
 	size_policy: ISizePolicy
@@ -32,20 +41,18 @@ class StrategyEstimator:
 			"Close": X
 		})
 		product_hloc = HLOCDataStream(product_df)
-		product_hloc.with_daily_returns()
 
-		trading_subsys = TradingSystem(
+		trading_subsys = TradingVectSystem(
 			data_source=product_hloc,
 			trading_rules=[StrategyEstimator.strat_class_(**self.strat_params)],
 			forecast_weights=[1.],
 			size_policy=StrategyEstimator.size_policy
 		)
 
-		trading_subsys.run()
+		trading_subsys.trade_vect()
 		tsar = trading_subsys.get_tsar()
 		estimated_result = tsar.get_metric_by_name(StrategyEstimator.metric)
 		return estimated_result
-
 
 class StratOptimEstimator:
 
@@ -79,8 +86,6 @@ class StratOptimEstimator:
 	def _optimize_product_strat(self, product: Product):
 
 		results = dict()
-		product.datastream.with_daily_returns()
-		product.datastream.parse_date_column()
 
 		# optimize by strat
 		for strat_metadata in self.strategies:

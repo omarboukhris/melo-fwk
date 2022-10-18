@@ -24,6 +24,6 @@ class EstimatorConfigBuilder:
 		if ConfigBuilderHelper.is_key_present(quant_query_dict, "EstimatorParamList"):
 			estimator_param_list = EstimatorConfigBuilder.get_estimator_params(quant_query_dict)
 
-		_EstimatorObj = QuantFlowFactory.get_workflow(estimator_kw)
+		_EstimatorObj = QuantFlowFactory.get_estimator(estimator_kw)
 		return _EstimatorObj, estimator_param_list
 

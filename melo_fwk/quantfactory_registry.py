@@ -1,14 +1,21 @@
 from melo_fwk.utils import quantflow_factory
 
+# Assets
 from melo_fwk.market_data.commodities import CommodityDataLoader
 from melo_fwk.market_data.fx import FxDataLoader
 
+# Estimators
 from melo_fwk.melo_estimators.backtest_estimator import BacktestEstimator
 from melo_fwk.melo_estimators.strat_optim_estimator import StratOptimEstimator
 from melo_fwk.melo_estimators.fw_optim_estimator import ForecastWeightsEstimator
 
+# Reporters
+from melo_fwk.reporters.backtest_reporter import BacktestReporter
+
+# Strategies
 from melo_fwk.rules import ewma, sma
 
+# Position Sizing
 from melo_fwk.policies.vol_target_policies.vol_target_size_policy import VolTargetSizePolicy
 from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
 
@@ -21,9 +28,12 @@ def register_all():
 	register_products()
 
 def register_estimator():
-	quantflow_factory.QuantFlowFactory.register_workflow("BacktestEstimator", BacktestEstimator)
-	quantflow_factory.QuantFlowFactory.register_workflow("StratOptimEstimator", StratOptimEstimator)
-	quantflow_factory.QuantFlowFactory.register_workflow("ForecastWeightsEstimator", ForecastWeightsEstimator)
+	quantflow_factory.QuantFlowFactory.register_estimator("BacktestEstimator", BacktestEstimator)
+	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
+
+	quantflow_factory.QuantFlowFactory.register_estimator("StratOptimEstimator", StratOptimEstimator)
+
+	quantflow_factory.QuantFlowFactory.register_estimator("ForecastWeightsEstimator", ForecastWeightsEstimator)
 
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma.EWMATradingRule)

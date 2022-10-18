@@ -1,11 +1,12 @@
+import pandas as pd
 import tqdm
 import numpy as np
 
 from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
 from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
-from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems.trading_vect_system import TradingVectSystem
 
-import scipy.optimize as opt
+from scipy.optimize import minimize, Bounds
 
 class ForecastWeightsEstimator:
 
@@ -37,27 +38,48 @@ class ForecastWeightsEstimator:
 
 	def run(self):
 		results = []
-		self.product.datastream.with_daily_returns()
-		self.product.datastream.parse_date_column()
 
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
 			self.current_year = year
-			results.append(opt.minimize(self.trade_with_weights, self.forecast_weights))
+
+			opt_bounds = Bounds(0, 1)
+			exp_ret, covmat = self.get_expected_results_by_strategy()
+			opt_cst = [
+				{'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)},
+				# {'type': 'eq', 'fun': lambda W: np.max(exp_ret) - W.T @ exp_ret}
+			]
+			results.append(
+				minimize(
+					ForecastWeightsEstimator.objective,
+					self.forecast_weights,
+					args=(exp_ret, covmat),
+					method='SLSQP',
+					bounds=opt_bounds,
+					constraints=opt_cst
+				))
 
 		return results
 
-	def trade_with_weights(self, weights):
+	@staticmethod
+	def objective(W, exp_ret, covmat):
+		return -((W.T @ exp_ret) / (W.T @ covmat @ W) ** 0.5)
+
+	def get_expected_results_by_strategy(self):
 		size_policy = self.size_policy_class_(risk_policy=self.vol_target)
+		result = []
+		returns = {}
+		for strategy in self.strategies:
+			trading_subsys = TradingVectSystem(
+				data_source=self.product.datastream.get_data_by_year(self.current_year),
+				trading_rules=[strategy],
+				forecast_weights=[1.],
+				size_policy=size_policy
+			)
 
-		trading_subsys = TradingSystem(
-			data_source=self.product.datastream.get_data_by_year(self.current_year),
-			trading_rules=self.strategies,
-			forecast_weights=weights,
-			size_policy=size_policy
-		)
+			trading_subsys.trade_vect()
+			tsar = trading_subsys.get_tsar()
 
-		trading_subsys.run()
-		tsar = trading_subsys.get_negative_tsar()
+			returns.update({type(strategy): tsar.account_series})
+			result.append(tsar.get_metric_by_name(self.metric))
 
-		return tsar.get_metric_by_name(self.metric)
-
+		return np.array(result), pd.DataFrame(returns).cov()

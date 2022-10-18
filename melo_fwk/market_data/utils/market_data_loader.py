@@ -12,35 +12,35 @@ class MarketDataLoader:
 
 	@staticmethod
 	def get_fx():
-		return MarketDataLoader.get_products("assets/Fx/*.csv")
+		return MarketDataLoader.get_dataset_locations("assets/Fx/*.csv")
 
 	@staticmethod
 	def get_commodities():
-		return MarketDataLoader.get_products("assets/Commodity/*.csv")
+		return MarketDataLoader.get_dataset_locations("assets/Commodity/*.csv")
 
 	@staticmethod
 	def get_commodity_hloc_datastream(product: str):
-		product_list = MarketDataLoader.get_products(f"assets/Commodity/{product}.csv")
+		product_list = MarketDataLoader.get_dataset_locations(f"assets/Commodity/{product}.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
 
-		return MarketDataLoader.get_product_datastream(product_list[0])
+		return MarketDataLoader.load_datastream(product_list[0])
 
 	@staticmethod
 	def get_fx_hloc_datastream(product: str):
-		product_list = MarketDataLoader.get_products(f"assets/Fx/{product}.csv")
+		product_list = MarketDataLoader.get_dataset_locations(f"assets/Fx/{product}.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_fx_hloc_datastream, product = {product_list}"
 
-		return MarketDataLoader.get_product_datastream(product_list[0])
+		return MarketDataLoader.load_datastream(product_list[0])
 
 	@staticmethod
-	def get_product_datastream(product: dict) -> Product:
+	def load_datastream(product: dict) -> Product:
 		input_df = pd.read_csv(product["datasource"])
 		return Product(product["name"], ds.HLOCDataStream(input_df))
 
 	@staticmethod
-	def get_products(path: str):
+	def get_dataset_locations(path: str):
 		""" Globs historic data files and prepares them in a list
 		of instruments to trade
 
@@ -54,15 +54,3 @@ class MarketDataLoader:
 			product_name = path.split("/")[-1][:-4]
 			output.append({"name": product_name, "datasource": path})
 		return output
-
-	@staticmethod
-	def get_mock_datastream(_: dict):
-		mock_dict = {
-			"Date": [i for i in range(MarketDataLoader.mock_datastream_length)],
-			"Close": [i for i in range(MarketDataLoader.mock_datastream_length)],
-			"Open": [i for i in range(MarketDataLoader.mock_datastream_length)],
-			"High": [i for i in range(MarketDataLoader.mock_datastream_length)],
-			"Low": [i for i in range(MarketDataLoader.mock_datastream_length)],
-		}
-		mock_df = pd.DataFrame(mock_dict)
-		return Product("mock_df", ds.HLOCDataStream(mock_df))

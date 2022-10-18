@@ -16,11 +16,11 @@ import unittest
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_empty_trading_system(self):
-		products = bdl.MarketDataLoader.get_products("assets/Commodity/Cocoa.csv")
+		products = bdl.MarketDataLoader.get_dataset_locations("assets/Commodity/Cocoa.csv")
 		assert len(products) != 0, "(TradingSystemUnitTests) Did not find any product"
-		loaded_prod = bdl.MarketDataLoader.get_product_datastream(products[0])
+		loaded_prod = bdl.MarketDataLoader.load_datastream(products[0])
 		pds = loaded_prod.datastream
-		pds.with_daily_returns()
+		pds._with_daily_returns()
 
 		tr_sys = ts.TradingSystem(
 			data_source=pds,
@@ -48,8 +48,8 @@ class TradingSystemUnitTests(unittest.TestCase):
 		products = bdl.MarketDataLoader.get_commodities()
 		sum_ = 0.
 		for product in tqdm.tqdm(products):
-			loaded_prod = bdl.MarketDataLoader.get_product_datastream(product)
-			loaded_prod.datastream.with_daily_returns()
+			loaded_prod = bdl.MarketDataLoader.load_datastream(product)
+			loaded_prod.datastream._with_daily_returns()
 
 			sma_params = {
 				"fast_span": 32,
@@ -88,14 +88,14 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		# products = bdl.MarketDataLoader.get_fx()
-		products = bdl.MarketDataLoader.get_commodities()
+		products = bdl.MarketDataLoader.get_fx()
+		products += bdl.MarketDataLoader.get_commodities()
 		sum_ = 0.
 		results = {}
 
-		for i, product in tqdm.tqdm(enumerate(products)):
-			loaded_prod = bdl.MarketDataLoader.get_product_datastream(product)
-			loaded_prod.datastream.with_daily_returns()
+		for product in tqdm.tqdm(products):
+			loaded_prod = bdl.MarketDataLoader.load_datastream(product)
+			loaded_prod.datastream._with_daily_returns()
 
 			sma_params = {
 				"fast_span": 16,
@@ -122,14 +122,15 @@ class TradingSystemUnitTests(unittest.TestCase):
 			# account_plt.save_png(f"data/residual/{product['name']}_plot_vect.png")
 
 			tsar = tr_sys.get_tsar()
-			results.update({f"all_{i}": tsar})
+			results.update({product["name"]: tsar})
 			sum_ += tsar.annual_delta()
 
+		results_list = [r for r in results.values()]
 		account_df = pd.DataFrame({
-			"Date": results["all_1"].dates,
-			"Balance": [0. for _ in results["all_1"].dates]
+			"Date": results_list[0].dates,
+			"Balance": [0. for _ in results_list[0].dates]
 		})
-		for tsar in results.values():
+		for tsar in results_list:
 			account_df["Balance"] += tsar.account_series
 		account_plt = AccountPlotter(account_df)
 		account_plt.save_png(f"data/residual/all_plot_vect.png")
@@ -139,7 +140,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		starting_balance = 10000 * len(results)
 		print(f"starting balance : {starting_balance}")
-		print(f"final balance : {starting_balance + sum_}")
+		print(f"final balance : {sum_}")
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ class SMATradingRule:
 	search_space = {
 		"fast_span": [i for i in range(4, 60)],
 		"slow_span": [i for i in range(8, 100)],
-		"scale": [6.5],
+		"scale": [1.],
 		"cap": [20]
 	}
 

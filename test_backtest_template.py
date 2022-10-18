@@ -14,9 +14,6 @@ from melo_fwk.trading_systems.trading_system import TradingSystem
 import numpy as np
 
 product = CommodityDataLoader.Gold
-# do this by default
-product.datastream.parse_date_column()
-product.datastream.with_daily_returns()
 
 strat = [
 	EWMATradingRule(

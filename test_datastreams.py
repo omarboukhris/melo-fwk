@@ -12,23 +12,9 @@ import unittest
 class TestDataStreamsHelper:
 
 	@staticmethod
-	def test_mock_datastream(products: List[dict]):
-		for product in tqdm.tqdm(products):
-			loaded_prod = MarketDataLoader.get_mock_datastream({})
-			loaded_prod.datastream.with_daily_returns()
-
-			for tick in loaded_prod.datastream:
-
-				TestDataStreamsHelper.quick_sanity_check(loaded_prod.datastream, product, tick)
-				assert loaded_prod.datastream.get_diff_from_index(tick["Date"]) == 1
-
-	@staticmethod
 	def test_datastream(products: List[dict], years: List[str]):
 		for product in tqdm.tqdm(products):
-			loaded_prod = MarketDataLoader.get_product_datastream(product)
-			loaded_prod.datastream.parse_date_column()
-			loaded_prod.datastream.with_daily_returns()
-			# print(pdstream.get_data()[["Date", "Close", "Daily_diff"]])
+			loaded_prod = MarketDataLoader.load_datastream(product)
 
 			for y in years:
 				yearly_pdstream = loaded_prod.datastream.get_data_by_year(y)
@@ -60,14 +46,9 @@ class DataStreamUnitTests(unittest.TestCase):
 		for tick in pdstream:
 			process_tick(tick)
 
-	def test_mock_datastream(self):
-		TestDataStreamsHelper.test_mock_datastream(
-			MarketDataLoader.get_commodities()
-		)
-
 	def test_datastream_stocks(self):
 		TestDataStreamsHelper.test_datastream(
-			MarketDataLoader.get_products("data/Stocks/*.csv"),
+			MarketDataLoader.get_dataset_locations("data/Stocks/*.csv"),
 			[str(i) for i in range(2000, 2022)]
 		)
 

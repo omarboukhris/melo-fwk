@@ -8,7 +8,8 @@ class QuantFlowFactory:
 	strategies = dict()
 	strat_configs = dict()
 	search_spaces = dict()
-	workflows = dict()
+	estimators = dict()
+	reporters = dict()
 	size_policies = dict()
 	result_writers = dict()
 
@@ -45,12 +46,20 @@ class QuantFlowFactory:
 		return QuantFlowFactory.size_policies[size_policy_label]
 
 	@staticmethod
-	def register_workflow(workflow_label: str, workflow: callable):
-		QuantFlowFactory.workflows[workflow_label] = workflow
+	def register_estimator(estimator_label: str, estimator: callable):
+		QuantFlowFactory.estimators[estimator_label] = estimator
 
 	@staticmethod
-	def get_workflow(workflow_label: str):
-		return QuantFlowFactory.workflows[workflow_label]
+	def get_estimator(estimator_label: str):
+		return QuantFlowFactory.estimators[estimator_label]
+
+	@staticmethod
+	def register_reporter(estimator_label: str, reporter: callable):
+		QuantFlowFactory.reporters[estimator_label] = reporter
+
+	@staticmethod
+	def get_reporter(estimator_label: str):
+		return QuantFlowFactory.reporters[estimator_label]
 
 	@staticmethod
 	def get_result_writer(result_writer_label: str):

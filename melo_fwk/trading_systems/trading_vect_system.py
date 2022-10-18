@@ -25,8 +25,8 @@ class TradingVectSystem(BaseTradingSystem):
 	def trade_vect(self):
 
 		forecast_series = self.forecast_cumsum()
-		pose_series = self.size_policy.position_size_vect(forecast_series)
-		daily_pnl = self.get_daily_pnl(pose_series)
+		pose_series = self.size_policy.position_size_vect(forecast_series).fillna(0)
+		daily_pnl = self.get_daily_pnl(pose_series).fillna(0)
 		# orderbook building ??
 
 		self.tsar_history = {

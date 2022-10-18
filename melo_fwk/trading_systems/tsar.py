@@ -42,10 +42,10 @@ class TradingSystemAnnualResult:
 		return self.account_series.iloc[-1]
 
 	def sharpe_ratio(self, rf: float = 0.0):
-		mean = self.account_series.mean() - self.account_series.iat[0] - rf
+		mean = self.account_series.mean() - rf
 		sigma = self.account_series.std()
 		sharpe_r = mean / sigma if sigma != 0 else 0.
-		return 0. if math.isnan(sharpe_r) else sharpe_r
+		return sharpe_r
 
 	def sortino_ratio(self, rf: float = 0.0):
 		# needs rework ########################

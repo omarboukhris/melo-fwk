@@ -40,8 +40,6 @@ class BacktestEstimator:
 	def _trade_product(self, product: Product):
 		balance = self.vol_target.trading_capital
 		results = dict()
-		product.datastream.with_daily_returns()
-		product.datastream.parse_date_column()
 
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
 			vol_target = VolTarget(

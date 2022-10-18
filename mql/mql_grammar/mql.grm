@@ -16,6 +16,7 @@ QuantQuery ->
     where. !PositionSizing
     select. !ProcessDef
     |
+
     // User defines Products
     // default Strategy       : Buy and Hold OR Search
     // default PositionSizing : 1 OR Search
@@ -23,6 +24,7 @@ QuantQuery ->
     with. !ProductsDef
     select. !ProcessDef
     |
+
     // User defines Products & Strategy
     // default PositionSizing : 1 OR Search
     create. QueryName=alphanum.
@@ -34,6 +36,8 @@ QuantQuery ->
     // by ProcessDef
     // ====================
     // add output piping and formatting
+    // how to add forecast scale calibration ?
+    // how to add portfolio alloc optim ?
     // add costs and trading policy
 
 

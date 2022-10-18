@@ -45,7 +45,7 @@ def run_mql_process(mql_query_path: Path):
 if __name__ == "__main__":
 
 	templates = {
-		"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
+		# "backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 		"strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
 	}
