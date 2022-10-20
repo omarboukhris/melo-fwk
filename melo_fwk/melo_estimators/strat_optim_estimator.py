@@ -1,11 +1,12 @@
 import pandas as pd
 import tqdm
+from sklearn.model_selection import GridSearchCV
 
-from melo_fwk.market_data.product import Product
-from melo_fwk.market_data.utils.hloc_datastream import HLOCDataStream
+from melo_fwk.market_data.utils.product import Product
+from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
 from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
 from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
-from melo_fwk.trading_systems.trading_vect_system import TradingVectSystem
+from melo_fwk.trading_systems.trading_system import TradingSystem
 
 from skopt import BayesSearchCV
 
@@ -19,6 +20,7 @@ warnings.filterwarnings('ignore',
 # ###################################################################
 
 class StrategyEstimator:
+	hloc_df: pd.Series
 	size_policy: ISizePolicy
 	strat_class_: callable
 	metric: str
@@ -36,21 +38,15 @@ class StrategyEstimator:
 		return self
 
 	def score(self, X: pd.Series):
-		product_df = pd.DataFrame({
-			"Date": X.index,
-			"Close": X
-		})
-		product_hloc = HLOCDataStream(product_df, parse_date=False)
 
-		trading_subsys = TradingVectSystem(
-			data_source=product_hloc,
+		trading_subsys = TradingSystem(
+			data_source=StrategyEstimator.hloc_df,
 			trading_rules=[StrategyEstimator.strat_class_(**self.strat_params)],
 			forecast_weights=[1.],
 			size_policy=StrategyEstimator.size_policy
 		)
 
-		trading_subsys.run()
-		tsar = trading_subsys.get_tsar()
+		tsar = trading_subsys.run()
 		estimated_result = tsar.get_metric_by_name(StrategyEstimator.metric)
 		return estimated_result
 
@@ -97,13 +93,13 @@ class StratOptimEstimator:
 			StrategyEstimator.strat_class_, strat_search_space_ = strat_metadata
 			# optimize by year
 			for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
-				opt = BayesSearchCV(
+				opt = GridSearchCV(
 					StrategyEstimator(),
 					strat_search_space_,
-					n_iter=32,
-					cv=3
+					cv=[(slice(None), slice(None))]
 				)
-				opt.fit(X=product.datastream.get_data_by_year(year).get_data()["Close"])
+				StrategyEstimator.hloc_df = product.datastream.get_data_by_year(year)
+				opt.fit(X=StrategyEstimator.hloc_df.get_dataframe())
 				results.update({f"{product.name}_{year}": opt})
 
 		# aggregate results and cross validate out of sample

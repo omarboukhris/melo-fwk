@@ -1,12 +1,11 @@
 
-from melo_fwk.market_data.utils.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
 
 class CommodityDataLoader:
 
 	# oil
 	BrentCrudeOil = MarketDataLoader.get_commodity_hloc_datastream("Brent Crude Oil")
 	CrudeOil = MarketDataLoader.get_commodity_hloc_datastream("Crude Oil")
-	HeatingOil = MarketDataLoader.get_commodity_hloc_datastream("Heating Oil")
 	NaturalGas = MarketDataLoader.get_commodity_hloc_datastream("Natural Gas")
 	RBOBGasoline = MarketDataLoader.get_commodity_hloc_datastream("RBOB Gasoline")
 

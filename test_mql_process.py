@@ -32,20 +32,13 @@ def run_mql_process(mql_query_path: Path):
 
 	# add result writer process here
 
-	# find a way to add output writers into mql grammar
-	# and return None or simple status code
-	# maybe link output writers and estimators ?
-	# Backtest estimator
-	# tsar_plotter = TsarPlotter(result)
-	# tsar_plotter.save_fig()
-
 	return output
 
 
 if __name__ == "__main__":
 
 	templates = {
-		# "backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
+		"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 		"strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
 	}

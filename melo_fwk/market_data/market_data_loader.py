@@ -1,8 +1,8 @@
 
 import glob
 import pandas as pd
-import melo_fwk.market_data.utils.hloc_datastream as ds
-from melo_fwk.market_data.product import Product
+import melo_fwk.datastreams.hloc_datastream as ds
+from melo_fwk.market_data.utils.product import Product
 
 from pathlib import Path
 
@@ -37,7 +37,7 @@ class MarketDataLoader:
 	@staticmethod
 	def load_datastream(product: dict) -> Product:
 		input_df = pd.read_csv(product["datasource"])
-		return Product(product["name"], ds.HLOCDataStream(input_df))
+		return Product(product["name"], ds.HLOCDataStream(dataframe=input_df))
 
 	@staticmethod
 	def get_dataset_locations(path: str):
@@ -47,7 +47,7 @@ class MarketDataLoader:
 		:param path: to glob files from
 		:return: list of products with each product a key/value pair = {"name", "datasource"}
 		"""
-		btpath = str(MarketDataLoader.parent_folder.parent / path)
+		btpath = str(MarketDataLoader.parent_folder / path)
 		product_path_list = glob.glob(btpath)
 		output = []
 		for path in product_path_list:

@@ -1,10 +1,35 @@
-import math
+import melo_fwk.datastreams.utils.common as common
 
-from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
+from melo_fwk.datastreams.base_datastream import BaseDataStream
+
 from dataclasses import dataclass
 
 import pandas as pd
 
+
+"""This class is used to wrap Tsar Data Frames in an interface and to offer some HLOC operations"""
+class TsarDataStream(BaseDataStream):
+	
+	def __init__(self, **kwargs):
+		super(TsarDataStream, self).__init__(**kwargs)
+
+	def get_data_by_year(self, y: str):
+		return TsarDataStream(
+			dataframe=self.dataframe.loc[
+				self.dataframe["Year"] == y,
+			].reset_index(drop=True),
+			date_label=self._date_label,
+		)
+
+	def to_tsar(self):
+		return TradingSystemAnnualResult(
+			dates=self.dataframe["Date"],
+			price_series=self.dataframe["Close"],
+			forecast_series=self.dataframe["Forecast"],
+			size_series=self.dataframe["Size"],
+			account_series=self.dataframe["Account"],
+			daily_pnl_series=self.dataframe["Daily_PnL"]
+		)
 
 @dataclass(frozen=True)
 class TradingSystemAnnualResult:
@@ -14,7 +39,6 @@ class TradingSystemAnnualResult:
 	size_series: pd.Series
 	account_series: pd.Series
 	daily_pnl_series: pd.Series
-	vol_target: VolTarget
 
 	def get_metric_by_name(self, name: str, rf: float = 0.):
 		if name in ["sharpe", "sr"]:
@@ -35,6 +59,17 @@ class TradingSystemAnnualResult:
 			"PnL": self.PnL(),
 			"ReturnVolatility": self.return_vol()
 		}
+
+	def to_df(self):
+		tsar_df = pd.DataFrame({
+			"Dates": self.dates,
+			"Price": self.price_series,
+			"Forecast": self.forecast_series,
+			"Size": self.size_series,
+			"Account": self.account_series,
+			"Daily_PnL": self.daily_pnl_series
+		})
+		return TsarDataStream(dataframe=common.parse_year_from_date(tsar_df))
 
 	def annual_delta(self):
 		assert len(self.account_series) > 1, \
@@ -69,4 +104,7 @@ class TradingSystemAnnualResult:
 	def calmar_ratio(self):
 		calmars = self.account_series.mean() / abs(self.max_drawdown())
 		return calmars
+
+
+
 

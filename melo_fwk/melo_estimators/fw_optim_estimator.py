@@ -4,7 +4,7 @@ import numpy as np
 
 from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
 from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
-from melo_fwk.trading_systems.trading_vect_system import TradingVectSystem
+from melo_fwk.trading_systems.trading_system import TradingSystem
 
 from scipy.optimize import minimize, Bounds
 
@@ -43,7 +43,7 @@ class ForecastWeightsEstimator:
 			self.current_year = year
 
 			opt_bounds = Bounds(0, 1)
-			exp_ret, covmat = self.get_expected_results_by_strategy()
+			expected_ret, covmat_ret = self.get_expected_results_by_strategy()
 			opt_cst = [
 				{'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)},
 				# {'type': 'eq', 'fun': lambda W: np.max(exp_ret) - W.T @ exp_ret}
@@ -52,7 +52,7 @@ class ForecastWeightsEstimator:
 				minimize(
 					ForecastWeightsEstimator.objective,
 					self.forecast_weights,
-					args=(exp_ret, covmat),
+					args=(expected_ret, covmat_ret),
 					method='SLSQP',
 					bounds=opt_bounds,
 					constraints=opt_cst
@@ -69,17 +69,16 @@ class ForecastWeightsEstimator:
 		result = []
 		returns = {}
 		for strategy in self.strategies:
-			trading_subsys = TradingVectSystem(
+			trading_subsys = TradingSystem(
 				data_source=self.product.datastream.get_data_by_year(self.current_year),
 				trading_rules=[strategy],
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
 
-			trading_subsys.run()
-			tsar = trading_subsys.get_tsar()
-
-			returns.update({type(strategy): tsar.account_series})
+			tsar = trading_subsys.run()
+			key = f"{self.product.name}.{str(strategy)}"
+			returns.update({key: tsar.account_series})
 			result.append(tsar.get_metric_by_name(self.metric))
 
 		return np.array(result), pd.DataFrame(returns).cov()
