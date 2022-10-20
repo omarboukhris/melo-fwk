@@ -43,8 +43,8 @@ class TradingSystemAdj(TradingSystem):
 
 		pos_adj = PositionAdjust()
 		forecast_series = self.forecast_cumsum()  # .interpolate()
-		pose_series = self.size_policy.position_size_vect(forecast_series).apply(pos_adj)  # .interpolate()
-		pose_diff = pose_series.diff()
+		pose_series = self.size_policy.position_size_vect(forecast_series).round().apply(pos_adj)  # .interpolate()
+		# pose_diff = pose_series.diff()
 		daily_pnl_series = self.get_daily_pnl(pose_series)  # .interpolate()
 		# orderbook building ??
 

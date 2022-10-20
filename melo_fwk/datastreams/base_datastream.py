@@ -13,7 +13,7 @@ class BaseDataStream:
 
 		self.dataframe = dataframe
 		self._date_label = date_label
-		self.years = self.years = common.parse_year_from_date(self.dataframe)
+		self.years = common.parse_year_from_date(self.dataframe)
 
 	def get_dataframe(self):
 		""" Get the whole dataframe """

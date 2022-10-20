@@ -6,6 +6,45 @@ from melo_fwk.market_data.utils.product import Product
 
 from pathlib import Path
 
+products_block_size = {
+	# Commodity
+	"Brent Crude Oil": 1000,
+	"Cocoa": 100,  #
+	"Coffee": 100,  #
+	"Copper": 100,  #
+	"Corn": 100,  #
+	"Cotton": 100,  #
+	"Crude Oil": 1000,  #
+	"Feeder Cattle": 100,  #
+	"Gold": 100,  #
+	"Lean Hogs": 100,  #
+	"Live Cattle": 100,  #
+	"Lumber": 100,  #
+	"Natural Gas": 100,  #
+	"Oat": 100,  #
+	"Palladium": 100,  #
+	"Platinum": 100,  #
+	"RBOB Gasoline": 100,  #
+	"Silver": 100,  #
+	"Soybean": 100,  #
+	"Soybean Meal": 100,  #
+	"Soybean Oil": 100,  #
+	"Sugar": 100,  #
+	"Wheat": 100,  #
+
+	# Fx
+	"AUDUSD": 1e+5,
+	"CADUSD": 1e+5,
+	"CHFUSD": 1e+5,
+	"EURCAD": 1e+5,
+	"EURCHF": 1e+5,
+	"EURGBP": 1e+5,
+	"EURJPY": 1e+5,
+	"EURUSD": 1e+5,
+	"GBPUSD": 1e+5,
+	"NZDUSD": 1e+5,
+}
+
 class MarketDataLoader:
 	parent_folder = Path(Path(__file__).parent)
 	mock_datastream_length = 1000
@@ -37,7 +76,10 @@ class MarketDataLoader:
 	@staticmethod
 	def load_datastream(product: dict) -> Product:
 		input_df = pd.read_csv(product["datasource"])
-		return Product(product["name"], ds.HLOCDataStream(dataframe=input_df))
+		return Product(
+			product["name"],
+			products_block_size[product["name"]],
+			ds.HLOCDataStream(dataframe=input_df))
 
 	@staticmethod
 	def get_dataset_locations(path: str):

@@ -24,7 +24,7 @@ class TsarDataStream(BaseDataStream):
 	def to_tsar(self):
 		return TradingSystemAnnualResult(
 			dates=self.dataframe["Date"],
-			price_series=self.dataframe["Close"],
+			price_series=self.dataframe["Price"],
 			forecast_series=self.dataframe["Forecast"],
 			size_series=self.dataframe["Size"],
 			account_series=self.dataframe["Account"],
@@ -60,21 +60,21 @@ class TradingSystemAnnualResult:
 			"ReturnVolatility": self.return_vol()
 		}
 
-	def to_df(self):
+	def to_datastream(self):
 		tsar_df = pd.DataFrame({
-			"Dates": self.dates,
+			"Date": self.dates,
 			"Price": self.price_series,
 			"Forecast": self.forecast_series,
 			"Size": self.size_series,
 			"Account": self.account_series,
 			"Daily_PnL": self.daily_pnl_series
 		})
-		return TsarDataStream(dataframe=common.parse_year_from_date(tsar_df))
+		return TsarDataStream(dataframe=tsar_df)
 
-	def annual_delta(self):
-		assert len(self.account_series) > 1, \
-			"(TradingSystemAnnualReport) final_balance: account data frame is empty"
-		return self.account_series.iloc[-1]
+	def annual_delta(self) -> float:
+		if len(self.account_series) < 1:
+			return 0.
+		return float(self.account_series.iloc[-1])
 
 	def sharpe_ratio(self, rf: float = 0.0):
 		mean = self.account_series.mean() - rf

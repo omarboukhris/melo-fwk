@@ -2,6 +2,7 @@ import pandas as pd
 import tqdm
 import numpy as np
 
+from melo_fwk.market_data.utils.product import Product
 from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
 from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 from melo_fwk.trading_systems.trading_system import TradingSystem
@@ -69,8 +70,13 @@ class ForecastWeightsEstimator:
 		result = []
 		returns = {}
 		for strategy in self.strategies:
+			y_prod = Product(
+				name=self.product.name,
+				block_size=self.product,
+				datastream=self.product.datastream.get_data_by_year(self.current_year)
+			)
 			trading_subsys = TradingSystem(
-				data_source=self.product.datastream.get_data_by_year(self.current_year),
+				product=y_prod,
 				trading_rules=[strategy],
 				forecast_weights=[1.],
 				size_policy=size_policy

@@ -20,7 +20,7 @@ warnings.filterwarnings('ignore',
 # ###################################################################
 
 class StrategyEstimator:
-	hloc_df: pd.Series
+	product: Product
 	size_policy: ISizePolicy
 	strat_class_: callable
 	metric: str
@@ -40,7 +40,7 @@ class StrategyEstimator:
 	def score(self, X: pd.Series):
 
 		trading_subsys = TradingSystem(
-			data_source=StrategyEstimator.hloc_df,
+			product=StrategyEstimator.product,
 			trading_rules=[StrategyEstimator.strat_class_(**self.strat_params)],
 			forecast_weights=[1.],
 			size_policy=StrategyEstimator.size_policy
@@ -98,8 +98,11 @@ class StratOptimEstimator:
 					strat_search_space_,
 					cv=[(slice(None), slice(None))]
 				)
-				StrategyEstimator.hloc_df = product.datastream.get_data_by_year(year)
-				opt.fit(X=StrategyEstimator.hloc_df.get_dataframe())
+				StrategyEstimator.product = Product(
+					name=product.name,
+					block_size=product.block_size,
+					datastream=product.datastream.get_data_by_year(year))
+				opt.fit(X=StrategyEstimator.product.datastream.get_dataframe())
 				results.update({f"{product.name}_{year}": opt})
 
 		# aggregate results and cross validate out of sample

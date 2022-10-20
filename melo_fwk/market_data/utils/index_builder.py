@@ -25,6 +25,7 @@ class IndexBuilder:
 		return {
 			"|".join(products.keys()): Product(
 				name=f"idx.{IndexBuilder.i}",
+				block_size=1,
 				datastream=HLOCDataStream(dataframe=merged_df[["Date", "Close"]])
 			)
 		}

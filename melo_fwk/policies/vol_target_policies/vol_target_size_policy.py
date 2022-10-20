@@ -5,7 +5,7 @@ from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
 
 class VolTargetSizePolicy(ISizePolicy):
 
-	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 100):
+	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 1):
 		super(VolTargetSizePolicy, self).__init__(risk_policy)
 		self.block_size = block_size
 

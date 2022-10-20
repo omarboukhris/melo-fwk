@@ -34,10 +34,38 @@ class BacktestEstimator:
 	def run(self):
 		out_dict = dict()
 		for product_name, product_dataclass in self.products.items():
-			out_dict[product_name] = self._trade_product(product_dataclass)
+			if self.reinvest:
+				out_dict[product_name] = self._trade_product_reinvest(product_dataclass)
+			else:
+				out_dict[product_name] = self._trade_product(product_dataclass)
 		return out_dict
 
 	def _trade_product(self, product: Product):
+		balance = self.vol_target.trading_capital
+		results = dict()
+
+		vol_target = VolTarget(
+			annual_vol_target=self.vol_target.annual_vol_target,
+			trading_capital=balance)
+		size_policy = self.size_policy_class_(risk_policy=vol_target)
+
+		trading_subsys = TradingSystem(
+			product=product,
+			trading_rules=self.strategies,
+			forecast_weights=self.forecast_weights,
+			size_policy=size_policy
+		)
+
+		tsar = trading_subsys.run()
+
+		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+			yearly_tsar = tsar.to_datastream().get_data_by_year(year).to_tsar()
+			results.update({f"{product.name}_{year}": yearly_tsar})
+			balance += tsar.annual_delta()
+
+		return results
+
+	def _trade_product_reinvest(self, product: Product):
 		balance = self.vol_target.trading_capital
 		results = dict()
 
@@ -47,8 +75,13 @@ class BacktestEstimator:
 				trading_capital=balance if self.reinvest else self.vol_target.trading_capital)
 			size_policy = self.size_policy_class_(risk_policy=vol_target)
 
+			yearly_prod = Product(
+				name=product.name,
+				block_size=product.block_size,
+				datastream=product.datastream.get_data_by_year(year)
+			)
 			trading_subsys = TradingSystem(
-				data_source=product.datastream.get_data_by_year(year),
+				data_source=yearly_prod,
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
 				size_policy=size_policy

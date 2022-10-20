@@ -50,16 +50,17 @@ class TradingSystemUnitTests(unittest.TestCase):
 			vol_target = VolTarget(
 				annual_vol_target=0.5,
 				trading_capital=10000)
-			size_policy = VolTargetSizePolicy(risk_policy=vol_target)
+			size_policy = VolTargetSizePolicy(
+				risk_policy=vol_target,
+				block_size=loaded_prod.block_size)
 
 			tr_sys = TradingSystemAdj(
-				data_source=loaded_prod.datastream,
+				product=loaded_prod,
 				trading_rules=[sma],
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
 			tsar = tr_sys.run()
-
 			# df_account = tr_sys.account_dataframe()
 			# account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
 			# account_plt.save_png(f"data/residual/{product['name']}_plot_vect.png")
@@ -67,6 +68,15 @@ class TradingSystemUnitTests(unittest.TestCase):
 			results.update({product["name"]: tsar})
 			sum_ += tsar.annual_delta()
 
+		results_list = self.plot_all(results)
+
+		starting_balance = 10000 * len(results)
+		forecasts = [tsar.forecast_series.mean() for tsar in results_list]
+		print(f"starting balance : {starting_balance}")
+		print(f"final balance : {sum_}")
+		print(f"forecast means {np.mean(forecasts)}: {forecasts}")
+
+	def plot_all(self, results):
 		results_list = [r for r in results.values()]
 		account_df = pd.DataFrame({
 			"Date": results_list[0].dates,
@@ -76,15 +86,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 			account_df["Balance"] += tsar.account_series
 		account_plt = AccountPlotter(account_df)
 		account_plt.save_png(f"data/residual/all_plot_vect.png")
-
 		tsar_plotter = TsarPlotter({"pname": results})
 		tsar_plotter.save_fig(export_folder="data/residual")
-
-		starting_balance = 10000 * len(results)
-		forecasts = [tsar.forecast_series.mean() for tsar in results_list]
-		print(f"starting balance : {starting_balance}")
-		print(f"final balance : {sum_}")
-		print(f"forecast means {np.mean(forecasts)}: {forecasts}")
+		return results_list
 
 
 if __name__ == "__main__":
