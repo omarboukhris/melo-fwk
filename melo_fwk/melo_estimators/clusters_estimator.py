@@ -49,20 +49,18 @@ class ClustersEstimator:
 		:return:
 		"""
 		out_dict = dict()
+		# doesn't actually matter with buy and hold
 		if self.global_corr:
-			for product_name, product in self.products.items():
-				for year, y_return in self._trade_product_global(product).items():
-					if year in out_dict.keys():
-						out_dict[year].update(y_return)
-					else:
-						out_dict[year] = y_return
+			_trade_fn = self._trade_product_global
 		else:
-			for product_name, product in self.products.items():
-				for year, y_return in self._trade_product(product).items():
-					if year in out_dict.keys():
-						out_dict[year].update(y_return)
-					else:
-						out_dict[year] = y_return
+			_trade_fn = self._trade_product
+
+		for product_name, product in self.products.items():
+			for year, y_return in _trade_fn(product).items():
+				if year in out_dict.keys():
+					out_dict[year].update(y_return)
+				else:
+					out_dict[year] = y_return
 
 		df_dict = dict()
 		for year, returns in out_dict.items():
