@@ -11,11 +11,11 @@ class TradingSystem(BaseTradingSystem):
 	Sub-classes can implement multi-threaded execution if needed.
 
 	Needs :
-	- a data source for historic price data
-	- a set of trading rules
-	- a set of forcast weights (sum(w_i) == 1)
-	- a pose sizing policy
-	- a policy for entering/exiting trades
+		- a data source for historic price data
+		- a set of trading rules
+		- a set of forcast weights (sum(w_i) == 1)
+		- a pose sizing policy
+		- a policy for entering/exiting trades
 	"""
 
 	component_name = "TradingSystem"

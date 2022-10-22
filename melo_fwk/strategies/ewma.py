@@ -1,5 +1,5 @@
 
-from melo_fwk.strategies.base_strat import BaseStrategy
+from melo_fwk.strategies import BaseStrategy
 
 from dataclasses import dataclass
 

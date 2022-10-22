@@ -1,15 +1,16 @@
 
 from melo_fwk.market_data.product import Product
 
-from melo_fwk.strategies.base_strat import BaseStrategy
+from melo_fwk.strategies import BaseStrategy
 
-from melo_fwk.position_size_policies import BaseSizePolicy
+from melo_fwk.size_policies import BaseSizePolicy
 
 from melodb.loggers import ILogger
 
-from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
-from melo_fwk.datastreams.tsar_datastream import TsarDataStream
-
+from melo_fwk.datastreams import (
+	HLOCDataStream,
+	TsarDataStream
+)
 from typing import List
 
 import pandas as pd

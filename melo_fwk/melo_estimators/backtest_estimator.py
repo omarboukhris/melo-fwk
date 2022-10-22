@@ -1,10 +1,10 @@
 
 import tqdm
 
-from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.market_data.product import Product
-from melo_fwk.strategies.base_strat import BaseStrategy
-from melo_fwk.position_size_policies import (
+from melo_fwk.strategies import BaseStrategy
+from melo_fwk.size_policies import (
 	BaseSizePolicy,
 	VolTarget
 )

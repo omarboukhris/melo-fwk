@@ -1,29 +1,27 @@
 from melo_fwk.utils import quantflow_factory
 
-# Assets
-from melo_fwk.market_data.commodities import CommodityDataLoader
-from melo_fwk.market_data.fx import FxDataLoader
-
-# Estimators
-from melo_fwk.melo_estimators.backtest_estimator import BacktestEstimator
-from melo_fwk.melo_estimators.strat_optim_estimator import StratOptimEstimator
-from melo_fwk.melo_estimators.fw_optim_estimator import ForecastWeightsEstimator
-from melo_fwk.melo_estimators.vol_target_estimator import VolTargetEstimator
-
-# Reporters
-from melo_fwk.reporters.backtest_reporter import BacktestReporter
-
-# Strategies
-from melo_fwk.strategies import ewma, sma
-
-# Position Sizing
-from melo_fwk.position_size_policies import (
+from melo_fwk.market_data import (
+	CommodityDataLoader,
+	FxDataLoader
+)
+from melo_fwk.melo_estimators import (
+	BacktestEstimator,
+	StratOptimEstimator,
+	ForecastWeightsEstimator,
+	VolTargetEstimator
+)
+from melo_fwk.strategies import (
+	EWMAStrategy,
+	SMAStrategy
+)
+from melo_fwk.size_policies import (
 	BaseSizePolicy,
 	VolTargetSizePolicy,
 	VolTargetInertiaPolicy,
 	VolTargetDiscreteSizePolicy
 )
 
+from melo_fwk.reporters.backtest_reporter import BacktestReporter
 
 def register_all():
 	register_estimator()
@@ -43,12 +41,12 @@ def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
 
 def register_strats():
-	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma.EWMAStrategy)
-	quantflow_factory.QuantFlowFactory.register_strategy("sma", sma.SMAStrategy)
+	quantflow_factory.QuantFlowFactory.register_strategy("ewma", EWMAStrategy)
+	quantflow_factory.QuantFlowFactory.register_strategy("sma", SMAStrategy)
 
 def register_search_spaces():
-	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", ewma.EWMAStrategy.search_space)
-	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", sma.SMAStrategy.search_space)
+	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", EWMAStrategy.search_space)
+	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", SMAStrategy.search_space)
 
 def register_size_policies():
 	quantflow_factory.QuantFlowFactory.register_size_policy("default", BaseSizePolicy)

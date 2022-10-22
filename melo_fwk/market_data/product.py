@@ -7,3 +7,6 @@ class Product:
 	name: str
 	block_size: int
 	datastream: HLOCDataStream
+
+	def years(self):
+		return self.datastream.years

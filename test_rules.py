@@ -6,7 +6,7 @@ from melo_fwk.strategies import (
 	EWMAStrategy,
 	# SMAStrategy
 )
-from melo_fwk.plots.plots import ForecastPlotter, HLOCPricePlotter
+from melo_fwk.plots import ForecastPlotter, HLOCPricePlotter
 from melo_fwk.market_data import market_data_loader as bdl
 
 import unittest

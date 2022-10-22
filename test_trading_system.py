@@ -1,17 +1,16 @@
-from melo_fwk.market_data.market_data_loader import MarketDataLoader
+from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import (
 	EWMAStrategy,
 	# SMAStrategy
 )
-from melo_fwk.position_size_policies import (
+from melo_fwk.size_policies import (
 	VolTarget,
 	VolTargetInertiaPolicy
 )
-from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems import TradingSystem
 
-from melo_fwk.plots.plots import AccountPlotter
-from melo_fwk.plots.tsar_plots import TsarPlotter
+from melo_fwk.plots import AccountPlotter, TsarPlotter
 
 import numpy as np
 import pandas as pd
@@ -27,7 +26,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 			googl : 2 8
 			meta : 4 16    # mid trends
 			aapl : 16 64   # long trends
-
 
 		:return:
 		"""

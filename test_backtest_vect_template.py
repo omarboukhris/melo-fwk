@@ -4,11 +4,11 @@ from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.market_data.product import Product
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.position_size_policies import (
+from melo_fwk.size_policies import (
 	VolTargetInertiaPolicy,
 	VolTarget
 )
-from melo_fwk.plots.tsar_plots import TsarPlotter
+from melo_fwk.plots import TsarPlotter
 
 product = CommodityDataLoader.Gold
 
@@ -52,7 +52,7 @@ trading_subsys = TradingSystem(
 )
 
 tsar = trading_subsys.run()
-for year in tqdm.tqdm(product.datastream.years):
+for year in tqdm.tqdm(product.years()):
 	y_tsar = tsar.get_data_by_year(year)
 	results.update({f"Gold_{year}": y_tsar})
 

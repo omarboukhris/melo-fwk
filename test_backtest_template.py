@@ -4,11 +4,11 @@ from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.market_data.product import Product
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.position_size_policies import (
+from melo_fwk.size_policies import (
 	VolTargetSizePolicy,
 	VolTarget
 )
-from melo_fwk.plots.tsar_plots import TsarPlotter
+from melo_fwk.plots import TsarPlotter
 
 
 product = CommodityDataLoader.Gold
@@ -43,7 +43,7 @@ size_policy = VolTargetSizePolicy(
 Trades each year individually
 No position is open by the end of the year
 """
-for year in tqdm.tqdm(product.datastream.years):
+for year in tqdm.tqdm(product.years()):
 
 	y_prod = Product(
 		name=product.name,

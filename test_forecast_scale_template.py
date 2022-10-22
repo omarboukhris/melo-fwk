@@ -7,7 +7,7 @@ from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import EWMAStrategy
 
-from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems import TradingSystem
 
 import random
 
@@ -27,7 +27,7 @@ sample_products = random.sample(products, int(len(products)*0.5))
 results = {}
 
 for product in tqdm.tqdm(sample_products):
-	for year in product.datastream.years:
+	for year in product.years():
 
 		y_prod = Product(
 			name=product.name,

@@ -5,8 +5,7 @@ from typing import ClassVar
 import pandas as pd
 import tqdm
 
-from melo_fwk.market_data.market_data_loader import MarketDataLoader
-
+from melo_fwk.market_data import MarketDataLoader
 
 @dataclass
 class BaseStrategy:

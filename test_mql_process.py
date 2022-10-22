@@ -1,6 +1,8 @@
 
-from melo_fwk.config.config_helper import ConfigBuilderHelper
-from melo_fwk.config import MeloConfig
+from melo_fwk.config import (
+	ConfigBuilderHelper,
+	MeloConfig
+)
 from melo_fwk import quantfactory_registry
 
 from mql.mql_parser import MqlParser
