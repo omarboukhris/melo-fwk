@@ -1,6 +1,6 @@
 import tqdm
 
-from melo_fwk.market_data import CommodityDataLoader
+from melo_fwk.market_data import CommodityDataLoader, FxDataLoader
 from melo_fwk.market_data.product import Product
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.strategies import EWMAStrategy
@@ -8,7 +8,8 @@ from melo_fwk.size_policies import VolTargetInertiaPolicy
 from melo_fwk.size_policies.vol_target import VolTarget
 from melo_fwk.plots import TsarPlotter
 
-product = CommodityDataLoader.Gold
+# product = CommodityDataLoader.Gold
+product = FxDataLoader.EURUSD
 
 strat = [
 	EWMAStrategy(

@@ -62,13 +62,13 @@ class TradingSystemUnitTests(unittest.TestCase):
 			results.update({product["name"]: tsar})
 			sum_ += tsar.annual_delta()
 
-		results_list = self.plot_all(results)
-
-		starting_balance = 50000 * len(results)
-		forecasts = [tsar.forecast_series.mean() for tsar in results_list]
-		print(f"starting balance : {starting_balance}")
-		print(f"final balance : {sum_}")
-		print(f"forecast means {np.mean(forecasts)}: {forecasts}")
+		# results_list = self.plot_all(results)
+		#
+		# starting_balance = 50000 * len(results)
+		# forecasts = [tsar.forecast_series.mean() for tsar in results_list]
+		# print(f"starting balance : {starting_balance}")
+		# print(f"final balance : {sum_}")
+		# print(f"forecast means {np.mean(forecasts)}: {forecasts}")
 
 	def plot_all(self, results):
 		# plot whole balance

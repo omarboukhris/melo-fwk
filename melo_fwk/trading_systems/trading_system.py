@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
@@ -30,17 +31,10 @@ class TradingSystem(BaseTradingSystem):
 
 		return f_series
 
-	def get_daily_pnl(self, pose_series: pd.Series):
-		daily_pnl_series = self.hloc_datastream.get_daily_diff_series() * pose_series * self.block_size
-		return daily_pnl_series
-
 	def run(self):
 
-		forecast_series = self.forecast_cumsum()  # .interpolate()
-		# pose_series = forecast_series.apply(self.size_policy.position_size).round()  # .interpolate()
-		pose_series = self.size_policy.position_size_vect(forecast_series)  # .interpolate()
-		daily_pnl = self.get_daily_pnl(pose_series).fillna(0)  # .interpolate()
-		# orderbook building ??
+		forecast_series = self.forecast_cumsum()
+		pose_series = self.size_policy.position_size_vect(forecast_series)
+		daily_pnl = self.hloc_datastream.get_daily_diff_series() * pose_series * self.block_size
 
 		return self.build_tsar(forecast_series, pose_series, daily_pnl)
-

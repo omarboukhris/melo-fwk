@@ -51,7 +51,8 @@ class BaseTradingSystem:
 		self,
 		forecast_series: pd.Series,
 		pose_series: pd.Series,
-		daily_pnl_series: pd.Series):
+		daily_pnl_series: pd.Series
+	):
 		return TsarDataStream(dataframe=pd.DataFrame({
 			"Date": self.hloc_datastream.get_date_series(),
 			"Price": self.hloc_datastream.get_close_series(),
