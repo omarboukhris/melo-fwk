@@ -1,4 +1,4 @@
-
+import pandas as pd
 import tqdm
 
 from melo_fwk.trading_systems import TradingSystem
@@ -10,7 +10,7 @@ from melo_fwk.size_policies.vol_target import VolTarget
 
 from typing import List
 
-class BacktestEstimator:
+class ClustersEstimator:
 
 	def __init__(
 		self,
@@ -33,17 +33,42 @@ class BacktestEstimator:
 		self.forecast_weights = forecast_weights
 		self.vol_target = vol_target
 		self.size_policy_class_ = size_policy_class_
-		self.reinvest = "reinvest" in estimator_params
+		self.global_corr = "glob" in estimator_params
 
 	def run(self):
+		"""
+		if global_corr:
+			get global returns in dataframe
+			compute corr heat map from df
+		else :
+			simulate all in one go,
+			loop through range(timeperiod) :
+			get yearly returns in dataframe
+			compute corr heat map from df
+
+		:return:
+		"""
 		out_dict = dict()
-		if self.reinvest:
-			for product_name, product_dataclass in self.products.items():
-				out_dict[product_name] = self._trade_product_reinvest(product_dataclass)
+		if self.global_corr:
+			for product_name, product in self.products.items():
+				for year, y_return in self._trade_product_global(product).items():
+					if year in out_dict.keys():
+						out_dict[year].update(y_return)
+					else:
+						out_dict[year] = y_return
 		else:
-			for product_name, product_dataclass in self.products.items():
-				out_dict[product_name] = self._trade_product(product_dataclass)
-		return out_dict
+			for product_name, product in self.products.items():
+				for year, y_return in self._trade_product(product).items():
+					if year in out_dict.keys():
+						out_dict[year].update(y_return)
+					else:
+						out_dict[year] = y_return
+
+		df_dict = dict()
+		for year, returns in out_dict.items():
+			df_dict[year] = pd.DataFrame(returns).corr()
+
+		return df_dict
 
 	def _trade_product(self, product: Product):
 
@@ -62,36 +87,34 @@ class BacktestEstimator:
 		tsar = trading_subsys.run()
 		results = dict()
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
-			yearly_tsar = tsar.get_data_by_year(year)
-			results.update({f"{product.name}_{year}": yearly_tsar})
+			y_return = tsar.get_data_by_year(year).account_series
+			if year in results.keys():
+				results[year].update({product.name: y_return})
+			else:
+				results[year] = {product.name: y_return}
 
 		return results
 
-	def _trade_product_reinvest(self, product: Product):
-		balance = self.vol_target.trading_capital
+	def _trade_product_global(self, product: Product):
+		vol_target = VolTarget(
+			annual_vol_target=self.vol_target.annual_vol_target,
+			trading_capital=self.vol_target.trading_capital)
+		size_policy = self.size_policy_class_(risk_policy=vol_target)
+
 		results = dict()
-
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
-			vol_target = VolTarget(
-				annual_vol_target=self.vol_target.annual_vol_target,
-				trading_capital=balance if self.reinvest else self.vol_target.trading_capital)
-			size_policy = self.size_policy_class_(risk_policy=vol_target)
-
-			yearly_prod = Product(
-				name=product.name,
-				block_size=product.block_size,
-				datastream=product.datastream.get_data_by_year(year)
-			)
 			trading_subsys = TradingSystem(
-				product=yearly_prod,
+				product=product.datastream.get_data_by_year(year),
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
 				size_policy=size_policy
 			)
 
 			tsar = trading_subsys.run()
-			# change output file path
-			results.update({f"{product.name}_{year}": tsar})
-			balance += tsar.annual_delta()
+			y_return = tsar.get_data_by_year(year).account_series
+			if year in results.keys():
+				results[year].update({product.name: y_return})
+			else:
+				results[year] = {product.name: y_return}
 
 		return results

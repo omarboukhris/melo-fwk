@@ -3,3 +3,4 @@ from melo_fwk.melo_estimators.backtest_estimator import BacktestEstimator
 from melo_fwk.melo_estimators.strat_optim_estimator import StratOptimEstimator
 from melo_fwk.melo_estimators.fw_optim_estimator import ForecastWeightsEstimator
 from melo_fwk.melo_estimators.vol_target_estimator import VolTargetEstimator
+from melo_fwk.melo_estimators.clusters_estimator import ClustersEstimator

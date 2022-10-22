@@ -1,6 +1,7 @@
+import numpy as np
 import pandas as pd
 
-from melo_fwk.size_policies import VolTarget
+from melo_fwk.size_policies.vol_target import VolTarget
 
 
 class BaseSizePolicy:
@@ -15,4 +16,4 @@ class BaseSizePolicy:
 		self.risk_policy = risk_policy
 
 	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
-		return forecast/forecast.abs()
+		return pd.Series(np.ones(shape=(len(forecast),)))

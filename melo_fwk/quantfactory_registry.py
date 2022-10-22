@@ -5,10 +5,11 @@ from melo_fwk.market_data import (
 	FxDataLoader
 )
 from melo_fwk.melo_estimators import (
+	ClustersEstimator,
 	BacktestEstimator,
 	StratOptimEstimator,
 	ForecastWeightsEstimator,
-	VolTargetEstimator
+	VolTargetEstimator,
 )
 from melo_fwk.strategies import (
 	EWMAStrategy,
@@ -32,13 +33,12 @@ def register_all():
 
 def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_estimator("BacktestEstimator", BacktestEstimator)
-	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
-
+	quantflow_factory.QuantFlowFactory.register_estimator("ClustersEstimator", ClustersEstimator)
 	quantflow_factory.QuantFlowFactory.register_estimator("StratOptimEstimator", StratOptimEstimator)
-
 	quantflow_factory.QuantFlowFactory.register_estimator("ForecastWeightsEstimator", ForecastWeightsEstimator)
-
 	quantflow_factory.QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
+
+	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
 
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", EWMAStrategy)

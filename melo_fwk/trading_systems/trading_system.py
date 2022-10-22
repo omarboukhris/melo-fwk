@@ -8,14 +8,12 @@ class TradingSystem(BaseTradingSystem):
 	This class trades only one position, one product at a time.
 	To backtest for a whole portfolio, you need a TradingSystem per asset,
 	then sum up after each iteration.
-	Sub-classes can implement multi-threaded execution if needed.
 
-	Needs :
+	Input Parameters :
 		- a data source for historic price data
-		- a set of trading rules
-		- a set of forcast weights (sum(w_i) == 1)
+		- a set of trading strategies
+		- a set of forecast weights (sum(w_i) == 1)
 		- a pose sizing policy
-		- a policy for entering/exiting trades
 	"""
 
 	component_name = "TradingSystem"

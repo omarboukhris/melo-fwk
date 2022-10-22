@@ -3,10 +3,8 @@ import tqdm
 import numpy as np
 
 from melo_fwk.market_data.product import Product
-from melo_fwk.size_policies import (
-	BaseSizePolicy,
-	VolTarget
-)
+from melo_fwk.size_policies import BaseSizePolicy
+from melo_fwk.size_policies.vol_target import VolTarget
 from melo_fwk.strategies import BaseStrategy
 from melo_fwk.trading_systems import TradingSystem
 
