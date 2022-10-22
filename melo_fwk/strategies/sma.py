@@ -1,22 +1,23 @@
 
+from melo_fwk.strategies.base_strat import BaseStrategy
+
 from dataclasses import dataclass
 
 import pandas as pd
 import numpy as np
 
-@dataclass(frozen=True)
-class SMATradingRule:
+@dataclass
+class SMAParamSpace:
 	fast_span: int
 	slow_span: int
-	scale: float
-	cap: float
 
 	search_space = {
 		"fast_span": [i for i in range(4, 60)],
 		"slow_span": [i for i in range(8, 100)],
-		"scale": [1.],
-		"cap": [20]
 	}
+
+@dataclass
+class SMAStrategy(BaseStrategy, SMAParamSpace):
 
 	def forecast_vect(self, data: pd.Series):
 		fast_sma = data.rolling(int(self.fast_span)).mean()
@@ -39,7 +40,3 @@ class SMATradingRule:
 		])
 		return f_series
 
-	def forecast(self, data: pd.Series):
-		cap_f_vect = self.forecast_vect_cap(data)
-		assert len(cap_f_vect) > 0, "(SMATradingRule) empty forecast vector"
-		return cap_f_vect.iat[-1]

@@ -1,6 +1,6 @@
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
+from melo_fwk.position_size_policies.vol_target import VolTarget
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 
 
@@ -11,8 +11,10 @@ class VolTargetConfigBuilder:
 			return VolTarget(annual_vol_target=0., trading_capital=0.)
 
 		position_size_dict = ConfigBuilderHelper.strip_single(quant_query_dict, "PositionSizing")
-		vol_target_cfg = ConfigBuilderHelper.parse_num_list(position_size_dict, "VolTargetCouple")
-		return VolTarget(*vol_target_cfg)
+		if "VolTargetCouple" in position_size_dict.keys():
+			vol_target_cfg = ConfigBuilderHelper.parse_num_list(position_size_dict, "VolTargetCouple")
+			return VolTarget(*vol_target_cfg)
+		return None
 
 class SizePolicyConfigBuilder:
 	@staticmethod

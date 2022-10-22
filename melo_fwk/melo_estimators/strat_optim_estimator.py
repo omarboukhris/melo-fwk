@@ -1,66 +1,28 @@
-import pandas as pd
-import tqdm
+from melo_fwk.melo_estimators.utils.strat_optim import StrategyEstimator
+from melo_fwk.strategies.base_strat import BaseStrategy
+from melo_fwk.market_data.product import Product
+from melo_fwk.position_size_policies import (
+	BaseSizePolicy,
+	VolTarget
+)
+
 from sklearn.model_selection import GridSearchCV
 
-from melo_fwk.market_data.utils.product import Product
-from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
-from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
-from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
-from melo_fwk.trading_systems.trading_system import TradingSystem
+import tqdm
 
-from skopt import BayesSearchCV
-
-# ###################################################################
-# Optimzer shouldn't evaluate the same point twice
-# This filters warnings w/ message
-# "The objective has been evaluated at this point before."
-import warnings
-warnings.filterwarnings('ignore',
-	message='The objective has been evaluated at this point before.')
-# ###################################################################
-
-class StrategyEstimator:
-	product: Product
-	size_policy: ISizePolicy
-	strat_class_: callable
-	metric: str
-
-	def __init__(self, **kwargs):
-		self.strat_params = kwargs
-
-	def get_params(self, deep=True):
-		return self.strat_params
-
-	def set_params(self, **kwargs):
-		return StrategyEstimator(**kwargs)
-
-	def fit(self, X):
-		return self
-
-	def score(self, X: pd.Series):
-
-		trading_subsys = TradingSystem(
-			product=StrategyEstimator.product,
-			trading_rules=[StrategyEstimator.strat_class_(**self.strat_params)],
-			forecast_weights=[1.],
-			size_policy=StrategyEstimator.size_policy
-		)
-
-		tsar = trading_subsys.run()
-		estimated_result = tsar.get_metric_by_name(StrategyEstimator.metric)
-		return estimated_result
+from typing import List
 
 class StratOptimEstimator:
 
 	def __init__(
 		self,
 		products: dict,
-		time_period: list,
-		strategies: list = None,
-		forecast_weights: list = None,
+		time_period: List[int],
+		strategies: List[BaseStrategy] = None,
+		forecast_weights: List[int] = None,
 		vol_target: VolTarget = VolTarget(0., 0.),
-		size_policy_class_: callable = ConstSizePolicy,
-		estimator_params: list = None
+		size_policy_class_: callable = BaseSizePolicy,
+		estimator_params: List[str] = None
 	):
 		strategies = [] if strategies is None else strategies
 		assert len(strategies) != 0, \
@@ -71,6 +33,7 @@ class StratOptimEstimator:
 		self.time_period = time_period
 		self.strategies = strategies
 		StrategyEstimator.size_policy = size_policy_class_(risk_policy=vol_target)
+
 		StrategyEstimator.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
 
 	def run(self):
@@ -91,6 +54,7 @@ class StratOptimEstimator:
 			assert len(strat_metadata) == 2, \
 				"(StratOptimEstimator) Strat metadata is incomplete (length != 2)"
 			StrategyEstimator.strat_class_, strat_search_space_ = strat_metadata
+
 			# optimize by year
 			for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
 				opt = GridSearchCV(

@@ -7,9 +7,9 @@ from 2004 to 2008
 
 where strategies
 	are (ewma, sma)
-	with strategyConfig (ewmaConfig, smaConfig)
+    with strategyConfig (ewma_strat_0, sma_strat_0)
 	and forecastWeights (0.5, 0.5)
 
 where sizePolicy (VolTargetSizePolicy)
 
-select poseSizeOptimEstimator (100000)
+select VolTargetEstimator <100000>

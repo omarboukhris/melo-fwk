@@ -1,6 +1,6 @@
 
-from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
-from melo_fwk.market_data.utils.product import Product
+from melo_fwk.datastreams import HLOCDataStream
+from melo_fwk.market_data import Product
 import pandas as pd
 
 

@@ -1,6 +1,6 @@
 
 from melo_fwk.config.config_helper import ConfigBuilderHelper
-from melo_fwk.config.melo_config import MeloConfig
+from melo_fwk.config import MeloConfig
 from melo_fwk import quantfactory_registry
 
 from mql.mql_parser import MqlParser
@@ -41,6 +41,7 @@ if __name__ == "__main__":
 		"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 		"strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
+		"vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql"
 	}
 	# still missing :
 	# asset select

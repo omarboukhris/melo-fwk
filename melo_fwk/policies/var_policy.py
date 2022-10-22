@@ -7,7 +7,8 @@ run some MC sims :
 	microcrash event
 	short squeeze
 
-Check VaR and adjust size accordingly	
+Check VaR and adjust size accordingly?
+	
 """
 
 @dataclass(frozen=True)

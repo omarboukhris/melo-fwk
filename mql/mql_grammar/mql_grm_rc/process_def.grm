@@ -6,6 +6,8 @@ ProcessDef ->
 EstimatorParamList ->
     alphanum. |
     alphanum. comma. |
+    numeric. |
+    numeric. comma. |
 []
 
 // add output pipes here

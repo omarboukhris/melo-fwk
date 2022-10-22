@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 
-from melo_fwk.datastreams.tsar_datastream import TradingSystemAnnualResult
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 class TradingSystem(BaseTradingSystem):
@@ -34,22 +33,16 @@ class TradingSystem(BaseTradingSystem):
 		return f_series
 
 	def get_daily_pnl(self, pose_series: pd.Series):
-		daily_pnl_series = self.hloc_datastream.get_daily_diff_series() * pose_series  # * self.block_size
+		daily_pnl_series = self.hloc_datastream.get_daily_diff_series() * pose_series * self.block_size
 		return daily_pnl_series
 
 	def run(self):
 
 		forecast_series = self.forecast_cumsum()  # .interpolate()
-		pose_series = self.size_policy.position_size_vect(forecast_series).round()  # .interpolate()
+		# pose_series = forecast_series.apply(self.size_policy.position_size).round()  # .interpolate()
+		pose_series = self.size_policy.position_size_vect(forecast_series)  # .interpolate()
 		daily_pnl = self.get_daily_pnl(pose_series).fillna(0)  # .interpolate()
 		# orderbook building ??
 
-		return TradingSystemAnnualResult(
-			dates=self.hloc_datastream.get_date_series(),
-			price_series=self.hloc_datastream.get_close_series(),
-			forecast_series=forecast_series,
-			size_series=pose_series,
-			account_series=daily_pnl.expanding(1).sum(),
-			daily_pnl_series=daily_pnl
-		)
+		return self.build_tsar(forecast_series, pose_series, daily_pnl)
 

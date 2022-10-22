@@ -1,16 +1,18 @@
-import pandas as pd
+
+from melo_fwk.market_data.product import Product
+
+from melo_fwk.strategies.base_strat import BaseStrategy
+
+from melo_fwk.position_size_policies import BaseSizePolicy
 
 from melodb.loggers import ILogger
-from melodb.Order import Order
 
 from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
+from melo_fwk.datastreams.tsar_datastream import TsarDataStream
 
-from melo_fwk.policies.trading_policies.trading_policy import BaseTradingPolicy, ITradingPolicy
-from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy, ConstSizePolicy
+from typing import List
 
-from melo_fwk.datastreams.tsar_datastream import TradingSystemAnnualResult
-
-from melo_fwk.market_data.utils.product import Product
+import pandas as pd
 
 class BaseTradingSystem:
 	component_name = "BaseTradingSystem"
@@ -18,9 +20,9 @@ class BaseTradingSystem:
 	def __init__(
 		self,
 		product: Product,
-		trading_rules: list,
-		forecast_weights: list,
-		size_policy: ISizePolicy = ConstSizePolicy(),
+		trading_rules: List[BaseStrategy],
+		forecast_weights: List[float],
+		size_policy: BaseSizePolicy = BaseSizePolicy(),
 		logger: ILogger = ILogger(component_name)
 	):
 		self.logger = logger
@@ -30,8 +32,6 @@ class BaseTradingSystem:
 			self.logger.error("(AssertionError) Number of TradingRules must match forcast weights")
 
 		self.time_index = 0
-		self.order_book = []
-		self.tsar_history = []
 		self.hloc_datastream = product.datastream
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights
@@ -46,20 +46,16 @@ class BaseTradingSystem:
 			forecast_weights=[]
 		)
 
-	def order_book_dataframe(self):
-		orderbook_dict = [order.to_dict() for order in self.order_book]
-		return pd.DataFrame(orderbook_dict)
-
 	def build_tsar(
 		self,
 		forecast_series: pd.Series,
 		pose_series: pd.Series,
 		daily_pnl_series: pd.Series):
-		return TradingSystemAnnualResult(
-			dates=self.hloc_datastream.get_date_series(),
-			price_series=self.hloc_datastream.get_close_series(),
-			forecast_series=forecast_series,
-			size_series=pose_series,
-			account_series=daily_pnl_series.expanding(1).sum(),
-			daily_pnl_series=daily_pnl_series
-		)
+		return TsarDataStream(dataframe=pd.DataFrame({
+			"Date": self.hloc_datastream.get_date_series(),
+			"Price": self.hloc_datastream.get_close_series(),
+			"Forecast": forecast_series,
+			"Size": pose_series,
+			"Account": daily_pnl_series.expanding(1).sum(),
+			"Daily_PnL": daily_pnl_series
+		}))

@@ -1,9 +1,9 @@
 import pandas as pd
 
-from melo_fwk.policies.vol_target_policies.base_size_policy import ISizePolicy
-from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
+from melo_fwk.position_size_policies.base_size_policy import BaseSizePolicy
+from melo_fwk.position_size_policies.vol_target import VolTarget
 
-class VolTargetSizePolicy(ISizePolicy):
+class VolTargetSizePolicy(BaseSizePolicy):
 
 	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 1):
 		super(VolTargetSizePolicy, self).__init__(risk_policy)
@@ -19,7 +19,7 @@ class VolTargetSizePolicy(ISizePolicy):
 
 	def block_value(self, lookback: int = 36) -> pd.Series:
 		# 1% price differencial
-		return self.datastream.get_close_series().ewm(span=lookback).mean()  # * self.block_size
+		return self.datastream.get_close_series().ewm(span=lookback).mean() * self.block_size
 		# block_size = how many shares the contract controls
 
 	def instrument_vol(self, lookback: int = 36) -> pd.Series:

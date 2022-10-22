@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from math import sqrt
 
 
-@dataclass(frozen=True)
+@dataclass
 class VolTarget:
 	yearly_trading_days = 256
 	annual_vol_target: float

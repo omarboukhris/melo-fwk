@@ -18,7 +18,7 @@ QuantQuery ->
     |
 
     // User defines Products
-    // default Strategy       : Buy and Hold OR Search
+    // default Strategy       : Buy and Hold
     // default PositionSizing : 1 OR Search
     create. QueryName=alphanum.
     with. !ProductsDef

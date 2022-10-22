@@ -11,4 +11,8 @@ with
     strategyConfig (ewma_strat_0, sma_strat_0)
     and forecastWeights (0.5, 0.5)
 
+where
+    volTarget is (0.5, 100000)
+    and sizePolicy (VolTargetSizePolicy)
+
 select BacktestEstimator<reinvest>

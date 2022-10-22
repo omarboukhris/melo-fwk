@@ -8,16 +8,21 @@ from melo_fwk.market_data.fx import FxDataLoader
 from melo_fwk.melo_estimators.backtest_estimator import BacktestEstimator
 from melo_fwk.melo_estimators.strat_optim_estimator import StratOptimEstimator
 from melo_fwk.melo_estimators.fw_optim_estimator import ForecastWeightsEstimator
+from melo_fwk.melo_estimators.vol_target_estimator import VolTargetEstimator
 
 # Reporters
 from melo_fwk.reporters.backtest_reporter import BacktestReporter
 
 # Strategies
-from melo_fwk.rules import ewma, sma
+from melo_fwk.strategies import ewma, sma
 
 # Position Sizing
-from melo_fwk.policies.vol_target_policies.vol_target_size_policy import VolTargetSizePolicy
-from melo_fwk.policies.vol_target_policies.base_size_policy import ConstSizePolicy
+from melo_fwk.position_size_policies import (
+	BaseSizePolicy,
+	VolTargetSizePolicy,
+	VolTargetInertiaPolicy,
+	VolTargetDiscreteSizePolicy
+)
 
 
 def register_all():
@@ -35,17 +40,21 @@ def register_estimator():
 
 	quantflow_factory.QuantFlowFactory.register_estimator("ForecastWeightsEstimator", ForecastWeightsEstimator)
 
+	quantflow_factory.QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
+
 def register_strats():
-	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma.EWMATradingRule)
-	quantflow_factory.QuantFlowFactory.register_strategy("sma", sma.SMATradingRule)
+	quantflow_factory.QuantFlowFactory.register_strategy("ewma", ewma.EWMAStrategy)
+	quantflow_factory.QuantFlowFactory.register_strategy("sma", sma.SMAStrategy)
 
 def register_search_spaces():
-	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", ewma.EWMATradingRule.search_space)
-	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", sma.SMATradingRule.search_space)
+	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", ewma.EWMAStrategy.search_space)
+	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", sma.SMAStrategy.search_space)
 
 def register_size_policies():
+	quantflow_factory.QuantFlowFactory.register_size_policy("default", BaseSizePolicy)
 	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", VolTargetSizePolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("default", ConstSizePolicy)
+	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetInertiaPolicy", VolTargetInertiaPolicy)
+	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetDiscreteSizePolicy", VolTargetDiscreteSizePolicy)
 
 def register_products():
 	# =============================================================

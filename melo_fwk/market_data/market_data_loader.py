@@ -1,8 +1,10 @@
 
 import glob
+import random
+
 import pandas as pd
 import melo_fwk.datastreams.hloc_datastream as ds
-from melo_fwk.market_data.utils.product import Product
+from melo_fwk.market_data.product import Product
 
 from pathlib import Path
 
@@ -11,7 +13,7 @@ products_block_size = {
 	"Brent Crude Oil": 1000,
 	"Cocoa": 100,  #
 	"Coffee": 100,  #
-	"Copper": 100,  #
+	"Copper": 10000,  #
 	"Corn": 100,  #
 	"Cotton": 100,  #
 	"Crude Oil": 1000,  #
@@ -50,16 +52,35 @@ class MarketDataLoader:
 	mock_datastream_length = 1000
 
 	@staticmethod
+	def products_pool():
+		products_loc = MarketDataLoader.get_commodities() + MarketDataLoader.get_fx()
+		products = [MarketDataLoader.load_datastream(prod) for prod in products_loc]
+		return products
+
+	@staticmethod
+	def shuffled_pool():
+		pool = MarketDataLoader.products_pool()
+		random.shuffle(pool)
+		return pool, len(pool)
+
+	@staticmethod
+	def sample_products_pool(ratio: float):
+		assert 0. < ratio <= 1., \
+			f"(MarketDataLoader) Invalid sampling ratio provided {ratio} not in [0 ,1]"
+		shuffled_pool, size = MarketDataLoader.shuffled_pool()
+		return random.sample(shuffled_pool, int(size * ratio))
+
+	@staticmethod
 	def get_fx():
-		return MarketDataLoader.get_dataset_locations("assets/Fx/*.csv")
+		return MarketDataLoader._get_dataset_locations("assets/Fx/*.csv")
 
 	@staticmethod
 	def get_commodities():
-		return MarketDataLoader.get_dataset_locations("assets/Commodity/*.csv")
+		return MarketDataLoader._get_dataset_locations("assets/Commodity/*.csv")
 
 	@staticmethod
 	def get_commodity_hloc_datastream(product: str):
-		product_list = MarketDataLoader.get_dataset_locations(f"assets/Commodity/{product}.csv")
+		product_list = MarketDataLoader._get_dataset_locations(f"assets/Commodity/{product}.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
 
@@ -67,7 +88,7 @@ class MarketDataLoader:
 
 	@staticmethod
 	def get_fx_hloc_datastream(product: str):
-		product_list = MarketDataLoader.get_dataset_locations(f"assets/Fx/{product}.csv")
+		product_list = MarketDataLoader._get_dataset_locations(f"assets/Fx/{product}.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_fx_hloc_datastream, product = {product_list}"
 
@@ -82,7 +103,7 @@ class MarketDataLoader:
 			ds.HLOCDataStream(dataframe=input_df))
 
 	@staticmethod
-	def get_dataset_locations(path: str):
+	def _get_dataset_locations(path: str):
 		""" Globs historic data files and prepares them in a list
 		of instruments to trade
 

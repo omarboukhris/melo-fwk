@@ -1,23 +1,25 @@
 
+from melo_fwk.strategies.base_strat import BaseStrategy
+
 from dataclasses import dataclass
 
 import pandas as pd
 import numpy as np
 
 
-@dataclass(frozen=True)
-class EWMATradingRule:
-	fast_span: int = 0
-	slow_span: int = 0
-	scale: float = 0
-	cap: float = 0
+
+@dataclass
+class EWMAParamSpace:
+	fast_span: int
+	slow_span: int
 
 	search_space = {
 		"fast_span": [i for i in range(4, 60)],
 		"slow_span": [i for i in range(8, 100)],
-		"scale": [1.],
-		"cap": [20]
 	}
+
+@dataclass
+class EWMAStrategy(BaseStrategy, EWMAParamSpace):
 
 	def forecast_vect(self, data: pd.Series):
 		"""
@@ -45,5 +47,5 @@ class EWMATradingRule:
 
 	def forecast(self, data: pd.Series):
 		cap_f_vect = self.forecast_vect_cap(data)
-		assert len(cap_f_vect) > 0, "(EWMATradingRule) empty forecast vector"
+		assert len(cap_f_vect) > 0, "(EWMAStrategy) empty forecast vector"
 		return cap_f_vect.iat[-1]

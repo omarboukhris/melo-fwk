@@ -1,13 +1,14 @@
-from melo_fwk.market_data import market_data_loader as bdl
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
 
-from melo_fwk.rules.ewma import EWMATradingRule
-# from rules.sma_rule import SMATradingRule
-
-from melo_fwk.policies.vol_target_policies.vol_target import VolTarget
-from melo_fwk.policies.vol_target_policies.vol_target_size_policy import VolTargetSizePolicy
-
-# from melo_fwk.trading_systems.trading_system import TradingSystem
-from melo_fwk.trading_systems.trading_system_adj import TradingSystemAdj
+from melo_fwk.strategies import (
+	EWMAStrategy,
+	# SMAStrategy
+)
+from melo_fwk.position_size_policies import (
+	VolTarget,
+	VolTargetInertiaPolicy
+)
+from melo_fwk.trading_systems.trading_system import TradingSystem
 
 from melo_fwk.plots.plots import AccountPlotter
 from melo_fwk.plots.tsar_plots import TsarPlotter
@@ -31,52 +32,49 @@ class TradingSystemUnitTests(unittest.TestCase):
 		:return:
 		"""
 
-		products = bdl.MarketDataLoader.get_fx()
-		products += bdl.MarketDataLoader.get_commodities()
+		products = MarketDataLoader.get_fx()
+		products += MarketDataLoader.get_commodities()
 		# products = random.sample(products, 20)
 		sum_ = 0.
 		results = {}
 
 		for product in tqdm.tqdm(products):
-			loaded_prod = bdl.MarketDataLoader.load_datastream(product)
+			loaded_prod = MarketDataLoader.load_datastream(product)
 
 			sma_params = {
 				"fast_span": 16,
 				"slow_span": 64,
 				"scale": 16,
-				"cap": 20,
 			}
-			sma = EWMATradingRule(**sma_params)
+			sma = EWMAStrategy(**sma_params)
 			vol_target = VolTarget(
 				annual_vol_target=0.5,
-				trading_capital=10000)
-			size_policy = VolTargetSizePolicy(
+				trading_capital=50000)
+			size_policy = VolTargetInertiaPolicy(
 				risk_policy=vol_target,
 				block_size=loaded_prod.block_size)
 
-			tr_sys = TradingSystemAdj(
+			tr_sys = TradingSystem(
 				product=loaded_prod,
 				trading_rules=[sma],
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
 			tsar = tr_sys.run()
-			# df_account = tr_sys.account_dataframe()
-			# account_plt = AccountPlotter(df_account, loaded_prod.datastream.get_data())
-			# account_plt.save_png(f"data/residual/{product['name']}_plot_vect.png")
 
 			results.update({product["name"]: tsar})
 			sum_ += tsar.annual_delta()
 
 		results_list = self.plot_all(results)
 
-		starting_balance = 10000 * len(results)
+		starting_balance = 50000 * len(results)
 		forecasts = [tsar.forecast_series.mean() for tsar in results_list]
 		print(f"starting balance : {starting_balance}")
 		print(f"final balance : {sum_}")
 		print(f"forecast means {np.mean(forecasts)}: {forecasts}")
 
 	def plot_all(self, results):
+		# plot whole balance
 		results_list = [r for r in results.values()]
 		account_df = pd.DataFrame({
 			"Date": results_list[0].dates,
@@ -86,6 +84,8 @@ class TradingSystemUnitTests(unittest.TestCase):
 			account_df["Balance"] += tsar.account_series
 		account_plt = AccountPlotter(account_df)
 		account_plt.save_png(f"data/residual/all_plot_vect.png")
+
+		# plot tsar
 		tsar_plotter = TsarPlotter({"pname": results})
 		tsar_plotter.save_fig(export_folder="data/residual")
 		return results_list

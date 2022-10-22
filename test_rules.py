@@ -2,8 +2,10 @@
 import pandas as pd
 import tqdm
 
-from melo_fwk.rules.ewma import EWMATradingRule
-# from rules.sma_rule import SMATradingRule
+from melo_fwk.strategies import (
+	EWMAStrategy,
+	# SMAStrategy
+)
 from melo_fwk.plots.plots import ForecastPlotter, HLOCPricePlotter
 from melo_fwk.market_data import market_data_loader as bdl
 
@@ -19,10 +21,8 @@ class TradingRuleUnitTests(unittest.TestCase):
 			ewma_params = {
 				"fast_span": 32,
 				"slow_span": 128,
-				"scale": 6,
-				"cap": 20,
 			}
-			ewma = EWMATradingRule(**ewma_params)
+			ewma = EWMAStrategy(**ewma_params)
 
 			forcast_df = pd.DataFrame({
 				"Date": product_hloc.datastream.get_date_series(),
