@@ -1,8 +1,9 @@
-
+from melo_fwk.config import ConfigBuilderHelper
 from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder, VolTargetConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
+from melo_fwk.reporters.md_formatter import MdFormatter
 
 from melo_fwk.size_policies.vol_target import VolTarget
 
@@ -12,12 +13,14 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class MeloConfig:
+	name: str
 	products_config: tuple  # (product[], start..end)
 	size_policy_class_: callable  # BaseSizePolicy
 	vol_target: VolTarget
 	strat_config_registry: StratConfigRegistry
 	strategies_config: tuple  # (strategy[], fw[])
 	estimator_config_: tuple  # (estimator, estimator_param[])
+	reporter_class_: callable  # Reporters
 
 	@staticmethod
 	def build(quant_query_path: Path, quant_query: dict):
@@ -30,12 +33,14 @@ class MeloConfig:
 		"""
 		strat_config_registry = StratConfigRegistry.build_registry(str(quant_query_path.parent))
 		return MeloConfig(
+			name=ConfigBuilderHelper.strip_single(quant_query, "QueryName"),
 			products_config=ProductConfigBuilder.build_products(quant_query),
 			size_policy_class_=SizePolicyConfigBuilder.build_size_policy(quant_query),
 			vol_target=VolTargetConfigBuilder.build_vol_target(quant_query),
 			strat_config_registry=strat_config_registry,
 			strategies_config=StrategyConfigBuilder.build_strategy(quant_query, strat_config_registry),
 			estimator_config_=EstimatorConfigBuilder.build_estimator(quant_query),
+			reporter_class_=EstimatorConfigBuilder.get_reporter(quant_query)
 		)
 
 	def build_estimator(self):
@@ -49,6 +54,11 @@ class MeloConfig:
 			estimator_params=self.estimator_config_[1]
 		)
 
+	def write_report(self, estimator_results: dict):
+		reporter = self.reporter_class_(self)
+		md_ss = reporter.header() + self.reporter_class_.process_results(estimator_results)
+		MdFormatter.save_md(self.name, md_ss)
+
 	def asdict(self):
 		return {
 			"products_config": self.products_config,
@@ -56,7 +66,8 @@ class MeloConfig:
 			"vol_target": self.vol_target,
 			"strat_config_registry": self.strat_config_registry,
 			"strategies_config": self.strategies_config,
-			"estimator_config_": self.estimator_config_
+			"estimator_config_": self.estimator_config_,
+			"reporter_class_": self.reporter_class_
 		}
 
 	def __str__(self):

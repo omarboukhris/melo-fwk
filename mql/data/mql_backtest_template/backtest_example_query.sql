@@ -2,7 +2,7 @@ create BacktestExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)
     Commodities (Oat, Cocoa)
-    trade idx
+    trade single
 
 from 2004 to 2008
 

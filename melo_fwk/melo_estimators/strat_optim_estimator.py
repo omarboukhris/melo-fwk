@@ -1,6 +1,5 @@
 
 from melo_fwk.melo_estimators.utils.strat_optim import StrategyEstimator
-from melo_fwk.strategies import BaseStrategy
 from melo_fwk.market_data.product import Product
 from melo_fwk.size_policies import BaseSizePolicy
 from melo_fwk.size_policies.vol_target import VolTarget
@@ -17,7 +16,7 @@ class StratOptimEstimator:
 		self,
 		products: dict,
 		time_period: List[int],
-		strategies: List[BaseStrategy] = None,
+		strategies: List[tuple] = None,
 		forecast_weights: List[int] = None,
 		vol_target: VolTarget = VolTarget(0., 0.),
 		size_policy_class_: callable = BaseSizePolicy,

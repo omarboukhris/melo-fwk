@@ -60,12 +60,14 @@ class TsarDataStream(BaseDataStream):
 	def sharpe_ratio(self, rf: float = 0.0):
 		mean = self.account_series.mean() - rf
 		sigma = self.account_series.std()
-		sharpe_r = mean / sigma if sigma != 0 else 0.
+		sharpe_r = mean / sigma if sigma != 0 else mean
 		return sharpe_r
 
 	def sortino_ratio(self, rf: float = 0.0):
-		# needs rework ########################
-		pass
+		mean = self.account_series.mean() - rf
+		sigma = self.account_series[self.account_series < 0].std()
+		sortino = mean / sigma if sigma != 0 else mean
+		return sortino
 
 	def PnL(self):
 		return self.account_series.iat[-1]
@@ -74,7 +76,6 @@ class TsarDataStream(BaseDataStream):
 		return self.account_series.std()
 
 	def get_drawdown(self, trading_days: int = 255):
-		# this is bugged ########################
 		peak = self.account_series.rolling(window=trading_days, min_periods=1).max()
 		dd = (self.account_series / peak) - 1
 		return dd

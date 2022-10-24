@@ -3,6 +3,13 @@
 class MdFormatter:
 
 	@staticmethod
+	def item_list(items: list):
+		ss = ""
+		for i in items:
+			ss += f"- {i}\n"
+		return ss
+
+	@staticmethod
 	def bold(ss: str):
 		return f"**{ss}**"
 
@@ -24,11 +31,13 @@ class MdFormatter:
 
 	@staticmethod
 	def image(title: str, image_file_path: str, alt_text: str):
-		return f"![{alt_text}][{image_file_path} {title}]\n"
+		return f"![{alt_text}]({image_file_path} \"{title}\")\n"
 
 	@staticmethod
 	def save_md(filename: str, ss: str):
 		try:
+			if filename[:-3] != ".md":
+				filename += ".md"
 			with open(filename, "w") as fstream:
 				fstream.write(ss)
 		except Exception as e:

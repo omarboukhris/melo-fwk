@@ -47,10 +47,7 @@ class BacktestEstimator:
 
 	def _trade_product(self, product: Product):
 
-		vol_target = VolTarget(
-			annual_vol_target=self.vol_target.annual_vol_target,
-			trading_capital=self.vol_target.trading_capital)
-		size_policy = self.size_policy_class_(risk_policy=vol_target)
+		size_policy = self.size_policy_class_(risk_policy=self.vol_target)
 
 		trading_subsys = TradingSystem(
 			product=product,
@@ -74,7 +71,7 @@ class BacktestEstimator:
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
 			vol_target = VolTarget(
 				annual_vol_target=self.vol_target.annual_vol_target,
-				trading_capital=balance if self.reinvest else self.vol_target.trading_capital)
+				trading_capital=balance)
 			size_policy = self.size_policy_class_(risk_policy=vol_target)
 
 			yearly_prod = Product(
