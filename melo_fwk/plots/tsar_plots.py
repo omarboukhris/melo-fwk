@@ -19,7 +19,7 @@ class TsarPlotter:
 	def save_fig(self, export_folder: str):
 
 		exported_png = []
-		for product_name, tsar_entry in tqdm.tqdm(self.tsar_list.items()):
+		for product_name, tsar_entry in tqdm.tqdm(self.tsar_list.items(), leave=False):
 			for filename, tsar in tqdm.tqdm(tsar_entry.items()):
 				png_export_file = f"{export_folder}/{filename}.png"
 				exported_png.append(

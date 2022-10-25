@@ -5,7 +5,7 @@ from melo_fwk.reporters.utils.md_formatter import MdFormatter
 from melo_fwk.plots import TsarPlotter
 from melo_fwk.loggers.global_logger import GlobalLogger
 
-class BacktestReporter:
+class VolTargetReporter:
 
 	def __init__(self, input_config: MeloConfig):
 		"""
@@ -15,8 +15,8 @@ class BacktestReporter:
 		:param input_config:
 		:return:
 		"""
-		self.logger = GlobalLogger.build_composite_for("BacktestReporter")
-		self.logger.info("Initializing BacktestReporter")
+		self.logger = GlobalLogger.build_composite_for("VolTargetReporter")
+		self.logger.info("Initializing Reporter")
 		# name:
 		self.name = input_config.name
 
@@ -39,7 +39,7 @@ class BacktestReporter:
 		ss += MdFormatter.h2("Products:")
 		ss += MdFormatter.item_list(self.products_name_list)
 
-		ss += MdFormatter.h2("VolTarget:")
+		ss += MdFormatter.h2("VolTarget - Position Size:")
 		ss += MdFormatter.italic(str(self.size_policy_class_)) + "\n"
 		ss += MdFormatter.item_list(str(self.vol_target).split("\n")[:-1])
 
@@ -49,28 +49,4 @@ class BacktestReporter:
 		return ss
 
 	def process_results(self, export_dir: str, raw_results: dict):
-		"""
-		raw_results dict :
-			key = product name
-			Value = dict :
-				key = product_filepath + year
-				value = TSAR
-		"""
-		self.logger.info("Exporting Tsar data")
-		ss = ""
-		for product_name, tsar_dict in tqdm.tqdm(raw_results.items(), leave=False):
-
-			assert isinstance(tsar_dict, dict), \
-				f"(BacktestReporter) TSAR result {product_name} is not associated to a dict"
-
-			for prod_fn_y, tsar in tsar_dict.items():
-				tsar_png = f"{export_dir}/assets/{prod_fn_y}.png"
-				TsarPlotter.save_tsar_as_png(tsar_png, tsar)
-
-				title = prod_fn_y.replace("_", " ")
-				tsar_png = f"assets/{prod_fn_y}.png"
-				ss += MdFormatter.h2(title)
-				ss += MdFormatter.image(title, tsar_png, prod_fn_y)
-
-		self.logger.info("Finished Exporting Tsar Data..")
-		return ss
+		return ""

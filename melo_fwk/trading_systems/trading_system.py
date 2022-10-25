@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
@@ -16,8 +15,6 @@ class TradingSystem(BaseTradingSystem):
 		- a set of forecast weights (sum(w_i) == 1)
 		- a pose sizing policy
 	"""
-
-	component_name = "TradingSystem"
 
 	def __init__(self, **kwargs):
 		super(TradingSystem, self).__init__(**kwargs)

@@ -3,13 +3,15 @@ from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder, VolTargetConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
-from melo_fwk.reporters.md_formatter import MdFormatter
+from melo_fwk.reporters.utils.md_formatter import MdFormatter
 
 from melo_fwk.size_policies.vol_target import VolTarget
 
 from pathlib import Path
 
 from dataclasses import dataclass
+
+import os
 
 @dataclass(frozen=True)
 class MeloConfig:
@@ -55,9 +57,21 @@ class MeloConfig:
 		)
 
 	def write_report(self, estimator_results: dict):
+		"""
+		NOTE: Generates artifacts (
+			export folder: $query_name
+			assets folder: $query_name/assets/
+			tsar png
+		)
+		:param estimator_results:
+		:return:
+		"""
+		if not os.path.isdir(self.name):
+			os.mkdir(self.name)
+			os.mkdir(self.name + "/assets/")
 		reporter = self.reporter_class_(self)
-		md_ss = reporter.header() + self.reporter_class_.process_results(estimator_results)
-		MdFormatter.save_md(self.name, md_ss)
+		md_ss = reporter.header() + reporter.process_results(self.name, estimator_results)
+		MdFormatter.save_md(self.name, "report.md", md_ss)
 
 	def asdict(self):
 		return {

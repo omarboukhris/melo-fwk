@@ -1,4 +1,6 @@
 
+from melo_fwk.loggers.global_logger import GlobalLogger
+
 class ConfigBuilderHelper:
 	@staticmethod
 	def is_key_present(parsed_dict: dict, key: str):
@@ -6,10 +8,8 @@ class ConfigBuilderHelper:
 
 	@staticmethod
 	def strip(parsed_dict: dict, key: str):
-		assert ConfigBuilderHelper.is_key_present(parsed_dict, key), \
-			f"Key [{key}] not in Dictionary keys [{parsed_dict.keys()}]"
-		assert len(parsed_dict[key]) >= 1, \
-			f"Key [{key}] not in Dictionary keys [{parsed_dict.keys()}]"
+		assert key in parsed_dict.keys(), GlobalLogger.build_composite_for("ConfigBuilderHelper").error(
+			f"Key [{key}] not in Dictionary keys [{parsed_dict.keys()}]")
 		return parsed_dict[key]
 
 	@staticmethod

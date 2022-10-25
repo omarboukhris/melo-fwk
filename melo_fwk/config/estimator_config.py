@@ -1,4 +1,4 @@
-
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 
@@ -21,6 +21,7 @@ class EstimatorConfigBuilder:
 		if ConfigBuilderHelper.is_key_present(stripped_entry, "EstimatorParamList"):
 			estimator_param_list = ConfigBuilderHelper.strip_single(stripped_entry, "EstimatorParamList").split(",")
 			estimator_param_list = [estimator_param.strip() for estimator_param in estimator_param_list]
+			GlobalLogger.build_composite_for("EstimatorParamCongif").warn(f"Parsed Estimator Params ({estimator_param_list})")
 			return estimator_param_list
 		return []
 

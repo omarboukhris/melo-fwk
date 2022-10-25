@@ -15,7 +15,7 @@ class TsarDataStream(BaseDataStream):
 		self.account_series = self.dataframe["Account"]
 		self.daily_pnl_series = self.dataframe["Daily_PnL"]
 
-	def get_data_by_year(self, y: str):
+	def get_data_by_year(self, y: int):
 		# offset account with start capital
 		# useful when running whole history with the same vol target
 		tsar = TsarDataStream(

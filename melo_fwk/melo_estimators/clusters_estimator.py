@@ -1,6 +1,7 @@
 import pandas as pd
 import tqdm
 
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.market_data.product import Product
 from melo_fwk.strategies import BaseStrategy
@@ -22,10 +23,12 @@ class ClustersEstimator:
 		size_policy_class_: callable = BaseSizePolicy,
 		estimator_params: List[str] = None
 	):
+		self.logger = GlobalLogger.build_composite_for("ClustersEstimator")
+
 		strategies = [] if strategies is None else strategies
 		forecast_weights = [] if forecast_weights is None else forecast_weights
-		assert len(strategies) == len(forecast_weights), \
-			"(BacktestEstimator) Strategies and Forecast weight do not correspond."
+		assert len(strategies) == len(forecast_weights), self.logger.error(
+			"Strategies and Forecast weight do not correspond.")
 
 		self.products = products
 		self.time_period = time_period
@@ -34,6 +37,8 @@ class ClustersEstimator:
 		self.vol_target = vol_target
 		self.size_policy_class_ = size_policy_class_
 		self.global_corr = "glob" in estimator_params
+
+		self.logger.info("Estimator Initialized")
 
 	def run(self):
 		"""
@@ -55,13 +60,15 @@ class ClustersEstimator:
 		else:
 			_trade_fn = self._trade_product
 
-		for product_name, product in self.products.items():
+		self.logger.info("Fetching products returns")
+		for product_name, product in tqdm.tqdm(self.products.items(), leave=False):
 			for year, y_return in _trade_fn(product).items():
 				if year in out_dict.keys():
 					out_dict[year].update(y_return)
 				else:
 					out_dict[year] = y_return
 
+		self.logger.info("Building yearly correllation heatmap")
 		df_dict = dict()
 		for year, returns in out_dict.items():
 			df_dict[year] = pd.DataFrame(returns).corr()
@@ -84,7 +91,7 @@ class ClustersEstimator:
 
 		tsar = trading_subsys.run()
 		results = dict()
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+		for year in range(int(self.time_period[0]), int(self.time_period[1])):
 			y_return = tsar.get_data_by_year(year).account_series
 			if year in results.keys():
 				results[year].update({product.name: y_return})
@@ -100,7 +107,7 @@ class ClustersEstimator:
 		size_policy = self.size_policy_class_(risk_policy=vol_target)
 
 		results = dict()
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+		for year in range(int(self.time_period[0]), int(self.time_period[1])):
 			trading_subsys = TradingSystem(
 				product=product.datastream.get_data_by_year(year),
 				trading_rules=self.strategies,

@@ -23,12 +23,24 @@ from melo_fwk.size_policies import (
 )
 
 from melo_fwk.reporters.backtest_reporter import BacktestReporter
+from melo_fwk.reporters.fw_optim_reporter import ForecastWeightsReporter
+from melo_fwk.reporters.strat_optim_reporter import StratOptimReporter
+from melo_fwk.reporters.vol_target_reporter import VolTargetReporter
+from melo_fwk.reporters.clusters_reporter import ClustersReporter
+
+from melo_fwk.loggers.global_logger import GlobalLogger
 
 def register_all():
+	log = GlobalLogger.build_composite_for("QuantFactoryRegistryBuilding")
+	log.info("Registring Estimators...")
 	register_estimator()
+	log.info("Registring Strategies...")
 	register_strats()
+	log.info("Registring Strategies Search Spaces...")
 	register_search_spaces()
+	log.info("Registring Size Policies...")
 	register_size_policies()
+	log.info("Registring Products/Assets historical data...")
 	register_products()
 
 def register_estimator():
@@ -39,6 +51,10 @@ def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
 
 	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
+	quantflow_factory.QuantFlowFactory.register_reporter("ClustersEstimator", ClustersReporter)
+	quantflow_factory.QuantFlowFactory.register_reporter("StratOptimEstimator", StratOptimReporter)
+	quantflow_factory.QuantFlowFactory.register_reporter("ForecastWeightsEstimator", ForecastWeightsReporter)
+	quantflow_factory.QuantFlowFactory.register_reporter("VolTargetEstimator", VolTargetReporter)
 
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", EWMAStrategy)

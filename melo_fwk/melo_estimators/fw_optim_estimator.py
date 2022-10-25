@@ -2,6 +2,7 @@ import pandas as pd
 import tqdm
 import numpy as np
 
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.product import Product
 from melo_fwk.size_policies import BaseSizePolicy
 from melo_fwk.size_policies.vol_target import VolTarget
@@ -37,13 +38,16 @@ class ForecastWeightsEstimator:
 		size_policy_class_: callable = BaseSizePolicy,
 		estimator_params: List[str] = None
 	):
+		self.logger = GlobalLogger.build_composite_for("ForecastWeightsEstimator")
+
 		strategies = [] if strategies is None else strategies
 		forecast_weights = [1./len(strategies) for _ in strategies] if forecast_weights is None else forecast_weights
-		assert len(strategies) == len(forecast_weights), \
-			"(ForecastWeightsEstimator) Strategies and Forecast weight do not correspond."
-		assert len(products) == 1, \
-			"(ForecastWeightsEstimator) Can only optimize weight for 1 product at a time"
+		assert len(strategies) == len(forecast_weights), self.logger.error(
+			"Strategies and Forecast weight do not correspond.")
+		assert len(products) == 1, self.logger.error(
+			"Can only optimize weight for 1 product at a time")
 
+		# multiple products ??
 		self.product = list(products.values())[0]
 		self.current_year = -1
 		self.time_period = time_period
@@ -53,10 +57,12 @@ class ForecastWeightsEstimator:
 		self.size_policy_class_ = size_policy_class_
 		self.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
 
+		self.logger.info("Initialized Estimator")
+
 	def run(self):
 		results = []
 
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1])), leave=False):
 			self.current_year = year
 
 			opt_bounds = Bounds(0, 1)

@@ -1,4 +1,4 @@
-
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.market_data.utils.index_builder import IndexBuilder
 from melo_fwk.config.config_helper import ConfigBuilderHelper
@@ -11,6 +11,7 @@ class ProductConfigBuilder:
 		instruments = ConfigBuilderHelper.strip_single(stripped_entry, "instrument")
 		time_period = [int(year) for year in stripped_entry["timeperiod"]]
 
+		GlobalLogger.build_composite_for("ProductConfigBuilder").info("Loading Products")
 		output_products = {}
 		for prods in products_generator:
 			products_type = ConfigBuilderHelper.strip_single(prods, "productType")
@@ -28,6 +29,7 @@ class ProductConfigBuilder:
 	def _get_product(products_type: str, product_name: str) -> dict:
 		product_factory_name = f"{products_type}.{product_name}"
 		assert product_factory_name in QuantFlowFactory.products.keys(), \
-			f"QuantFlowFactory: {product_factory_name} product key not in [{QuantFlowFactory.products.keys()}]"
+			GlobalLogger.build_composite_for("ProductConfigBuilder").error(
+				f"QuantFlowFactory: {product_factory_name} product key not in [{QuantFlowFactory.products.keys()}]")
 		return {product_factory_name: QuantFlowFactory.get_product(product_factory_name)}
 

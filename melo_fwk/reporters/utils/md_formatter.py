@@ -34,11 +34,11 @@ class MdFormatter:
 		return f"![{alt_text}]({image_file_path} \"{title}\")\n"
 
 	@staticmethod
-	def save_md(filename: str, ss: str):
+	def save_md(export_folder: str, filename: str, ss: str):
 		try:
-			if filename[:-3] != ".md":
+			if filename[-3:] != ".md":
 				filename += ".md"
-			with open(filename, "w") as fstream:
+			with open(f"{export_folder}/{filename}", "w") as fstream:
 				fstream.write(ss)
 		except Exception as e:
 			print(f"(MdFormatter) Exception caught : {e}")

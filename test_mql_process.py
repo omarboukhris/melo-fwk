@@ -1,16 +1,16 @@
+from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.loggers.console_logger import ConsoleLogger
 
 from melo_fwk.config import (
 	ConfigBuilderHelper,
 	MeloConfig
 )
 from melo_fwk import quantfactory_registry
-from melo_fwk.reporters.md_formatter import MdFormatter
 
 from mql.mql_parser import MqlParser
 
 from pathlib import Path
 
-from melo_fwk.reporters.backtest_reporter import BacktestReporter
 
 def run_mql_process(mql_query_path: Path):
 	"""
@@ -35,21 +35,26 @@ def run_mql_process(mql_query_path: Path):
 
 	estimator_obj_ = mql_config.build_estimator()
 	output = estimator_obj_.run()
+	# print(output)
 
 	mql_config.write_report(output)
+
 
 
 if __name__ == "__main__":
 
 	templates = {
 		"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
-		# "fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
-		# "strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
-		# "vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-		# "clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
+		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+		"vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
+		"clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
+		"strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
 	}
 	# still missing :
 	# alloc opt
+	GlobalLogger.set_loggers([ConsoleLogger])
+
+	# set loggers
 
 	# register melo components in factory
 	quantfactory_registry.register_all()

@@ -10,6 +10,9 @@ from melo_fwk.size_policies.vol_target import VolTarget
 
 from typing import List
 
+from melo_fwk.loggers.global_logger import GlobalLogger
+
+
 class BacktestEstimator:
 
 	def __init__(
@@ -22,10 +25,12 @@ class BacktestEstimator:
 		size_policy_class_: callable = BaseSizePolicy,
 		estimator_params: List[str] = None
 	):
+		self.logger = GlobalLogger.build_composite_for("BacktestEstimator")
+
 		strategies = [] if strategies is None else strategies
 		forecast_weights = [] if forecast_weights is None else forecast_weights
-		assert len(strategies) == len(forecast_weights), \
-			"(BacktestEstimator) Strategies and Forecast weight do not correspond."
+		assert len(strategies) == len(forecast_weights), self.logger.error(
+			"Strategies and Forecast weight do not correspond.")
 
 		self.products = products
 		self.time_period = time_period
@@ -35,14 +40,22 @@ class BacktestEstimator:
 		self.size_policy_class_ = size_policy_class_
 		self.reinvest = "reinvest" in estimator_params
 
+		self.logger.info("BacktestEstimator Initialized")
+
 	def run(self):
 		out_dict = dict()
+
 		if self.reinvest:
-			for product_name, product_dataclass in self.products.items():
-				out_dict[product_name] = self._trade_product_reinvest(product_dataclass)
+			self.logger.info("Running multi-year Backtest with trading capital adjustment")
+			trade_fn_ = self._trade_product_reinvest
 		else:
-			for product_name, product_dataclass in self.products.items():
-				out_dict[product_name] = self._trade_product(product_dataclass)
+			self.logger.info("Running multi-year Backtest with fixed volatility target")
+			trade_fn_ = self._trade_product
+
+		for i, (product_name, product_dataclass) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
+			self.logger.info(f"Running Simulation on Product {product_name} {i+1}/{len(self.products)}")
+			out_dict[product_name] = trade_fn_(product_dataclass)
+		self.logger.info("Backtest completed")
 		return out_dict
 
 	def _trade_product(self, product: Product):
@@ -58,7 +71,7 @@ class BacktestEstimator:
 
 		tsar = trading_subsys.run()
 		results = dict()
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+		for year in range(int(self.time_period[0]), int(self.time_period[1])):
 			yearly_tsar = tsar.get_data_by_year(year)
 			results.update({f"{product.name}_{year}": yearly_tsar})
 
@@ -68,7 +81,7 @@ class BacktestEstimator:
 		balance = self.vol_target.trading_capital
 		results = dict()
 
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1]))):
+		for year in range(int(self.time_period[0]), int(self.time_period[1])):
 			vol_target = VolTarget(
 				annual_vol_target=self.vol_target.annual_vol_target,
 				trading_capital=balance)

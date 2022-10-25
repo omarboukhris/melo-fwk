@@ -1,11 +1,8 @@
-
 from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import BaseStrategy
 
 from melo_fwk.size_policies import BaseSizePolicy
-
-from melodb.loggers import ILogger
 
 from melo_fwk.datastreams import (
 	HLOCDataStream,
@@ -16,7 +13,6 @@ from typing import List
 import pandas as pd
 
 class BaseTradingSystem:
-	component_name = "BaseTradingSystem"
 
 	def __init__(
 		self,
@@ -24,15 +20,14 @@ class BaseTradingSystem:
 		trading_rules: List[BaseStrategy],
 		forecast_weights: List[float],
 		size_policy: BaseSizePolicy = BaseSizePolicy(),
-		logger: ILogger = ILogger(component_name)
 	):
-		self.logger = logger
 
-		assert product is not None, self.logger.error("(AssertionError) Data source is None")
+		assert product is not None, "(AssertionError) Data source is None"
 		assert len(trading_rules) == len(forecast_weights), \
-			self.logger.error("(AssertionError) Number of TradingRules must match forcast weights")
+			"(AssertionError) Number of TradingRules must match forcast weights"
 
 		self.time_index = 0
+		self.product_name = product.name
 		self.hloc_datastream = product.datastream
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights

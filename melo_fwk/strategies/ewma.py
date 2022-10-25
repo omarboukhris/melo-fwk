@@ -42,7 +42,7 @@ class EWMAStrategy(BaseStrategy, EWMAParamSpace):
 		f_series = pd.Series([
 			min(f_val, self.cap) if f_val > 0 else max(f_val, -self.cap)
 			for f_val in f_vect
-		])
+		], dtype=float)
 		return f_series
 
 	def forecast(self, data: pd.Series):

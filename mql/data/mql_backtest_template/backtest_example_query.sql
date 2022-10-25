@@ -15,4 +15,4 @@ where
     volTarget is (0.5, 100000)
     and sizePolicy (VolTargetSizePolicy)
 
-select BacktestEstimator<reinvest>
+select BacktestEstimator

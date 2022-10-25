@@ -1,4 +1,4 @@
-
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.utils import yaml_io
@@ -51,13 +51,16 @@ class StratConfigRegistry:
 class StrategyConfigBuilder:
 	@staticmethod
 	def build_strategy(quant_query_dict: dict, strat_config_registry: StratConfigRegistry):
+		logger = GlobalLogger.build_composite_for("StratConfigBuilder")
 		if not ConfigBuilderHelper.is_key_present(quant_query_dict, "StrategiesDef"):
+			logger.warn("No Strategies Parsed; Using default NONE")
 			return [], []
 
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")
 		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyList").split(",")
 		strat_config_points = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyConfigList").split(",")
 
+		logger.info(f"Loading Strategies {strategies_kw}")
 		strategies = []
 		for strat, config in zip(strategies_kw, strat_config_points):
 			if "." in config:
@@ -76,11 +79,13 @@ class StrategyConfigBuilder:
 				)
 
 		if not ConfigBuilderHelper.is_key_present(stripped_entry, "forecastWeightsList"):
-			return strategies, None
+			logger.warn("No ForecastWeights Parsed; Using default 1/n")
+			return strategies, [1/len(strategies) for _ in strategies]
 
 		forecast_weights_str = ConfigBuilderHelper.strip_single(stripped_entry, "forecastWeightsList")
 		forecast_weights = [float(fw_str) for fw_str in forecast_weights_str.split(",")]
 
+		logger.info(f"ForecastWeights Parsed; Using {forecast_weights}")
 		return strategies, forecast_weights
 
 
