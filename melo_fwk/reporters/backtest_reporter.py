@@ -64,13 +64,13 @@ class BacktestReporter:
 				f"(BacktestReporter) TSAR result {product_name} is not associated to a dict"
 
 			for prod_fn_y, tsar in tsar_dict.items():
-				tsar_png = f"{export_dir}/assets/{prod_fn_y}.png"
-				TsarPlotter.save_tsar_as_png(tsar_png, tsar)
-
 				title = prod_fn_y.replace("_", " ")
 				tsar_png = f"assets/{prod_fn_y}.png"
 				ss += MdFormatter.h2(title)
 				ss += MdFormatter.image(title, tsar_png, prod_fn_y)
 
-		self.logger.info("Finished Exporting Tsar Data..")
+				tsar_png = f"{export_dir}/{tsar_png}"
+				TsarPlotter.save_tsar_as_png(tsar_png, tsar)
+
+		self.logger.info("Finished Exporting Tsar Images..")
 		return ss

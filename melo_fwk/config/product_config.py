@@ -11,16 +11,21 @@ class ProductConfigBuilder:
 		instruments = ConfigBuilderHelper.strip_single(stripped_entry, "instrument")
 		time_period = [int(year) for year in stripped_entry["timeperiod"]]
 
-		GlobalLogger.build_composite_for("ProductConfigBuilder").info("Loading Products")
+		plogger = GlobalLogger.build_composite_for("ProductConfigBuilder")
+		plogger.info("Loading Products")
 		output_products = {}
 		for prods in products_generator:
 			products_type = ConfigBuilderHelper.strip_single(prods, "productType")
 			products_name_list = ConfigBuilderHelper.parse_list(prods, "ProductsList")
 			for product_name in products_name_list:
-				output_products.update(ProductConfigBuilder._get_product(products_type, product_name))
+				product = ProductConfigBuilder._get_product(products_type, product_name)
+				plogger.info(f"Loaded Product {product.keys()}")
+				output_products.update(product)
 
+		plogger.info(f"{len(output_products)} Products loaded")
 		# if idx build index otherwise trade singles
 		if instruments == "idx":
+			plogger.warn("Building Product Index: DEPRECATED. Backtest trading Single products")
 			return IndexBuilder.build(output_products), time_period
 		# else: trade singles
 		return output_products, time_period

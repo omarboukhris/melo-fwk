@@ -48,8 +48,7 @@ class ForecastWeightsEstimator:
 			"Can only optimize weight for 1 product at a time")
 
 		# multiple products ??
-		self.product = list(products.values())[0]
-		self.current_year = -1
+		self.products = products
 		self.time_period = time_period
 		self.strategies = strategies
 		self.forecast_weights = np.array(forecast_weights)
@@ -60,13 +59,19 @@ class ForecastWeightsEstimator:
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
-		results = []
+		out_dict = dict()
+		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
+		for i, (product_name, product_dataclass) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
+			out_dict[product_name] = self._optimize_weights_by_product(product_dataclass)
+		self.logger.info("Finished running estimator")
+		return out_dict
 
+	def _optimize_weights_by_product(self, product: Product):
+		results = []
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1])), leave=False):
-			self.current_year = year
 
 			opt_bounds = Bounds(0, 1)
-			expected_ret, covmat_ret = self.get_expected_results_by_strategy()
+			expected_ret, covmat_ret = self.get_expected_results(product, year)
 			opt_cst = [
 				{'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)},
 				# {'type': 'eq', 'fun': lambda W: np.max(exp_ret) - W.T @ exp_ret}
@@ -88,17 +93,13 @@ class ForecastWeightsEstimator:
 
 		return results
 
-	def get_expected_results_by_strategy(self):
+	def get_expected_results(self, product: Product, year: int):
 		size_policy = self.size_policy_class_(risk_policy=self.vol_target)
 		result = []
 		returns = {}
 
 		for strategy in self.strategies:
-			y_prod = Product(
-				name=self.product.name,
-				block_size=self.product.block_size,
-				datastream=self.product.datastream.get_data_by_year(self.current_year)
-			)
+			y_prod = product.get_year(year)
 			trading_subsys = TradingSystem(
 				product=y_prod,
 				trading_rules=[strategy],
@@ -107,7 +108,7 @@ class ForecastWeightsEstimator:
 			)
 
 			tsar = trading_subsys.run()
-			key = f"{self.product.name}.{str(strategy)}"
+			key = f"{product.name}.{str(strategy)}"
 			returns.update({key: tsar.account_series})
 			result.append(tsar.get_metric_by_name(self.metric))
 

@@ -22,8 +22,8 @@ class TsarPlotter:
 		for product_name, tsar_entry in tqdm.tqdm(self.tsar_list.items(), leave=False):
 			for filename, tsar in tqdm.tqdm(tsar_entry.items()):
 				png_export_file = f"{export_folder}/{filename}.png"
-				exported_png.append(
-					self.save_tsar_as_png(png_export_file, tsar))
+				self.save_tsar_as_png(png_export_file, tsar)
+				exported_png.append(png_export_file)
 
 		return exported_png
 

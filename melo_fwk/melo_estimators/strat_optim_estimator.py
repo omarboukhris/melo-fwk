@@ -41,6 +41,7 @@ class StratOptimEstimator:
 		for i, (product_name, product_dataclass) in enumerate(self.products.items()):
 			self.logger.info(f"Running Strategy Optimizer for Product {product_name} {i+1}/{len(self.products)}")
 			out_dict[product_name] = self._optimize_product_strat(product_dataclass)
+		self.logger.info("Finished running estimator")
 		return out_dict
 
 	def _optimize_product_strat(self, product: Product):
@@ -62,10 +63,7 @@ class StratOptimEstimator:
 					strat_search_space_,
 					cv=[(slice(None), slice(None))]
 				)
-				StrategyEstimator.product = Product(
-					name=product.name,
-					block_size=product.block_size,
-					datastream=product.datastream.get_data_by_year(year))
+				StrategyEstimator.product = product.get_year(year)
 				opt.fit(X=StrategyEstimator.product.datastream.get_dataframe())
 				results.update({f"{product.name}_{year}": opt})
 

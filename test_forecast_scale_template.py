@@ -29,11 +29,7 @@ results = {}
 for product in tqdm.tqdm(sample_products):
 	for year in product.years():
 
-		y_prod = Product(
-			name=product.name,
-			block_size=product.block_size,
-			datastream=product.datastream.get_data_by_year(year)
-		)
+		y_prod = product.get_year(year)
 
 		for s in strat:
 			s.scale = 1.

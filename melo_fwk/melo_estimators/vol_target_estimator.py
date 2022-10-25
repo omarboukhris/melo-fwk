@@ -47,10 +47,10 @@ class VolTargetEstimator:
 
 	def run(self):
 		out_dict = dict()
-		self.logger.info(f"Using Size Policy: {self.size_policy_class_}")
+		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
 		for i, (product_name, product_dataclass) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
-			self.logger.info(f"Running Vol Target Estimation on Product {product_name} {i+1}/{len(self.products)}")
 			out_dict[product_name] = self._trade_product(product_dataclass)
+		self.logger.info("Finished running estimator")
 		return out_dict
 
 	def _trade_product(self, product: Product):

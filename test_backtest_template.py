@@ -44,11 +44,7 @@ No position is open by the end of the year
 """
 for year in tqdm.tqdm(product.years()):
 
-	y_prod = Product(
-		name=product.name,
-		block_size=product.block_size,
-		datastream=product.datastream.get_data_by_year(year)
-	)
+	y_prod = product.get_year(year)
 
 	trading_subsys = TradingSystem(
 		product=y_prod,

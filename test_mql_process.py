@@ -37,7 +37,7 @@ def run_mql_process(mql_query_path: Path):
 	output = estimator_obj_.run()
 	# print(output)
 
-	mql_config.write_report(output)
+	mql_config.write_report(output, "data/")
 
 
 

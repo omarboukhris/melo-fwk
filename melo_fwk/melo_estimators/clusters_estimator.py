@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import tqdm
 
@@ -8,6 +9,10 @@ from melo_fwk.strategies import BaseStrategy
 from melo_fwk.size_policies import BaseSizePolicy
 from melo_fwk.size_policies.vol_target import VolTarget
 
+import scipy
+import scipy.cluster.hierarchy as sch
+
+import matplotlib.pyplot as plt
 
 from typing import List
 
@@ -60,7 +65,7 @@ class ClustersEstimator:
 		else:
 			_trade_fn = self._trade_product
 
-		self.logger.info("Fetching products returns")
+		self.logger.info(f"Fetching {len(self.products)} Products returns")
 		for product_name, product in tqdm.tqdm(self.products.items(), leave=False):
 			for year, y_return in _trade_fn(product).items():
 				if year in out_dict.keys():
@@ -71,7 +76,17 @@ class ClustersEstimator:
 		self.logger.info("Building yearly correllation heatmap")
 		df_dict = dict()
 		for year, returns in out_dict.items():
-			df_dict[year] = pd.DataFrame(returns).corr()
+			# Clustering
+			# https://github.com/TheLoneNut/CorrelationMatrixClustering/blob/master/CorrelationMatrixClustering.ipynb
+			df = pd.DataFrame(returns)
+
+			X = df.corr().values
+			d = sch.distance.pdist(X)  # vector of ('55' choose 2) pairwise distances
+			L = sch.linkage(d, method='complete')
+			ind = sch.fcluster(L, 0.5 * d.max(), 'distance')
+			columns = [df.columns.tolist()[i] for i in list((np.argsort(ind)))]
+			df_dict[year] = df.reindex(columns, axis=1)
+		self.logger.info("Finished building Heatmap")
 
 		return df_dict
 

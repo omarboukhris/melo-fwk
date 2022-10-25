@@ -62,5 +62,5 @@ class HLOCDataStream(BaseDataStream):
 
 	def _get_value_at_date(self, value: str, date: str) -> float:
 		x = self.dataframe.loc[self.dataframe[self._date_label] == date, value].to_numpy()
-		assert len(x) == 1, "(AssertionError) Timestamp is invalid, date not found or not unique"
+		assert len(x) == 1, "(HLOCDataStream) Timestamp is invalid, date not found or not unique"
 		return x[0]

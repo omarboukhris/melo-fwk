@@ -2,7 +2,7 @@ import tqdm
 
 from melo_fwk.config.melo_config import MeloConfig
 from melo_fwk.reporters.utils.md_formatter import MdFormatter
-from melo_fwk.plots import TsarPlotter
+from melo_fwk.plots import TsarPlotter, HeatMapPlotter
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 class ClustersReporter:
@@ -49,4 +49,15 @@ class ClustersReporter:
 		return ss
 
 	def process_results(self, export_dir: str, raw_results: dict):
-		return ""
+		ss = ""
+		for year, df in raw_results.items():
+			title = f"Correllation Heat Map {year}"
+			heatmap_png = f"assets/HeatMap_{year}.png"
+			ss += MdFormatter.h2(title)
+			ss += MdFormatter.image(title, heatmap_png, f"corr_{year}")
+
+			filename = f"{export_dir}/{heatmap_png}"
+			HeatMapPlotter.save_heatmap_to_png(filename, df)
+
+		self.logger.info("Finished Exporting Heat Maps..")
+		return ss

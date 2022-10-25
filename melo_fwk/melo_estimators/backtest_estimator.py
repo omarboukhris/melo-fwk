@@ -52,10 +52,10 @@ class BacktestEstimator:
 			self.logger.info("Running multi-year Backtest with fixed volatility target")
 			trade_fn_ = self._trade_product
 
+		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
 		for i, (product_name, product_dataclass) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
-			self.logger.info(f"Running Simulation on Product {product_name} {i+1}/{len(self.products)}")
 			out_dict[product_name] = trade_fn_(product_dataclass)
-		self.logger.info("Backtest completed")
+		self.logger.info("Finished running estimator")
 		return out_dict
 
 	def _trade_product(self, product: Product):
@@ -87,11 +87,7 @@ class BacktestEstimator:
 				trading_capital=balance)
 			size_policy = self.size_policy_class_(risk_policy=vol_target)
 
-			yearly_prod = Product(
-				name=product.name,
-				block_size=product.block_size,
-				datastream=product.datastream.get_data_by_year(year)
-			)
+			yearly_prod = product.get_year(year)
 			trading_subsys = TradingSystem(
 				product=yearly_prod,
 				trading_rules=self.strategies,

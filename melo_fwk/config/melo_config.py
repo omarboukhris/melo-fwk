@@ -56,22 +56,22 @@ class MeloConfig:
 			estimator_params=self.estimator_config_[1]
 		)
 
-	def write_report(self, estimator_results: dict):
+	def write_report(self, estimator_results: dict, output_dir: str = "./"):
 		"""
 		NOTE: Generates artifacts (
-			export folder: $query_name
-			assets folder: $query_name/assets/
-			tsar png
+			export folder: $query_name/report.md
+			assets folder: $query_name/assets/*.png
 		)
 		:param estimator_results:
+		:param output_dir:
 		:return:
 		"""
-		if not os.path.isdir(self.name):
-			os.mkdir(self.name)
-			os.mkdir(self.name + "/assets/")
+		if not os.path.isdir(output_dir + self.name):
+			os.mkdir(output_dir + self.name)
+			os.mkdir(output_dir + self.name + "/assets/")
 		reporter = self.reporter_class_(self)
-		md_ss = reporter.header() + reporter.process_results(self.name, estimator_results)
-		MdFormatter.save_md(self.name, "report.md", md_ss)
+		md_ss = reporter.header() + reporter.process_results(output_dir + self.name, estimator_results)
+		MdFormatter.save_md(output_dir + self.name, "report.md", md_ss)
 
 	def asdict(self):
 		return {
