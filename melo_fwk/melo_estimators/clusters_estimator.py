@@ -9,10 +9,7 @@ from melo_fwk.strategies import BaseStrategy
 from melo_fwk.size_policies import BaseSizePolicy
 from melo_fwk.size_policies.vol_target import VolTarget
 
-import scipy
 import scipy.cluster.hierarchy as sch
-
-import matplotlib.pyplot as plt
 
 from typing import List
 

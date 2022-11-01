@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 
 from melo_fwk.datastreams.base_datastream import BaseDataStream
 
@@ -14,6 +16,13 @@ class TsarDataStream(BaseDataStream):
 		self.size_series = self.dataframe["Size"]
 		self.account_series = self.dataframe["Account"]
 		self.daily_pnl_series = self.dataframe["Daily_PnL"]
+
+	def add(self, other):
+		tsar = TsarDataStream(
+			dataframe=pd.concat([self.dataframe, other.dataframe]).reset_index(drop=True),
+			date_label=self._date_label
+		)
+		return tsar
 
 	def get_data_by_year(self, y: int):
 		# offset account with start capital
@@ -63,6 +72,11 @@ class TsarDataStream(BaseDataStream):
 		sharpe_r = mean / sigma if sigma != 0 else mean
 		return sharpe_r
 
+	def gar(self):
+		diff = self.account_series.diff().fillna(0)
+		a = np.log(1 + diff)
+		return a.mean()
+
 	def sortino_ratio(self, rf: float = 0.0):
 		mean = self.account_series.mean() - rf
 		sigma = self.account_series[self.account_series < 0].std()
@@ -77,8 +91,8 @@ class TsarDataStream(BaseDataStream):
 
 	def get_drawdown(self, trading_days: int = 255):
 		peak = self.account_series.rolling(window=trading_days, min_periods=1).max()
-		dd = (self.account_series / peak) - 1
-		return dd
+		dd = (self.account_series - peak)  # - 1
+		return dd.replace([np.inf, -np.inf], np.nan).fillna(0)
 
 	def max_drawdown(self):
 		return self.get_drawdown().min()

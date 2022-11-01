@@ -11,7 +11,7 @@ from pathlib import Path
 products_block_size = {
 	# Commodity
 	"Brent Crude Oil": 1000,
-	"Cocoa": 100,  #
+	"Cocoa": 10,  #
 	"Coffee": 100,  #
 	"Copper": 10000,  #
 	"Corn": 100,  #

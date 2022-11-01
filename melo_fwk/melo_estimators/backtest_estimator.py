@@ -38,16 +38,16 @@ class BacktestEstimator:
 		self.forecast_weights = forecast_weights
 		self.vol_target = vol_target
 		self.size_policy_class_ = size_policy_class_
-		self.reinvest = "reinvest" in estimator_params
+		self.compound = "compound" in estimator_params
 
 		self.logger.info("BacktestEstimator Initialized")
 
 	def run(self):
 		out_dict = dict()
 
-		if self.reinvest:
+		if self.compound:
 			self.logger.info("Running multi-year Backtest with trading capital adjustment")
-			trade_fn_ = self._trade_product_reinvest
+			trade_fn_ = self._trade_product_compound
 		else:
 			self.logger.info("Running multi-year Backtest with fixed volatility target")
 			trade_fn_ = self._trade_product
@@ -60,7 +60,10 @@ class BacktestEstimator:
 
 	def _trade_product(self, product: Product):
 
-		size_policy = self.size_policy_class_(risk_policy=self.vol_target)
+		size_policy = self.size_policy_class_(
+			risk_policy=self.vol_target,
+			block_size=product.block_size
+		)
 
 		trading_subsys = TradingSystem(
 			product=product,
@@ -77,27 +80,19 @@ class BacktestEstimator:
 
 		return results
 
-	def _trade_product_reinvest(self, product: Product):
-		balance = self.vol_target.trading_capital
+	def _trade_product_compound(self, product: Product):
 		results = dict()
-
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			vol_target = VolTarget(
-				annual_vol_target=self.vol_target.annual_vol_target,
-				trading_capital=balance)
-			size_policy = self.size_policy_class_(risk_policy=vol_target)
-
-			yearly_prod = product.get_year(year)
+			size_policy = self.size_policy_class_(risk_policy=self.vol_target)
 			trading_subsys = TradingSystem(
-				product=yearly_prod,
+				product=product.get_year(year),
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
 				size_policy=size_policy
 			)
 
-			tsar = trading_subsys.run()
-			# change output file path
+			tsar = trading_subsys.run().get_data_by_year(year)
 			results.update({f"{product.name}_{year}": tsar})
-			balance += tsar.annual_delta()
+			self.vol_target.trading_capital += tsar.annual_delta()
 
 		return results

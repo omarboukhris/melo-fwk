@@ -20,5 +20,3 @@ class VolTargetInertiaPolicy(VolTargetSizePolicy):
 		pose_series = (self.vol_scalar(lookback) * forecast) / 10.
 		return pose_series.apply(_inertia).round()
 
-
-

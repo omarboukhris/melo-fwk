@@ -8,8 +8,8 @@ from melo_fwk.size_policies import VolTargetInertiaPolicy
 from melo_fwk.size_policies.vol_target import VolTarget
 from melo_fwk.plots import TsarPlotter
 
-# product = CommodityDataLoader.Gold
-product = FxDataLoader.EURUSD
+product = CommodityDataLoader.Gold
+# product = FxDataLoader.EURUSD
 
 strat = [
 	EWMAStrategy(
@@ -18,25 +18,19 @@ strat = [
 		scale=16.,
 	),
 	EWMAStrategy(
-		fast_span=4,
+		fast_span=8,
 		slow_span=32,
 		scale=10.,
 	)
 ]
-fw = [0.4, 0.6]
+fw = [0.6, 0.4]
 
 results = {}
 
 balance = 60000
 
-y_prod = Product(
-	name=product.name,
-	block_size=product.block_size,
-	datastream=product.datastream
-)
-
 vol_target = VolTarget(
-	annual_vol_target=5e-1,
+	annual_vol_target=25e-2,
 	trading_capital=balance)
 size_policy = VolTargetInertiaPolicy(
 	risk_policy=vol_target,
@@ -44,17 +38,21 @@ size_policy = VolTargetInertiaPolicy(
 )
 
 trading_subsys = TradingSystem(
-	product=y_prod,
+	product=product,
 	trading_rules=strat,
 	forecast_weights=fw,
 	size_policy=size_policy
 )
 
-tsar = trading_subsys.run()
-for year in tqdm.tqdm(product.years()):
+tsar = None
+for year in tqdm.tqdm(product.years(), leave=True):
+	tsar = trading_subsys.run()
 	y_tsar = tsar.get_data_by_year(year)
-	results.update({f"Gold_{year}": y_tsar})
+	results.update({f"Gold_{year}_i": y_tsar})
+	balance += y_tsar.annual_delta()
+	trading_subsys.size_policy.risk_policy.trading_capital = balance
+	print(year, balance, y_tsar.max_drawdown())
 
 tsar_plotter = TsarPlotter({"pname": results})
 tsar_plotter.save_fig(export_folder="data/residual")
-print(tsar.annual_delta())
+print(balance)

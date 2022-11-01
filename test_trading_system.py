@@ -2,16 +2,12 @@ from melo_fwk.trading_systems import TradingSystem
 
 from melo_fwk.market_data import MarketDataLoader
 
-from melo_fwk.strategies import (
-	EWMAStrategy,
-	# SMAStrategy
-)
+from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.size_policies import VolTargetInertiaPolicy
 from melo_fwk.size_policies.vol_target import VolTarget
 
 from melo_fwk.plots import AccountPlotter, TsarPlotter
 
-import numpy as np
 import pandas as pd
 import tqdm
 import unittest
@@ -19,34 +15,24 @@ import unittest
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_trading_system_vect(self):
-		"""
-		2y 1h :
-			goog : 8 32
-			googl : 2 8
-			meta : 4 16    # mid trends
-			aapl : 16 64   # long trends
-
-		:return:
-		"""
+		sma_params = {
+			"fast_span": 16,
+			"slow_span": 64,
+			"scale": 16,
+		}
+		sma = EWMAStrategy(**sma_params)
 
 		products = MarketDataLoader.get_fx()
 		products += MarketDataLoader.get_commodities()
-		# products = random.sample(products, 20)
-		sum_ = 0.
-		results = {}
 
+		results = {}
+		balance = 0
+		start_capital = 10000 * len(products)
 		for product in tqdm.tqdm(products):
 			loaded_prod = MarketDataLoader.load_datastream(product)
-
-			sma_params = {
-				"fast_span": 16,
-				"slow_span": 64,
-				"scale": 16,
-			}
-			sma = EWMAStrategy(**sma_params)
 			vol_target = VolTarget(
-				annual_vol_target=0.5,
-				trading_capital=50000)
+				annual_vol_target=0.4,
+				trading_capital=10000)
 			size_policy = VolTargetInertiaPolicy(
 				risk_policy=vol_target,
 				block_size=loaded_prod.block_size)
@@ -60,23 +46,20 @@ class TradingSystemUnitTests(unittest.TestCase):
 			tsar = tr_sys.run()
 
 			results.update({product["name"]: tsar})
-			sum_ += tsar.annual_delta()
+			balance += tsar.annual_delta()
 
-		# results_list = self.plot_all(results)
-		#
-		# starting_balance = 50000 * len(results)
-		# forecasts = [tsar.forecast_series.mean() for tsar in results_list]
-		# print(f"starting balance : {starting_balance}")
-		# print(f"final balance : {sum_}")
-		# print(f"forecast means {np.mean(forecasts)}: {forecasts}")
-
-	def plot_all(self, results):
 		# plot whole balance
 		results_list = [r for r in results.values()]
 		account_df = pd.DataFrame({
 			"Date": results_list[0].dates,
 			"Balance": [0. for _ in results_list[0].dates]
 		})
+
+		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
+		print(f"starting capital : {start_capital}")
+		print(f"final balance : {balance}")
+		print(f"5% risk free : {risk_free}")
+
 		for tsar in results_list:
 			account_df["Balance"] += tsar.account_series
 		account_plt = AccountPlotter(account_df)

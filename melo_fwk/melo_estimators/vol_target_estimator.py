@@ -1,4 +1,5 @@
-
+import matplotlib.pyplot as plt
+import pandas as pd
 import tqdm
 
 from melo_fwk.loggers.global_logger import GlobalLogger
@@ -41,7 +42,7 @@ class VolTargetEstimator:
 		self.trading_capital = float(estimator_params[0])
 		self.step = float(estimator_params[1]) if len(estimator_params) >= 2 else 0.1
 		self.start = float(estimator_params[2]) if len(estimator_params) >= 3 else 0.1
-		self.end = float(estimator_params[3]) if len(estimator_params) >= 4 else 1.
+		self.end = float(estimator_params[3]) if len(estimator_params) >= 4 else 2.
 
 		self.logger.info("Initialized Estimator")
 
@@ -51,6 +52,14 @@ class VolTargetEstimator:
 		for i, (product_name, product_dataclass) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
 			out_dict[product_name] = self._trade_product(product_dataclass)
 		self.logger.info("Finished running estimator")
+
+		for key, result in out_dict.items():
+			key = key.replace(".", "_")
+			for year, df in result.items():
+				df.plot(x="vol_target", y="GAR")
+				plt.savefig(f"data/residual/{key}_{year}.png")
+				plt.close()
+
 		return out_dict
 
 	def _trade_product(self, product: Product):
@@ -61,6 +70,9 @@ class VolTargetEstimator:
 			trading_capital=self.trading_capital
 		)
 		results = dict()
+		for year in range(int(self.time_period[0]), int(self.time_period[1])):
+			results[year] = []
+
 		n_iter = int((self.end - self.start) / self.step)
 		for _ in tqdm.tqdm(range(n_iter), leave=False):
 			size_policy = self.size_policy_class_(risk_policy=vol_target)
@@ -74,10 +86,13 @@ class VolTargetEstimator:
 
 			for year in range(int(self.time_period[0]), int(self.time_period[1])):
 				yearly_tsar = tsar.get_data_by_year(year)
-				key = "{}_{}_{:.1f}".format(
-					product.name, year, vol_target.annual_vol_target
-				)
-				results.update({key: yearly_tsar})
+				results[year].append({
+					"vol_target": vol_target.annual_vol_target,
+					"GAR": yearly_tsar.gar(),  # get geometric returns
+				})
 			vol_target.annual_vol_target += self.step
+
+		for year in range(int(self.time_period[0]), int(self.time_period[1])):
+			results[year] = pd.DataFrame(results[year])
 
 		return results

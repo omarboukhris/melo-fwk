@@ -6,8 +6,7 @@ from melo_fwk.size_policies.vol_target import VolTarget
 class VolTargetSizePolicy(BaseSizePolicy):
 
 	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 1):
-		super(VolTargetSizePolicy, self).__init__(risk_policy)
-		self.block_size = block_size
+		super(VolTargetSizePolicy, self).__init__(risk_policy, block_size)
 
 	def price_vol(self, lookback: int = 36) -> pd.Series:
 		daily_return = self.datastream.get_daily_diff_series()

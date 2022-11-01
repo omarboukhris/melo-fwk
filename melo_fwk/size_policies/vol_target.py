@@ -4,7 +4,6 @@ from math import sqrt
 
 @dataclass
 class VolTarget:
-	yearly_trading_days = 256
 	annual_vol_target: float
 	trading_capital: float
 
@@ -12,7 +11,8 @@ class VolTarget:
 		return self.annual_vol_target * self.trading_capital
 
 	def daily_cash_vol_target(self):
-		return self.annual_cash_vol_target()/sqrt(VolTarget.yearly_trading_days)
+		# yearly_trading_days = 256 => sqrt = 16
+		return self.annual_cash_vol_target()/16.
 
 	def __str__(self):
 		return f"Annual vol target : {self.annual_vol_target}\n" +\

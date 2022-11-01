@@ -1,4 +1,4 @@
-
+import numpy as np
 import pandas as pd
 
 from melo_fwk.datastreams.base_datastream import BaseDataStream
@@ -16,8 +16,8 @@ class HLOCDataStream(BaseDataStream):
 	def get_data_by_year(self, y: int):
 		return HLOCDataStream(
 			dataframe=self.dataframe.loc[
-				self.dataframe["Year"] == y,
-			].reset_index(drop=True),
+				self.dataframe["Year"].isin([y, y-1])
+				].reset_index(drop=True),
 			date_label=self._date_label,
 		)
 

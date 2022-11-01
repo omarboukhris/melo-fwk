@@ -20,8 +20,8 @@ class SMAParamSpace:
 class SMAStrategy(BaseStrategy, SMAParamSpace):
 
 	def forecast_vect(self, data: pd.Series):
-		fast_sma = data.rolling(int(self.fast_span)).mean()
-		slow_sma = data.rolling(int(self.slow_span)).mean()
+		fast_sma = data.rolling(int(self.fast_span), min_periods=1).mean()
+		slow_sma = data.rolling(int(self.slow_span), min_periods=1).mean()
 
 		std = data.rolling(25).std()
 

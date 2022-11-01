@@ -5,9 +5,10 @@ from melo_fwk.size_policies.vol_target import VolTarget
 
 
 class BaseSizePolicy:
-	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.)):
+	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 100):
 		self.datastream = None
 		self.risk_policy = risk_policy
+		self.block_size = block_size
 
 	def update_datastream(self, datastream):
 		self.datastream = datastream

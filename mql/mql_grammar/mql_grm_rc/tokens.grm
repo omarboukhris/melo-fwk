@@ -16,7 +16,7 @@ voltarget.("volTarget")
 sizepolicy.("sizePolicy")
 select.("select")
 instrument.("single|sgl|index|idx")
-productType.("Commodities|Stock|Bonds|Forex")
+productType.("Commodities|Stock|Bonds|Fx")
 
 // operators
 ref.("\&")
