@@ -5,8 +5,8 @@ from melo_fwk.size_policies.vol_target import VolTarget
 
 class VolTargetInertiaPolicy(VolTargetSizePolicy):
 
-	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 1):
-		super(VolTargetInertiaPolicy, self).__init__(risk_policy, block_size)
+	def __init__(self, vol_target: VolTarget = VolTarget(0., 0.)):
+		super(VolTargetInertiaPolicy, self).__init__(vol_target)
 
 	def position_size_vect(self, forecast: pd.Series, lookback: int = 36) -> pd.Series:
 		def _inertia(pose: float) -> float:

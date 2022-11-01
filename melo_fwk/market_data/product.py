@@ -2,6 +2,9 @@
 from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
 from dataclasses import dataclass
 
+from melo_fwk.datastreams.utils import common
+
+
 @dataclass(frozen=True)
 class Product:
 	name: str
@@ -16,5 +19,18 @@ class Product:
 		return Product(
 			name=self.name,
 			block_size=self.block_size,
-			datastream=self.datastream.get_data_by_year(year)
+			datastream=self.datastream.get_year(year)
 		)
+
+	def get_date_series(self):
+		return self.datastream.get_date_series()
+
+	def get_close_series(self):
+		return self.datastream.get_close_series()
+
+	def get_dataframe(self):
+		return self.datastream.get_dataframe()
+
+	def get_daily_diff_series(self):
+		return self.datastream.get_daily_diff_series()
+

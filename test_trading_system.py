@@ -28,14 +28,14 @@ class TradingSystemUnitTests(unittest.TestCase):
 		results = {}
 		balance = 0
 		start_capital = 10000 * len(products)
+
+		"""Linear Vol target, no risk compounding"""
 		for product in tqdm.tqdm(products):
 			loaded_prod = MarketDataLoader.load_datastream(product)
 			vol_target = VolTarget(
 				annual_vol_target=0.4,
 				trading_capital=10000)
-			size_policy = VolTargetInertiaPolicy(
-				risk_policy=vol_target,
-				block_size=loaded_prod.block_size)
+			size_policy = VolTargetInertiaPolicy(vol_target=vol_target)
 
 			tr_sys = TradingSystem(
 				product=loaded_prod,

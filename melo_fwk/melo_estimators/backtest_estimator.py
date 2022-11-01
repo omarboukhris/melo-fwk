@@ -60,10 +60,7 @@ class BacktestEstimator:
 
 	def _trade_product(self, product: Product):
 
-		size_policy = self.size_policy_class_(
-			risk_policy=self.vol_target,
-			block_size=product.block_size
-		)
+		size_policy = self.size_policy_class_(vol_target=self.vol_target)
 
 		trading_subsys = TradingSystem(
 			product=product,
@@ -75,7 +72,7 @@ class BacktestEstimator:
 		tsar = trading_subsys.run()
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			yearly_tsar = tsar.get_data_by_year(year)
+			yearly_tsar = tsar.get_year(year)
 			results.update({f"{product.name}_{year}": yearly_tsar})
 
 		return results
@@ -83,7 +80,7 @@ class BacktestEstimator:
 	def _trade_product_compound(self, product: Product):
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			size_policy = self.size_policy_class_(risk_policy=self.vol_target)
+			size_policy = self.size_policy_class_(vol_target=self.vol_target)
 			trading_subsys = TradingSystem(
 				product=product.get_year(year),
 				trading_rules=self.strategies,
@@ -91,7 +88,7 @@ class BacktestEstimator:
 				size_policy=size_policy
 			)
 
-			tsar = trading_subsys.run().get_data_by_year(year)
+			tsar = trading_subsys.run().get_year(year)
 			results.update({f"{product.name}_{year}": tsar})
 			self.vol_target.trading_capital += tsar.annual_delta()
 

@@ -1,3 +1,5 @@
+import numpy as np
+
 from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import BaseStrategy
@@ -27,12 +29,10 @@ class BaseTradingSystem:
 			"(AssertionError) Number of TradingRules must match forcast weights"
 
 		self.time_index = 0
-		self.product_name = product.name
-		self.hloc_datastream = product.datastream
+		self.product = product
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights
-		self.size_policy = size_policy
-		self.block_size = product.block_size
+		self.size_policy = size_policy.setup_product(self.product)
 
 	@staticmethod
 	def default():
@@ -42,6 +42,14 @@ class BaseTradingSystem:
 			forecast_weights=[]
 		)
 
+	def forecast_cumsum(self):
+		f_series = pd.Series(np.zeros(shape=(len(self.product.get_dataframe()))))
+
+		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
+			f_series += forecast_weight * trading_rule.forecast_vect_cap(self.product.get_close_series())
+
+		return f_series
+
 	def build_tsar(
 		self,
 		forecast_series: pd.Series,
@@ -49,8 +57,8 @@ class BaseTradingSystem:
 		daily_pnl_series: pd.Series
 	):
 		return TsarDataStream(dataframe=pd.DataFrame({
-			"Date": self.hloc_datastream.get_date_series(),
-			"Price": self.hloc_datastream.get_close_series(),
+			"Date": self.product.get_date_series(),
+			"Price": self.product.get_close_series(),
 			"Forecast": forecast_series,
 			"Size": pose_series,
 			"Account": daily_pnl_series.expanding(1).sum(),

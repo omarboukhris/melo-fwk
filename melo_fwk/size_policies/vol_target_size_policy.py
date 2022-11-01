@@ -5,8 +5,8 @@ from melo_fwk.size_policies.vol_target import VolTarget
 
 class VolTargetSizePolicy(BaseSizePolicy):
 
-	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 1):
-		super(VolTargetSizePolicy, self).__init__(risk_policy, block_size)
+	def __init__(self, vol_target: VolTarget = VolTarget(0., 0.)):
+		super(VolTargetSizePolicy, self).__init__(vol_target)
 
 	def price_vol(self, lookback: int = 36) -> pd.Series:
 		daily_return = self.datastream.get_daily_diff_series()
@@ -25,8 +25,8 @@ class VolTargetSizePolicy(BaseSizePolicy):
 		return self.block_value(lookback) * self.price_vol(lookback)
 
 	def vol_scalar(self, lookback: int = 36) -> pd.Series:
-		# return self.instrument_vol(lookback) / self.risk_policy.daily_cash_vol_target()
-		return self.risk_policy.daily_cash_vol_target() / self.instrument_vol(lookback)
+		# return self.instrument_vol(lookback) / self.vol_target.daily_cash_vol_target()
+		return self.vol_target.daily_cash_vol_target() / self.instrument_vol(lookback)
 
 	def position_size(self, forecast: float, lookback: int = 36) -> float:
 		return self.vol_scalar(lookback).iat[-1] * forecast / 10.

@@ -24,7 +24,7 @@ class TsarDataStream(BaseDataStream):
 		)
 		return tsar
 
-	def get_data_by_year(self, y: int):
+	def get_year(self, y: int):
 		# offset account with start capital
 		# useful when running whole history with the same vol target
 		tsar = TsarDataStream(

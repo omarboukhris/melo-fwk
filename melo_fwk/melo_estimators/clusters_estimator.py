@@ -92,7 +92,7 @@ class ClustersEstimator:
 		vol_target = VolTarget(
 			annual_vol_target=self.vol_target.annual_vol_target,
 			trading_capital=self.vol_target.trading_capital)
-		size_policy = self.size_policy_class_(risk_policy=vol_target)
+		size_policy = self.size_policy_class_(vol_target=vol_target)
 
 		trading_subsys = TradingSystem(
 			product=product,
@@ -104,7 +104,7 @@ class ClustersEstimator:
 		tsar = trading_subsys.run()
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			y_return = tsar.get_data_by_year(year).account_series
+			y_return = tsar.get_year(year).account_series
 			if year in results.keys():
 				results[year].update({product.name: y_return})
 			else:
@@ -116,19 +116,19 @@ class ClustersEstimator:
 		vol_target = VolTarget(
 			annual_vol_target=self.vol_target.annual_vol_target,
 			trading_capital=self.vol_target.trading_capital)
-		size_policy = self.size_policy_class_(risk_policy=vol_target)
+		size_policy = self.size_policy_class_(vol_target=vol_target)
 
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
 			trading_subsys = TradingSystem(
-				product=product.datastream.get_data_by_year(year),
+				product=product.datastream.get_year(year),
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
 				size_policy=size_policy
 			)
 
 			tsar = trading_subsys.run()
-			y_return = tsar.get_data_by_year(year).account_series
+			y_return = tsar.get_year(year).account_series
 			if year in results.keys():
 				results[year].update({product.name: y_return})
 			else:

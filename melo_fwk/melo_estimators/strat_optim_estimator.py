@@ -31,7 +31,7 @@ class StratOptimEstimator:
 		self.current_year = -1
 		self.time_period = time_period
 		self.strategies = strategies
-		StrategyEstimator.size_policy = size_policy_class_(risk_policy=vol_target)
+		StrategyEstimator.size_policy = size_policy_class_(vol_target=vol_target)
 		StrategyEstimator.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
 
 		self.logger.info("Initialized Estimator")

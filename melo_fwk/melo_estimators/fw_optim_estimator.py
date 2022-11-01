@@ -92,7 +92,7 @@ class ForecastWeightsEstimator:
 		return results
 
 	def get_expected_results(self, product: Product, year: int):
-		size_policy = self.size_policy_class_(risk_policy=self.vol_target)
+		size_policy = self.size_policy_class_(vol_target=self.vol_target)
 		result = []
 		returns = {}
 

@@ -1,20 +1,23 @@
 import numpy as np
 import pandas as pd
 
+from melo_fwk.market_data.product import Product
 from melo_fwk.size_policies.vol_target import VolTarget
 
 
 class BaseSizePolicy:
-	def __init__(self, risk_policy: VolTarget = VolTarget(0., 0.), block_size: int = 100):
+	def __init__(self, vol_target: VolTarget = VolTarget(0., 0.)):
+		self.block_size = 1.
 		self.datastream = None
-		self.risk_policy = risk_policy
-		self.block_size = block_size
+		self.vol_target = vol_target
 
-	def update_datastream(self, datastream):
-		self.datastream = datastream
+	def setup_product(self, product: Product):
+		self.datastream = product.datastream
+		self.block_size = product.block_size
+		return self
 
 	def update_risk_policy(self, risk_policy: VolTarget):
-		self.risk_policy = risk_policy
+		self.vol_target = risk_policy
 
 	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
 		return pd.Series(np.ones(shape=(len(forecast),)))

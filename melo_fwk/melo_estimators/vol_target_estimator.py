@@ -75,7 +75,7 @@ class VolTargetEstimator:
 
 		n_iter = int((self.end - self.start) / self.step)
 		for _ in tqdm.tqdm(range(n_iter), leave=False):
-			size_policy = self.size_policy_class_(risk_policy=vol_target)
+			size_policy = self.size_policy_class_(vol_target=vol_target)
 			ts = TradingSystem(
 				product=product,
 				trading_rules=self.strategies,
@@ -85,7 +85,7 @@ class VolTargetEstimator:
 			tsar = ts.run()
 
 			for year in range(int(self.time_period[0]), int(self.time_period[1])):
-				yearly_tsar = tsar.get_data_by_year(year)
+				yearly_tsar = tsar.get_year(year)
 				results[year].append({
 					"vol_target": vol_target.annual_vol_target,
 					"GAR": yearly_tsar.gar(),  # get geometric returns

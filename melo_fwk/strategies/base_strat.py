@@ -32,7 +32,7 @@ class BaseStrategy:
 			for year in product.datastream.years:
 
 				self.scale = 1.
-				price_series = product.datastream.get_data_by_year(year).get_close_series()
+				price_series = product.datastream.get_year(year).get_close_series()
 				forecast_series = self.forecast_vect(price_series)
 				results.update({f"{product.name}.{year}": forecast_series})
 

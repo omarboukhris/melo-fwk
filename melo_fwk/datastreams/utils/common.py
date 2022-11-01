@@ -23,7 +23,7 @@ def parse_year_from_date(dataframe: pd.DataFrame, date_label: str = "Date"):
 			parse_date.years.append(y)
 			return y
 		except Exception as e:
-			print(f"HLOCDataStream can't parse date [{date}]")
+			print(f"Cannot parse date [{date}]")
 			raise e
 	parse_date.years = []
 

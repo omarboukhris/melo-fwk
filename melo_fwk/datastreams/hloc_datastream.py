@@ -13,7 +13,7 @@ class HLOCDataStream(BaseDataStream):
 		super(HLOCDataStream, self).__init__(**kwargs)
 		self.dataframe = common.get_daily_diff_from_value(self.dataframe)
 
-	def get_data_by_year(self, y: int):
+	def get_year(self, y: int):
 		return HLOCDataStream(
 			dataframe=self.dataframe.loc[
 				self.dataframe["Year"].isin([y, y-1])
