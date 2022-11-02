@@ -72,10 +72,11 @@ class TsarDataStream(BaseDataStream):
 		sharpe_r = mean / sigma if sigma != 0 else mean
 		return sharpe_r
 
-	def gar(self):
-		diff = self.account_series.diff().fillna(0)
-		a = np.log(1 + diff)
-		return a.mean()
+	def gar(self, starting_capital: float):
+		avg_daily_diff = self.account_series.diff().fillna(0).ewm(span=25).mean()
+		diff = avg_daily_diff / starting_capital
+		a = (1 + diff).prod() ** 0.5 - 1.
+		return a
 
 	def sortino_ratio(self, rf: float = 0.0):
 		mean = self.account_series.mean() - rf

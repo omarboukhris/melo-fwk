@@ -9,7 +9,7 @@ class StringStreamLogger(BaseLogger):
 		self.ss = ""
 
 	def info(self, log_message: str):
-		self.ss += f"INFO  [{datetime.now()}] ({self.component}): {log_message}"
+		self.ss += f"[{datetime.now()}] INFO ({self.component}): {log_message}"
 
 	def warn(self, log_message: str):
 		self.ss += f"WARN  [{datetime.now()}] ({self.component}): {log_message}"

@@ -6,18 +6,25 @@ from melo_fwk.size_policies.vol_target import VolTarget
 
 
 class BaseSizePolicy:
-	def __init__(self, vol_target: VolTarget = VolTarget(0., 0.)):
+	def __init__(
+		self,
+		annual_vol_target: float,
+		trading_capital: float
+	):
 		self.block_size = 1.
 		self.datastream = None
-		self.vol_target = vol_target
+		self.vol_target = VolTarget(annual_vol_target, trading_capital)
+
+	def update_trading_capital(self, trading_capital: float):
+		self.vol_target.trading_capital += trading_capital
+
+	def update_annual_vol_target(self, annual_vol_target: float):
+		self.vol_target.annual_vol_target += annual_vol_target
 
 	def setup_product(self, product: Product):
 		self.datastream = product.datastream
 		self.block_size = product.block_size
 		return self
-
-	def update_risk_policy(self, risk_policy: VolTarget):
-		self.vol_target = risk_policy
 
 	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
 		return pd.Series(np.ones(shape=(len(forecast),)))

@@ -5,8 +5,6 @@ from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.market_data.product import Product
 from melo_fwk.strategies import BaseStrategy
 from melo_fwk.size_policies import BaseSizePolicy
-from melo_fwk.size_policies.vol_target import VolTarget
-
 
 from typing import List
 
@@ -21,8 +19,7 @@ class BacktestEstimator:
 		time_period: List[int],
 		strategies: List[BaseStrategy] = None,
 		forecast_weights: List[int] = None,
-		vol_target: VolTarget = VolTarget(0., 0.),
-		size_policy_class_: callable = BaseSizePolicy,
+		size_policy: BaseSizePolicy = None,
 		estimator_params: List[str] = None
 	):
 		self.logger = GlobalLogger.build_composite_for("BacktestEstimator")
@@ -36,8 +33,7 @@ class BacktestEstimator:
 		self.time_period = time_period
 		self.strategies = strategies
 		self.forecast_weights = forecast_weights
-		self.vol_target = vol_target
-		self.size_policy_class_ = size_policy_class_
+		self.size_policy = size_policy
 		self.compound = "compound" in estimator_params
 
 		self.logger.info("BacktestEstimator Initialized")
@@ -60,13 +56,11 @@ class BacktestEstimator:
 
 	def _trade_product(self, product: Product):
 
-		size_policy = self.size_policy_class_(vol_target=self.vol_target)
-
 		trading_subsys = TradingSystem(
 			product=product,
 			trading_rules=self.strategies,
 			forecast_weights=self.forecast_weights,
-			size_policy=size_policy
+			size_policy=self.size_policy
 		)
 
 		tsar = trading_subsys.run()
@@ -80,16 +74,15 @@ class BacktestEstimator:
 	def _trade_product_compound(self, product: Product):
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			size_policy = self.size_policy_class_(vol_target=self.vol_target)
 			trading_subsys = TradingSystem(
 				product=product.get_year(year),
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
-				size_policy=size_policy
+				size_policy=self.size_policy
 			)
 
-			tsar = trading_subsys.run().get_year(year)
+			tsar = trading_subsys.run_year(year)
 			results.update({f"{product.name}_{year}": tsar})
-			self.vol_target.trading_capital += tsar.annual_delta()
+			self.size_policy.update_trading_capital(tsar.annual_delta())
 
 		return results

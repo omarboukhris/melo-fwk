@@ -21,8 +21,7 @@ class ClustersEstimator:
 		time_period: List[int],
 		strategies: List[BaseStrategy] = None,
 		forecast_weights: List[int] = None,
-		vol_target: VolTarget = VolTarget(0., 0.),
-		size_policy_class_: callable = BaseSizePolicy,
+		size_policy: BaseSizePolicy = None,
 		estimator_params: List[str] = None
 	):
 		self.logger = GlobalLogger.build_composite_for("ClustersEstimator")
@@ -36,8 +35,7 @@ class ClustersEstimator:
 		self.time_period = time_period
 		self.strategies = strategies
 		self.forecast_weights = forecast_weights
-		self.vol_target = vol_target
-		self.size_policy_class_ = size_policy_class_
+		self.size_policy = size_policy
 		self.global_corr = "glob" in estimator_params
 
 		self.logger.info("Estimator Initialized")
@@ -89,16 +87,11 @@ class ClustersEstimator:
 
 	def _trade_product(self, product: Product):
 
-		vol_target = VolTarget(
-			annual_vol_target=self.vol_target.annual_vol_target,
-			trading_capital=self.vol_target.trading_capital)
-		size_policy = self.size_policy_class_(vol_target=vol_target)
-
 		trading_subsys = TradingSystem(
 			product=product,
 			trading_rules=self.strategies,
 			forecast_weights=self.forecast_weights,
-			size_policy=size_policy
+			size_policy=self.size_policy
 		)
 
 		tsar = trading_subsys.run()
@@ -113,18 +106,13 @@ class ClustersEstimator:
 		return results
 
 	def _trade_product_global(self, product: Product):
-		vol_target = VolTarget(
-			annual_vol_target=self.vol_target.annual_vol_target,
-			trading_capital=self.vol_target.trading_capital)
-		size_policy = self.size_policy_class_(vol_target=vol_target)
-
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
 			trading_subsys = TradingSystem(
 				product=product.datastream.get_year(year),
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
-				size_policy=size_policy
+				size_policy=self.size_policy
 			)
 
 			tsar = trading_subsys.run()

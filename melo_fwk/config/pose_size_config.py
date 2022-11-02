@@ -1,32 +1,35 @@
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.size_policies.vol_target import VolTarget
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.loggers.global_logger import GlobalLogger
 
-class VolTargetConfigBuilder:
+
+class SizePolicyConfigBuilder:
 	@staticmethod
-	def build_vol_target(quant_query_dict: dict):
+	def get_vol_target_params(quant_query_dict: dict):
 		logger = GlobalLogger.build_composite_for("VolTargetConfigBuilder")
-		if not ConfigBuilderHelper.is_key_present(quant_query_dict, "PositionSizing"):
+		if "PositionSizing" not in quant_query_dict.keys():
 			logger.warn("No VolTarget parsed; Using default (0, 0).")
-			return VolTarget(annual_vol_target=0., trading_capital=0.)
+			# annual_vol_target, trading_capital
+			return 0., 0.
 
 		position_size_dict = ConfigBuilderHelper.strip_single(quant_query_dict, "PositionSizing")
 		if "VolTargetCouple" in position_size_dict.keys():
 			vol_target_cfg = ConfigBuilderHelper.parse_num_list(position_size_dict, "VolTargetCouple")
 			logger.info(f"Parsed VolTarget from Query {vol_target_cfg}")
-			return VolTarget(*vol_target_cfg)
-		logger.warn("No VolTarget parsed; Couldn't parse VolTarget couple")
-		return None
+			return vol_target_cfg
+		logger.warn("No VolTarget parsed; Using default (0, 0).")
+		# annual_vol_target, trading_capital
+		return 0., 0.
 
-class SizePolicyConfigBuilder:
 	@staticmethod
 	def build_size_policy(quant_query_dict: dict):
+		vol_target_params = SizePolicyConfigBuilder.get_vol_target_params(quant_query_dict)
+
 		logger = GlobalLogger.build_composite_for("SizePolicyConfigBuilder")
-		if not ConfigBuilderHelper.is_key_present(quant_query_dict, "PositionSizing"):
+		if "PositionSizing" not in quant_query_dict.keys():
 			logger.warn("No PositionSizing Parsed; Using default BuyAndHold")
-			return QuantFlowFactory.get_size_policy("default")
+			return QuantFlowFactory.get_size_policy("default")(*vol_target_params)
 
 		position_size_dict = ConfigBuilderHelper.strip_single(quant_query_dict, "PositionSizing")
 
@@ -34,4 +37,5 @@ class SizePolicyConfigBuilder:
 		assert size_policy_factory_name in QuantFlowFactory.size_policies.keys(), logger.error(
 			f"{size_policy_factory_name} key is not in [{QuantFlowFactory.size_policies.keys()}]")
 		logger.info(f"PositionSizing Parsed; using {size_policy_factory_name}")
-		return QuantFlowFactory.get_size_policy(size_policy_factory_name)
+		return QuantFlowFactory.get_size_policy(size_policy_factory_name)(*vol_target_params)
+

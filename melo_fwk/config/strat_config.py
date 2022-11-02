@@ -52,7 +52,7 @@ class StrategyConfigBuilder:
 	@staticmethod
 	def build_strategy(quant_query_dict: dict, strat_config_registry: StratConfigRegistry):
 		logger = GlobalLogger.build_composite_for("StratConfigBuilder")
-		if not ConfigBuilderHelper.is_key_present(quant_query_dict, "StrategiesDef"):
+		if "StrategiesDef" not in quant_query_dict.keys():
 			logger.warn("No Strategies Parsed; Using default NONE")
 			return [], []
 
@@ -78,7 +78,7 @@ class StrategyConfigBuilder:
 					)
 				)
 
-		if not ConfigBuilderHelper.is_key_present(stripped_entry, "forecastWeightsList"):
+		if "forecastWeightsList" not in stripped_entry.keys():
 			logger.warn("No ForecastWeights Parsed; Using default 1/n")
 			return strategies, [1/len(strategies) for _ in strategies]
 

@@ -25,8 +25,7 @@ class StratOptimReporter:
 		self.begin, self.end = input_config.products_config[1]
 
 		# size policy:
-		self.vol_target = input_config.vol_target
-		self.size_policy_class_ = input_config.size_policy_class_
+		self.size_policy = input_config.size_policy
 
 		# strategies:
 		self.strat_list = [str(x) for x in input_config.strategies_config[0]]
@@ -40,8 +39,7 @@ class StratOptimReporter:
 		ss += MdFormatter.item_list(self.products_name_list)
 
 		ss += MdFormatter.h2("VolTarget:")
-		ss += MdFormatter.italic(str(self.size_policy_class_)) + "\n"
-		ss += MdFormatter.item_list(str(self.vol_target).split("\n")[:-1])
+		ss += MdFormatter.italic(str(self.size_policy))
 
 		ss += MdFormatter.h2("Strategies:")
 		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])

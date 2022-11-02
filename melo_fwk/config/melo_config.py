@@ -1,9 +1,10 @@
 from melo_fwk.config import ConfigBuilderHelper
 from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
-from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder, VolTargetConfigBuilder
+from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
 from melo_fwk.reporters.utils.md_formatter import MdFormatter
+from melo_fwk.size_policies import BaseSizePolicy
 
 from melo_fwk.size_policies.vol_target import VolTarget
 
@@ -17,8 +18,7 @@ import os
 class MeloConfig:
 	name: str
 	products_config: tuple  # (product[], start..end)
-	size_policy_class_: callable  # BaseSizePolicy
-	vol_target: VolTarget
+	size_policy: BaseSizePolicy
 	strat_config_registry: StratConfigRegistry
 	strategies_config: tuple  # (strategy[], fw[])
 	estimator_config_: tuple  # (estimator, estimator_param[])
@@ -37,8 +37,7 @@ class MeloConfig:
 		return MeloConfig(
 			name=ConfigBuilderHelper.strip_single(quant_query, "QueryName"),
 			products_config=ProductConfigBuilder.build_products(quant_query),
-			size_policy_class_=SizePolicyConfigBuilder.build_size_policy(quant_query),
-			vol_target=VolTargetConfigBuilder.build_vol_target(quant_query),
+			size_policy=SizePolicyConfigBuilder.build_size_policy(quant_query),
 			strat_config_registry=strat_config_registry,
 			strategies_config=StrategyConfigBuilder.build_strategy(quant_query, strat_config_registry),
 			estimator_config_=EstimatorConfigBuilder.build_estimator(quant_query),
@@ -51,8 +50,7 @@ class MeloConfig:
 			time_period=self.products_config[1],
 			strategies=self.strategies_config[0],
 			forecast_weights=self.strategies_config[1],
-			vol_target=self.vol_target,
-			size_policy_class_=self.size_policy_class_,
+			size_policy=self.size_policy,
 			estimator_params=self.estimator_config_[1]
 		)
 
@@ -76,8 +74,7 @@ class MeloConfig:
 	def asdict(self):
 		return {
 			"products_config": self.products_config,
-			"size_policy_class_": self.size_policy_class_,
-			"vol_target": self.vol_target,
+			"size_policy": self.size_policy,
 			"strat_config_registry": self.strat_config_registry,
 			"strategies_config": self.strategies_config,
 			"estimator_config_": self.estimator_config_,

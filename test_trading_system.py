@@ -4,7 +4,6 @@ from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.size_policies import VolTargetInertiaPolicy
-from melo_fwk.size_policies.vol_target import VolTarget
 
 from melo_fwk.plots import AccountPlotter, TsarPlotter
 
@@ -32,10 +31,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 		"""Linear Vol target, no risk compounding"""
 		for product in tqdm.tqdm(products):
 			loaded_prod = MarketDataLoader.load_datastream(product)
-			vol_target = VolTarget(
+			size_policy = VolTargetInertiaPolicy(
 				annual_vol_target=0.4,
 				trading_capital=10000)
-			size_policy = VolTargetInertiaPolicy(vol_target=vol_target)
 
 			tr_sys = TradingSystem(
 				product=loaded_prod,

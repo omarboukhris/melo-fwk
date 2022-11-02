@@ -2,7 +2,6 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.melo_estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
 from melo_fwk.size_policies import BaseSizePolicy
-from melo_fwk.size_policies.vol_target import VolTarget
 
 from sklearn.model_selection import GridSearchCV
 
@@ -18,8 +17,7 @@ class StratOptimEstimator:
 		time_period: List[int],
 		strategies: List[tuple] = None,
 		forecast_weights: List[int] = None,
-		vol_target: VolTarget = VolTarget(0., 0.),
-		size_policy_class_: callable = BaseSizePolicy,
+		size_policy: BaseSizePolicy = None,
 		estimator_params: List[str] = None
 	):
 		self.logger = GlobalLogger.build_composite_for("StratOptimEstimator")
@@ -31,7 +29,7 @@ class StratOptimEstimator:
 		self.current_year = -1
 		self.time_period = time_period
 		self.strategies = strategies
-		StrategyEstimator.size_policy = size_policy_class_(vol_target=vol_target)
+		StrategyEstimator.size_policy = size_policy
 		StrategyEstimator.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
 
 		self.logger.info("Initialized Estimator")

@@ -21,7 +21,7 @@ class BaseTradingSystem:
 		product: Product,
 		trading_rules: List[BaseStrategy],
 		forecast_weights: List[float],
-		size_policy: BaseSizePolicy = BaseSizePolicy(),
+		size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
 	):
 
 		assert product is not None, "(AssertionError) Data source is None"

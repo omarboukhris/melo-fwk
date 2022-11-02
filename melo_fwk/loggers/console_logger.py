@@ -9,15 +9,15 @@ class ConsoleLogger(BaseLogger):
 
 	def info(self, log_message: str):
 		print(
-			f"INFO  [{datetime.now()}] ({self.component}): {log_message}"
+			f"[{datetime.now()}] INFO ({self.component}): {log_message}"
 		)
 
 	def warn(self, log_message: str):
 		print(
-			f"WARN  [{datetime.now()}] ({self.component}): {log_message}"
+			f"[{datetime.now()}] WARN ({self.component}): {log_message}"
 		)
 
 	def error(self, log_message: str):
 		print(
-			f"ERROR [{datetime.now()}] ({self.component}): {log_message}"
+			f"[{datetime.now()}] ERROR({self.component}): {log_message}"
 		)

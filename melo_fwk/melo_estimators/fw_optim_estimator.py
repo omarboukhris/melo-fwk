@@ -34,8 +34,7 @@ class ForecastWeightsEstimator:
 		time_period: List[int],
 		strategies: List[BaseStrategy] = None,
 		forecast_weights: List[int] = None,
-		vol_target: VolTarget = VolTarget(0., 0.),
-		size_policy_class_: callable = BaseSizePolicy,
+		size_policy: BaseSizePolicy = None,
 		estimator_params: List[str] = None
 	):
 		self.logger = GlobalLogger.build_composite_for("ForecastWeightsEstimator")
@@ -52,8 +51,7 @@ class ForecastWeightsEstimator:
 		self.time_period = time_period
 		self.strategies = strategies
 		self.forecast_weights = np.array(forecast_weights)
-		self.vol_target = vol_target
-		self.size_policy_class_ = size_policy_class_
+		self.size_policy = size_policy
 		self.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
 
 		self.logger.info("Initialized Estimator")
@@ -92,7 +90,6 @@ class ForecastWeightsEstimator:
 		return results
 
 	def get_expected_results(self, product: Product, year: int):
-		size_policy = self.size_policy_class_(vol_target=self.vol_target)
 		result = []
 		returns = {}
 
@@ -102,7 +99,7 @@ class ForecastWeightsEstimator:
 				product=y_prod,
 				trading_rules=[strategy],
 				forecast_weights=[1.],
-				size_policy=size_policy,
+				size_policy=self.size_policy,
 			)
 
 			tsar = trading_subsys.run()

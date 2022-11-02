@@ -18,7 +18,7 @@ class EstimatorConfigBuilder:
 	@staticmethod
 	def get_estimator_params(quant_query_dict: dict):
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProcessDef")
-		if ConfigBuilderHelper.is_key_present(stripped_entry, "EstimatorParamList"):
+		if "EstimatorParamList" in stripped_entry.keys():
 			estimator_param_list = ConfigBuilderHelper.strip_single(stripped_entry, "EstimatorParamList").split(",")
 			estimator_param_list = [estimator_param.strip() for estimator_param in estimator_param_list]
 			GlobalLogger.build_composite_for("EstimatorParamCongif").warn(f"Parsed Estimator Params ({estimator_param_list})")

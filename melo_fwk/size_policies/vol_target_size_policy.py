@@ -1,12 +1,17 @@
 import pandas as pd
 
 from melo_fwk.size_policies import BaseSizePolicy
-from melo_fwk.size_policies.vol_target import VolTarget
 
 class VolTargetSizePolicy(BaseSizePolicy):
 
-	def __init__(self, vol_target: VolTarget = VolTarget(0., 0.)):
-		super(VolTargetSizePolicy, self).__init__(vol_target)
+	def __init__(
+		self,
+		annual_vol_target: float,
+		trading_capital: float
+	):
+		super(VolTargetSizePolicy, self).__init__(
+			annual_vol_target, trading_capital
+		)
 
 	def price_vol(self, lookback: int = 36) -> pd.Series:
 		daily_return = self.datastream.get_daily_diff_series()

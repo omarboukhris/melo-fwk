@@ -2,9 +2,6 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 class ConfigBuilderHelper:
-	@staticmethod
-	def is_key_present(parsed_dict: dict, key: str):
-		return key in parsed_dict.keys()
 
 	@staticmethod
 	def strip(parsed_dict: dict, key: str):

@@ -4,7 +4,6 @@ from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.size_policies import VolTargetInertiaPolicy
-from melo_fwk.size_policies.vol_target import VolTarget
 
 from melo_fwk.plots import TsarPlotter
 
@@ -29,10 +28,9 @@ results = {}
 
 balance = 60000
 
-vol_target = VolTarget(
+size_policy = VolTargetInertiaPolicy(
 	annual_vol_target=0.25,
 	trading_capital=balance)
-size_policy = VolTargetInertiaPolicy(vol_target)
 
 trading_subsys = TradingSystem(
 	product=product,
@@ -44,7 +42,7 @@ for year in product.years():
 	tsar = trading_subsys.run_year(year)
 	results.update({f"Gold_{year}_it": tsar})
 	balance += tsar.annual_delta()
-	trading_subsys.size_policy.vol_target.trading_capital = balance
+	trading_subsys.size_policy.update_trading_capital(tsar.annual_delta())
 	print(year, balance, tsar.max_drawdown())
 
 tsar_plotter = TsarPlotter({"pname": results})

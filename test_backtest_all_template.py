@@ -28,10 +28,9 @@ results = {}
 
 balance = 60000
 
-vol_target = VolTarget(
+size_policy = VolTargetInertiaPolicy(
 	annual_vol_target=25e-2,
 	trading_capital=balance)
-size_policy = VolTargetInertiaPolicy(vol_target)
 
 trading_subsys = TradingSystem(
 	product=product,
@@ -58,10 +57,9 @@ print(balance)
 results = {}
 balance = 60000
 
-vol_target = VolTarget(
+size_policy = VolTargetInertiaPolicy(
 	annual_vol_target=25e-2,
 	trading_capital=balance)
-size_policy = VolTargetInertiaPolicy(vol_target)
 
 trading_subsys = TradingSystem(
 	product=product,
