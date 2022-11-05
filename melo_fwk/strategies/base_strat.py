@@ -28,7 +28,7 @@ class BaseStrategy:
 
 		results = {}
 
-		for product in tqdm.tqdm(sample_products):
+		for product in sample_products:
 			for year in product.datastream.years:
 
 				self.scale = 1.
@@ -45,8 +45,8 @@ class BaseStrategy:
 		scale_f = 10 / mean_ps.mean()
 
 		self.scale = scale_f
-		scaled_ps = (scale_f * mean_ps)
-		print(mean_ps.mean(), scale_f, scaled_ps.mean())
+		# scaled_ps = (scale_f * mean_ps)
+		# print(mean_ps.mean(), scale_f, scaled_ps.mean())
 
 		# Make plotter, link to appropriate reporter : OptimStrat report
 		# plt.hist(mean, bins=100)

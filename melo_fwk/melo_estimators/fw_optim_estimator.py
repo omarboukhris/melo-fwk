@@ -1,6 +1,3 @@
-import pandas as pd
-import tqdm
-import numpy as np
 
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.product import Product
@@ -9,8 +6,13 @@ from melo_fwk.strategies import BaseStrategy
 from melo_fwk.trading_systems import TradingSystem
 
 from scipy.optimize import minimize, Bounds
-
 from typing import List
+import pandas as pd
+import numpy as np
+import tqdm
+
+import warnings
+warnings.filterwarnings('ignore', message='The objective has been evaluated at this point before.')
 
 class ForecastWeightsEstimator:
 	ForecastDivMultiplier: float = 2.
@@ -93,15 +95,14 @@ class ForecastWeightsEstimator:
 		returns = {}
 
 		for strategy in self.strategies:
-			y_prod = product.get_year(year)
 			trading_subsys = TradingSystem(
-				product=y_prod,
+				product=product,
 				trading_rules=[strategy],
 				forecast_weights=[1.],
 				size_policy=self.size_policy,
 			)
 
-			tsar = trading_subsys.run()
+			tsar = trading_subsys.run_year(year)
 			key = f"{product.name}.{str(strategy)}"
 			returns.update({key: tsar.account_series})
 			result.append(tsar.get_metric_by_name(self.metric))

@@ -47,4 +47,12 @@ class StratOptimReporter:
 		return ss
 
 	def process_results(self, export_dir: str, raw_results: dict):
+		# # plot objective is weird
+		# _ = plot_objective(
+		# 	opt.optimizer_results_[0],
+		# 	dimensions=[k for k in strat_search_space_.keys()],
+		# )
+		# # plt.colorbar()
+		# plt.show()
+
 		return ""

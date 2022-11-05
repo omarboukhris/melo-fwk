@@ -27,4 +27,4 @@ class BaseSizePolicy:
 		return self
 
 	def position_size_vect(self, forecast: pd.Series) -> pd.Series:
-		return pd.Series(np.ones(shape=(len(forecast),)))
+		return pd.Series(np.sign(forecast))

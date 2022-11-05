@@ -1,9 +1,14 @@
+import numpy as np
+from matplotlib import pyplot as plt
+from skopt.plots import plot_objective
+
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.melo_estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
 from melo_fwk.policies.size import BaseSizePolicy
 
-from sklearn.model_selection import GridSearchCV
+from skopt import BayesSearchCV
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 
 import tqdm
 
@@ -30,7 +35,7 @@ class StratOptimEstimator:
 		self.time_period = time_period
 		self.strategies = strategies
 		StrategyEstimator.size_policy = size_policy
-		StrategyEstimator.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
+		StrategyEstimator.metric = estimator_params[0] if len(estimator_params) > 0 else "pnl"
 
 		self.logger.info("Initialized Estimator")
 
@@ -44,6 +49,7 @@ class StratOptimEstimator:
 
 	def _optimize_product_strat(self, product: Product):
 		results = dict()
+		StrategyEstimator.product = product
 
 		for strat_metadata in self.strategies:
 			"""
@@ -55,19 +61,18 @@ class StratOptimEstimator:
 
 			self.logger.info(f"Optimizing Strategy {StrategyEstimator.strat_class_}")
 
-			# 1337
-			# optimize by year without loop
-			# (y-n..y-1 | y) for cv
-			# rework skestimator in utils
-			for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1])), leave=False):
-				opt = GridSearchCV(
-					StrategyEstimator(),
-					strat_search_space_,
-					cv=[(slice(None), slice(None))]
-				)
-				StrategyEstimator.product = product.get_year(year)
-				opt.fit(X=StrategyEstimator.product.datastream.get_dataframe())
-				results.update({f"{product.name}_{year}": opt})
+			X = np.array([int(year) for year in range(int(self.time_period[0]), int(self.time_period[1]))])
+			# set max_train_size for out of sample or expanding cv
+			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1)
 
-		# then return
+			opt = BayesSearchCV(
+				StrategyEstimator(),
+				strat_search_space_,
+				n_iter=128,
+				n_points=12,
+				cv=tscv,
+			)
+			opt.fit(X=X)
+			results.update({f"{product.name}": opt})
+
 		return results

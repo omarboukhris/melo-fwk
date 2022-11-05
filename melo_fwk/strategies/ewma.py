@@ -15,7 +15,7 @@ class EWMAParamSpace:
 
 	search_space = {
 		"fast_span": [i for i in range(4, 60)],
-		"slow_span": [i for i in range(8, 100)],
+		"slow_span": [i for i in range(30, 100)],
 	}
 
 @dataclass
