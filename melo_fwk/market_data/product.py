@@ -14,12 +14,12 @@ class Product:
 	def years(self):
 		return self.datastream.years
 
-	def get_year(self, year: int):
+	def get_year(self, year: int, stitch=True):
 		assert year in self.years(), f"(AssertionError) Product {self.name} : {year} not in {self.years()}"
 		return Product(
 			name=self.name,
 			block_size=self.block_size,
-			datastream=self.datastream.get_year(year)
+			datastream=self.datastream.get_year(year, stitch)
 		)
 
 	def get_date_series(self):

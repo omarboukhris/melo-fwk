@@ -1,7 +1,7 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.melo_estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
-from melo_fwk.size_policies import BaseSizePolicy
+from melo_fwk.policies.size import BaseSizePolicy
 
 from sklearn.model_selection import GridSearchCV
 
@@ -54,7 +54,11 @@ class StratOptimEstimator:
 			StrategyEstimator.strat_class_, strat_search_space_ = strat_metadata
 
 			self.logger.info(f"Optimizing Strategy {StrategyEstimator.strat_class_}")
-			# optimize by year
+
+			# 1337
+			# optimize by year without loop
+			# (y-n..y-1 | y) for cv
+			# rework skestimator in utils
 			for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1])), leave=False):
 				opt = GridSearchCV(
 					StrategyEstimator(),
@@ -65,6 +69,5 @@ class StratOptimEstimator:
 				opt.fit(X=StrategyEstimator.product.datastream.get_dataframe())
 				results.update({f"{product.name}_{year}": opt})
 
-		# aggregate results and cross validate out of sample
 		# then return
 		return results

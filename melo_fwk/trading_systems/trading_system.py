@@ -26,11 +26,12 @@ class TradingSystem(BaseTradingSystem):
 
 		return self.build_tsar(forecast_series, pose_series, daily_pnl)
 
-	def run_year(self, year: int):
+	def run_year(self, year: int, stitch=True):
 		product = self.product
-		self.product = self.product.get_year(year)
+		self.product = self.product.get_year(year, stitch)
 		self.size_policy.setup_product(self.product)
 		try:
+			# use get year in case of stitching
 			return self.run().get_year(year)
 		finally:
 			self.product = product

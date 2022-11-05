@@ -4,7 +4,7 @@ import tqdm
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.market_data.product import Product
 from melo_fwk.strategies import BaseStrategy
-from melo_fwk.size_policies import BaseSizePolicy
+from melo_fwk.policies.size import BaseSizePolicy
 
 from typing import List
 
@@ -64,23 +64,23 @@ class BacktestEstimator:
 		)
 
 		tsar = trading_subsys.run()
-		results = dict()
-		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			yearly_tsar = tsar.get_year(year)
-			results.update({f"{product.name}_{year}": yearly_tsar})
+		results = {
+			f"{product.name}_{year}": tsar.get_year(year)
+			for year in range(int(self.time_period[0]), int(self.time_period[1]))
+		}
 
 		return results
 
 	def _trade_product_compound(self, product: Product):
+		trading_subsys = TradingSystem(
+			product=product,
+			trading_rules=self.strategies,
+			forecast_weights=self.forecast_weights,
+			size_policy=self.size_policy
+		)
+
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			trading_subsys = TradingSystem(
-				product=product.get_year(year),
-				trading_rules=self.strategies,
-				forecast_weights=self.forecast_weights,
-				size_policy=self.size_policy
-			)
-
 			tsar = trading_subsys.run_year(year)
 			results.update({f"{product.name}_{year}": tsar})
 			self.size_policy.update_trading_capital(tsar.annual_delta())

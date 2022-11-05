@@ -42,14 +42,18 @@ class TsarDataStream(BaseDataStream):
 
 
 	def get_metric_by_name(self, name: str, rf: float = 0.):
-		if name in ["sharpe", "sr"]:
+		if name in ["pnl", "PnL"]:
+			return self.pnl()
+		if name in ["sharpe", "sr", "Sharpe"]:
 			return self.sharpe_ratio(rf)
-		if name in ["sortino", "sor"]:
+		if name in ["sortino", "sor", "Sortino"]:
 			return self.sortino_ratio(rf)
-		if name in ["drawdown", "ddown"]:
+		if name in ["drawdown", "ddown", "MaxDrawdown"]:
 			return self.max_drawdown()
-		if name in ["calmar", "cr"]:
+		if name in ["calmar", "cr", "Calmar"]:
 			return self.calmar_ratio()
+		if name in ["vol", "ReturnVolatility"]:
+			return self.return_vol()
 
 	def compute_all_metrics(self, rf: float = 0.0):
 		return {
@@ -57,7 +61,7 @@ class TsarDataStream(BaseDataStream):
 			"Sortino": self.sortino_ratio(rf),
 			"MaxDrawdown": self.max_drawdown(),
 			"Calmar": self.calmar_ratio(),
-			"PnL": self.PnL(),
+			"PnL": self.pnl(),
 			"ReturnVolatility": self.return_vol()
 		}
 
@@ -84,7 +88,7 @@ class TsarDataStream(BaseDataStream):
 		sortino = mean / sigma if sigma != 0 else mean
 		return sortino
 
-	def PnL(self):
+	def pnl(self):
 		return self.account_series.iat[-1]
 
 	def return_vol(self):

@@ -10,8 +10,6 @@ where strategies are (ewma)
 with
     strategyConfig (ewma_strat_0)
 
-where
-    volTarget is (0.5, 100000) and
-    sizePolicy (VolTargetInertiaPolicy)
+where sizePolicy is VolTargetInertiaPolicy (0.5, 100000)
 
 select BacktestEstimator

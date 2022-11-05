@@ -1,6 +1,6 @@
 import pandas as pd
 
-from melo_fwk.size_policies import BaseSizePolicy
+from melo_fwk.policies.size import BaseSizePolicy
 
 class VolTargetSizePolicy(BaseSizePolicy):
 
@@ -37,6 +37,7 @@ class VolTargetSizePolicy(BaseSizePolicy):
 		return self.vol_scalar(lookback).iat[-1] * forecast / 10.
 
 	def position_size_vect(self, forecast: pd.Series, lookback: int = 36) -> pd.Series:
+		# mean (forecast) = 10 // forecast / 10 == buy and hold € [-2, 2]
 		return (self.vol_scalar(lookback) * forecast) / 10.
 
 

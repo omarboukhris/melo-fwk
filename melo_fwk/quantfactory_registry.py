@@ -15,7 +15,7 @@ from melo_fwk.strategies import (
 	EWMAStrategy,
 	SMAStrategy
 )
-from melo_fwk.size_policies import (
+from melo_fwk.policies.size import (
 	BaseSizePolicy,
 	VolTargetSizePolicy,
 	VolTargetInertiaPolicy,

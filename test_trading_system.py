@@ -3,7 +3,7 @@ from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.size_policies import VolTargetInertiaPolicy
+from melo_fwk.policies.size import VolTargetInertiaPolicy
 
 from melo_fwk.plots import AccountPlotter, TsarPlotter
 
@@ -41,6 +41,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
+
 			tsar = tr_sys.run()
 
 			results.update({product["name"]: tsar})

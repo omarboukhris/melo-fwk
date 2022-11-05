@@ -1,8 +1,7 @@
 
 PositionSizing ->
-    sizepolicy. lpar. SizePolicy=alphanum. rpar.
-    |
-    voltarget. is. lpar. s:VolTargetCouple rpar.
-    and. sizepolicy. lpar. SizePolicy=alphanum. rpar.
+    sizepolicy. is. SizePolicy=alphanum. |
+    sizepolicy. is. SizePolicy=alphanum. lpar. s:VolTargetCouple rpar.
 
+//           ann vol target  ,     starting capital
 VolTargetCouple -> numeric. comma. numeric.

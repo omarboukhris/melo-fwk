@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from melo_fwk.market_data.product import Product
-from melo_fwk.size_policies.vol_target import VolTarget
+from melo_fwk.policies.size.vol_target import VolTarget
 
 
 class BaseSizePolicy:

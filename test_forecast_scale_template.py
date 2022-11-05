@@ -1,14 +1,11 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pandas as pd
 import tqdm
 
 from melo_fwk.market_data import MarketDataLoader
-
 from melo_fwk.strategies import EWMAStrategy
-
 from melo_fwk.trading_systems import TradingSystem
 
-import random
 
 strat = [
 	EWMAStrategy(
@@ -16,43 +13,34 @@ strat = [
 		slow_span=64,
 	)
 ]
-fw = [0.4, 0.6]
 
-products_loc = MarketDataLoader.get_commodities() + MarketDataLoader.get_fx()
-products = [MarketDataLoader.load_datastream(prod) for prod in products_loc ]
-random.shuffle(products)
-sample_products = random.sample(products, int(len(products)*0.5))
+products = MarketDataLoader.sample_products_pool(0.5)
 
 results = {}
+for product in tqdm.tqdm(products):
+	trading_subsys = TradingSystem(
+		product=product,
+		trading_rules=strat,
+		forecast_weights=[1.],
+	)
 
-for product in tqdm.tqdm(sample_products):
-	for year in product.years():
-
-		y_prod = product.get_year(year)
-
-		for s in strat:
-			s.scale = 1.
-			trading_subsys = TradingSystem(
-				product=y_prod,
-				trading_rules=[s],
-				forecast_weights=[1.],
-			)
-
-			tsar = trading_subsys.run()
-			results.update({f"{product.name}.{year}": tsar.forecast_series})
+	results.update({
+		f"{product.name}.{year}":
+			trading_subsys.run_year(year).forecast_series
+		for year in product.years()
+	})
 
 mean = []
-for key, result in results.items():
+for result in results.values():
 	result.apply(abs).apply(mean.append)
 
 mean_ps = pd.Series(mean)
 scale_f = 10/mean_ps.mean()
 scaled_ps = (scale_f * mean_ps)
-
+print("mean * scale == scaled mean")
 print(mean_ps.mean(), scale_f, scaled_ps.mean())
 
-plt.hist(mean, bins=100)
-plt.hist(scaled_ps.to_numpy(), bins=100, color="red", alpha=0.5)
-plt.show()
-
+# plt.hist(mean, bins=100)
+# plt.hist(scaled_ps.to_numpy(), bins=100, color="red", alpha=0.5)
+# plt.show()
 

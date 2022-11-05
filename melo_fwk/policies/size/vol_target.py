@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class VolTarget:
-	annual_vol_target: float
+	annual_vol_target: float  # between [0, 1]
 	trading_capital: float
 
 	def annual_cash_vol_target(self):
