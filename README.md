@@ -73,12 +73,13 @@ trading_subsys = TradingSystem(
 
 # run trading system for each year
 # and save result in dictionary
-results = {f"Gold_{year}": trading_subsys.run_year(year) for year in product.years()}
+results = {
+	f"Gold_{year}": trading_subsys.run_year(year) 
+	for year in product.years()
+}
 
 # update balance
-for tsar in results.values():
-	balance += tsar.annual_delta()
-
+balance += np.sum([tsar.annual_delta() for tsar in results.values()])
 print(f"Final balance = {balance}")
 
 # save annual metrics plots in export folder (make sure folder exists)
