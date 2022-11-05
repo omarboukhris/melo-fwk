@@ -7,8 +7,8 @@ pandas, matplotlib, yfinance, numpy, melodb, pyparse, scikit-optimize, sckit-lea
 ## Getting started
 
 This project is a quantitative trading backtest ecosystem.
-Common statistics and finance knowledge is required in order to use it properly to build a portfolio.
-Advanced knowledge of software engineering, statistics and finance is required in order to extend melo to your specific needs.
+Common statistics knowledge is required in order to use it properly to build a portfolio.
+Advanced knowledge of software engineering and statistics is required in order to extend melo to your specific needs.
 
 ## Name
 
