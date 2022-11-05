@@ -73,11 +73,10 @@ trading_subsys = TradingSystem(
 
 # run trading system for each year
 # and save result in dictionary
-results = dict()
-for year in product.years():
-	tsar = trading_subsys.run_year(year)
-	results.update({f"Gold_{year}": tsar})
-	# update balance
+results = {f"Gold_{year}": trading_subsys.run_year(year) for year in product.years()}
+
+# update balance
+for tsar in results.values():
 	balance += tsar.annual_delta()
 
 print(f"Final balance = {balance}")
