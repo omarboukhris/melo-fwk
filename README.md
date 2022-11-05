@@ -204,8 +204,8 @@ Then register both estimator and associated reporter to the factory `melo_fwk.qu
 # find register_estimator 
 # register estimator and reporter
 def register_estimator():
-	quantflow_factory.QuantFlowFactory.register_estimator("BacktestEstimator", BacktestEstimator)
-	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
+	quantflow_factory.QuantFlowFactory.register_estimator("MyNewEstimator", MyNewEstimator)
+	quantflow_factory.QuantFlowFactory.register_reporter("MyNewEstimator", MyNewReporter)
 
 ```
 
