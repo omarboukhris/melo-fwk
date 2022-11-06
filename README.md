@@ -117,8 +117,8 @@ class StratParamSpace:
 @dataclass
 class NewStrategy(BaseStrategy, StratParamSpace):
 
-  # forecast_vect implements the computation 
-  # of all forecast series from price data
+	# forecast_vect implements the computation 
+	# of all forecast series from price data
 	def forecast_vect(self, data: pd.Series) -> pd.Series:
 		pass # do your calculations here
 ```
@@ -136,7 +136,9 @@ def register_strats():
 
 def register_search_spaces():
 	# save strategy's search space in proper register
-	quantflow_factory.QuantFlowFactory.register_search_space("NewStrategy.search_space", NewStrategy.search_space)
+	quantflow_factory.QuantFlowFactory.register_search_space(
+		"NewStrategy.search_space", NewStrategy.search_space
+	)
 ```
 
 ### Add Position Size Policy
