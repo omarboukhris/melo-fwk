@@ -6,6 +6,7 @@ from melo_fwk.strategies import BaseStrategy
 from melo_fwk.trading_systems import TradingSystem
 
 from scipy.optimize import minimize, Bounds
+from skopt import gp_minimize
 from typing import List
 import pandas as pd
 import numpy as np
@@ -47,7 +48,6 @@ class ForecastWeightsEstimator:
 		assert len(products) == 1, self.logger.error(
 			"Can only optimize weight for 1 product at a time")
 
-		# multiple products ??
 		self.products = products
 		self.time_period = time_period
 		self.strategies = strategies
@@ -60,7 +60,7 @@ class ForecastWeightsEstimator:
 	def run(self):
 		out_dict = dict()
 		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
-		for i, (product_name, product_dataclass) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
+		for product_name, product_dataclass in tqdm.tqdm(self.products.items(), leave=False):
 			out_dict[product_name] = self._optimize_weights_by_product(product_dataclass)
 		self.logger.info("Finished running estimator")
 		return out_dict

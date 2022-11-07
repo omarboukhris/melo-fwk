@@ -1,15 +1,14 @@
 import pandas as pd
-import numpy as np
 
+from melo_fwk.datastreams import TsarDataStream
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 class TradingSystemIter(BaseTradingSystem):
 	"""Class for backtesting offline a trading system.
 	This class trades only one position, one product at a time.
 	To backtest for a whole portfolio, you need a TradingSystem per asset,
-	then sum up after each iteration.
 
-	This implementation processes data by block and
+	This implementation processes data by block
 
 	Input Parameters :
 		- a data source for historic price data
@@ -25,11 +24,12 @@ class TradingSystemIter(BaseTradingSystem):
 		self.observer = kwargs["observers"]
 		self.freq = kwargs["freq"] if "freq" in kwargs.keys() else 1
 
-	def run(self):
+	def run(self) -> TsarDataStream:
 		# process by block
 		forecast_series, i = self.forecast_cumsum(), 0
 		pose_series, daily_pnl = pd.Series(), pd.Series()
-		for i in range(int(len(self.product.get_dataframe())/self.freq)):
+		nb_batch = int(len(self.product.get_dataframe())/self.freq)
+		for i in range(nb_batch):
 			# get block starting index
 			idx = i * self.freq
 			# get pose_series

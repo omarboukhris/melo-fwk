@@ -1,4 +1,6 @@
+import matplotlib.pyplot as plt
 import tqdm
+from skopt.plots import plot_objective
 
 from melo_fwk.config.melo_config import MeloConfig
 from melo_fwk.reporters.utils.md_formatter import MdFormatter
@@ -39,7 +41,7 @@ class StratOptimReporter:
 		ss += MdFormatter.item_list(self.products_name_list)
 
 		ss += MdFormatter.h2("VolTarget:")
-		ss += MdFormatter.italic(str(self.size_policy))
+		ss += "Using " + MdFormatter.italic(type(self.size_policy).__name__) + " for Position Sizing\n"
 
 		ss += MdFormatter.h2("Strategies:")
 		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])
@@ -47,12 +49,26 @@ class StratOptimReporter:
 		return ss
 
 	def process_results(self, export_dir: str, raw_results: dict):
-		# # plot objective is weird
-		# _ = plot_objective(
-		# 	opt.optimizer_results_[0],
-		# 	dimensions=[k for k in strat_search_space_.keys()],
-		# )
-		# # plt.colorbar()
+		# ax = plot_objective(opt.optimizer_results_[0])
 		# plt.show()
+		self.logger.info("Exporting optimizarion results")
+		ss = ""
+		for product_name, tsar_dict in tqdm.tqdm(raw_results.items(), leave=False):
 
-		return ""
+			assert isinstance(tsar_dict, dict), \
+				f"(BacktestReporter) TSAR result {product_name} is not associated to a dict"
+
+			for prod_fn_y, opt in tsar_dict.items():
+				title = prod_fn_y.replace("_", " ")
+				opt_result_png = f"assets/{prod_fn_y}.png"
+				ss += MdFormatter.h2(title)
+				ss += MdFormatter.image(title, opt_result_png, prod_fn_y)
+
+				opt_png = f"{export_dir}/{opt_result_png}"
+				plt.figure(figsize=(10, 10))
+				_ = plot_objective(opt.optimizer_results_[0])
+				plt.savefig(opt_png)
+				plt.close()
+
+		self.logger.info("Finished Exporting optimization results..")
+		return ss

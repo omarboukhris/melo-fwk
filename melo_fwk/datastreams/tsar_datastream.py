@@ -65,7 +65,7 @@ class TsarDataStream(BaseDataStream):
 			"ReturnVolatility": self.return_vol()
 		}
 
-	def annual_delta(self) -> float:
+	def balance_delta(self) -> float:
 		if len(self.account_series) < 1:
 			return 0.
 		return float(self.account_series.iloc[-1])

@@ -19,7 +19,7 @@ class SMAParamSpace:
 @dataclass
 class SMAStrategy(BaseStrategy, SMAParamSpace):
 
-	def forecast_vect(self, data: pd.Series):
+	def forecast_vect(self, data: pd.Series) -> pd.Series:
 		fast_sma = data.rolling(int(self.fast_span), min_periods=1).mean()
 		slow_sma = data.rolling(int(self.slow_span), min_periods=1).mean()
 
@@ -32,11 +32,4 @@ class SMAStrategy(BaseStrategy, SMAParamSpace):
 		np.seterr(invalid="warn")
 		return forecast_vect
 
-	def forecast_vect_cap(self, data: pd.Series):
-		f_vect = self.forecast_vect(data)
-		f_series = pd.Series([
-			min(f_val, self.cap) if f_val > 0 else max(f_val, -self.cap)
-			for f_val in f_vect
-		], dtype=float)
-		return f_series
 

@@ -50,12 +50,35 @@ class BaseTradingSystem:
 
 		return f_series
 
+	def update_trading_capital(self, delta: float):
+		self.size_policy.update_trading_capital(delta)
+
+	def run(self) -> TsarDataStream:
+		pass
+
+	def run_year(self, year: int, stitch: bool = True):
+		product = self.product
+		self.product = self.product.get_year(year, stitch)
+		self.size_policy.setup_product(self.product)
+		try:
+			return self.run().get_year(year) if stitch else self.run()
+		finally:
+			self.product = product
+
+	def compound_by_year(self, stitch: bool = True):
+		output = []
+		for year in self.product.years():
+			tsar = self.run_year(year, stitch)
+			self.update_trading_capital(tsar.balance_delta())
+			output.append(tsar)
+		return output
+
 	def build_tsar(
 		self,
 		forecast_series: pd.Series,
 		pose_series: pd.Series,
 		daily_pnl_series: pd.Series
-	):
+	) -> TsarDataStream:
 		return TsarDataStream(dataframe=pd.DataFrame({
 			"Date": self.product.get_date_series(),
 			"Price": self.product.get_close_series(),

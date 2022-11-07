@@ -105,17 +105,17 @@ class ClustersEstimator:
 		return results
 
 	def _trade_product_global(self, product: Product):
+		trading_subsys = TradingSystem(
+			product=product,
+			trading_rules=self.strategies,
+			forecast_weights=self.forecast_weights,
+			size_policy=self.size_policy
+		)
 		results = dict()
 		for year in range(int(self.time_period[0]), int(self.time_period[1])):
-			trading_subsys = TradingSystem(
-				product=product.datastream.get_year(year),
-				trading_rules=self.strategies,
-				forecast_weights=self.forecast_weights,
-				size_policy=self.size_policy
-			)
 
-			tsar = trading_subsys.run()
-			y_return = tsar.get_year(year).account_series
+			tsar = trading_subsys.run_year(year)
+			y_return = tsar.account_series
 			if year in results.keys():
 				results[year].update({product.name: y_return})
 			else:

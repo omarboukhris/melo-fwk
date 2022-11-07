@@ -39,7 +39,7 @@ class VolTargetReporter:
 		ss += MdFormatter.item_list(self.products_name_list)
 
 		ss += MdFormatter.h2("VolTarget - Position Size:")
-		ss += MdFormatter.italic(str(self.size_policy))
+		ss += "Using " + MdFormatter.italic(type(self.size_policy).__name__) + " for Position Sizing\n"
 
 		ss += MdFormatter.h2("Strategies:")
 		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])

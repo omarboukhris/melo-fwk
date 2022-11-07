@@ -39,7 +39,8 @@ class BacktestReporter:
 		ss += MdFormatter.item_list(self.products_name_list)
 
 		ss += MdFormatter.h2("VolTarget:")
-		ss += MdFormatter.italic(str(self.size_policy))
+		ss += "Using " + MdFormatter.italic(type(self.size_policy).__name__) + " for Position Sizing\n"
+		ss += MdFormatter.item_list(self.size_policy.vol_target.to_list())
 
 		ss += MdFormatter.h2("Strategies:")
 		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])
@@ -70,5 +71,5 @@ class BacktestReporter:
 				tsar_png = f"{export_dir}/{tsar_png}"
 				TsarPlotter.save_tsar_as_png(tsar_png, tsar)
 
-		self.logger.info("Finished Exporting Tsar Images..")
+		self.logger.info("Finished Exporting Tsar data..")
 		return ss

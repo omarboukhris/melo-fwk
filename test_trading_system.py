@@ -45,7 +45,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 			tsar = tr_sys.run()
 
 			results.update({product["name"]: tsar})
-			balance += tsar.annual_delta()
+			balance += tsar.balance_delta()
 
 		# plot whole balance
 		results_list = [r for r in results.values()]

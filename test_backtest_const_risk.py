@@ -1,3 +1,5 @@
+import numpy as np
+
 from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.strategies import EWMAStrategy
@@ -22,8 +24,6 @@ strat = [
 ]
 fw = [0.6, 0.4]
 
-results = {}
-
 balance = 60000
 
 size_policy = VolTargetInertiaPolicy(
@@ -36,13 +36,14 @@ trading_subsys = TradingSystem(
 	forecast_weights=fw,
 	size_policy=size_policy
 )
-for year in product.years():
-	tsar = trading_subsys.run_year(year)
-	results.update({f"Gold_{year}_it": tsar})
-	balance += tsar.annual_delta()
-	trading_subsys.size_policy.update_trading_capital(tsar.annual_delta())
-	print(year, balance, tsar.max_drawdown())
+
+
+# tsar = trading_subsys.run()
+# print(balance + tsar.balance_delta())
+# results = {f"Gold_{year}_it": tsar.get_year(year) for year in product.years()}
+
+results = {f"Gold_{year}_it": trading_subsys.run_year(year) for year in product.years()}
+print(balance + np.sum([r.balance_delta() for r in results.values()]))
 
 tsar_plotter = TsarPlotter({"pname": results})
 tsar_plotter.save_fig(export_folder="data/residual", mute=True)
-print(balance)

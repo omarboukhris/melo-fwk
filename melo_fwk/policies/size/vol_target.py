@@ -14,6 +14,9 @@ class VolTarget:
 		# yearly_trading_days = 256 => sqrt = 16
 		return self.annual_cash_vol_target()/16.
 
+	def to_list(self):
+		return self.__str__().split("\n")[:-1]
+
 	def __str__(self):
 		return f"Annual vol target : {self.annual_vol_target}\n" +\
 			f"Trading capital : {self.trading_capital}\n" +\
