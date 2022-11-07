@@ -1,73 +1,82 @@
+import sys
+import unittest
+
+import numpy as np
+from tqdm import tqdm
+
+from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.trading_systems import TradingSystem
-
-from melo_fwk.market_data import MarketDataLoader
-
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.policies.size import VolTargetInertiaPolicy
-
-from melo_fwk.plots import AccountPlotter, TsarPlotter
-
-import pandas as pd
-import tqdm
-import unittest
+from melo_fwk.plots import TsarPlotter
 
 class TradingSystemUnitTests(unittest.TestCase):
 
-	def test_trading_system_vect(self):
-		sma_params = {
-			"fast_span": 16,
-			"slow_span": 64,
-			"scale": 16,
-		}
-		sma = EWMAStrategy(**sma_params)
+	def test_trading_system(self):
+		TradingSystemUnitTests.run_simulation("all")
+		TradingSystemUnitTests.run_simulation("linear")
+		TradingSystemUnitTests.run_simulation("compound")
 
-		products = MarketDataLoader.get_fx()
-		products += MarketDataLoader.get_commodities()
+	@staticmethod
+	def run_simulation(x: str):
+		product = CommodityDataLoader.Gold
+		# product = FxDataLoader.EURUSD
+
+		strat = [
+			EWMAStrategy(
+				fast_span=16,
+				slow_span=64,
+				scale=16.,
+			),
+			EWMAStrategy(
+				fast_span=8,
+				slow_span=32,
+				scale=10.,
+			)
+		]
+		fw = [0.6, 0.4]
+
+		start_capital = 60000
+		size_policy = VolTargetInertiaPolicy(
+			annual_vol_target=25e-2,
+			trading_capital=start_capital)
+
+		trading_subsys = TradingSystem(
+			product=product,
+			trading_rules=strat,
+			forecast_weights=fw,
+			size_policy=size_policy
+		)
 
 		results = {}
-		balance = 0
-		start_capital = 10000 * len(products)
 
-		"""Linear Vol target, no risk compounding"""
-		for product in tqdm.tqdm(products):
-			loaded_prod = MarketDataLoader.load_datastream(product)
-			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=0.4,
-				trading_capital=10000)
+		if x == "compound":
+			results = {
+				f"Gold_{y}_it": tsar
+				for y, tsar in zip(product.years(), trading_subsys.compound_by_year())
+			}
 
-			tr_sys = TradingSystem(
-				product=loaded_prod,
-				trading_rules=[sma],
-				forecast_weights=[1.],
-				size_policy=size_policy
-			)
+		elif x == "linear":
+			results = {
+				f"Gold_{year}_it": trading_subsys.run_year(year)
+				for year in product.years()
+			}
 
-			tsar = tr_sys.run()
+		elif x == "all":
+			tsar = trading_subsys.run()
+			results = {
+				f"Gold_{year}_it": tsar.get_year(year)
+				for year in product.years()
+			}
 
-			results.update({product["name"]: tsar})
-			balance += tsar.balance_delta()
-
-		# plot whole balance
-		results_list = [r for r in results.values()]
-		account_df = pd.DataFrame({
-			"Date": results_list[0].dates,
-			"Balance": [0. for _ in results_list[0].dates]
-		})
-
+		balance = start_capital + np.sum([r.balance_delta() for r in results.values()])
 		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
 		print(f"starting capital : {start_capital}")
 		print(f"final balance : {balance}")
 		print(f"5% risk free : {risk_free}")
 
-		for tsar in results_list:
-			account_df["Balance"] += tsar.account_series
-		account_plt = AccountPlotter(account_df)
-		account_plt.save_png(f"data/residual/all_plot_vect.png")
-
-		# plot tsar
 		tsar_plotter = TsarPlotter({"pname": results})
-		tsar_plotter.save_fig(export_folder="data/residual")
-		return results_list
+		tsar_plotter.save_fig(export_folder="data/residual", mute=True)
 
 
 if __name__ == "__main__":
