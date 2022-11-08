@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+import tqdm
 
 from melo_fwk.datastreams import TsarDataStream
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
@@ -20,41 +22,36 @@ class TradingSystemIter(BaseTradingSystem):
 	def __init__(self, **kwargs):
 		super(TradingSystemIter, self).__init__(**kwargs)
 
-		self.starting_capital = kwargs["starting_capital"]
-		self.observer = kwargs["observers"]
-		self.freq = kwargs["freq"] if "freq" in kwargs.keys() else 1
+		self.freq = kwargs["freq"] if "freq" in kwargs.keys() else 5
 
 	def run(self) -> TsarDataStream:
-		# process by block
+		"""process trades by block"""
+
+		start_capital = self.size_policy.vol_target.trading_capital
 		forecast_series, i = self.forecast_cumsum(), 0
-		pose_series, daily_pnl = pd.Series(), pd.Series()
+		pose_series, daily_pnl = pd.Series(dtype=np.float64), pd.Series(dtype=np.float64)
 		nb_batch = int(len(self.product.get_dataframe())/self.freq)
-		for i in range(nb_batch):
+		for i in tqdm.tqdm(range(nb_batch), leave=True):
 			# get block starting index
 			idx = i * self.freq
 			# get pose_series
-			pose_series = pd.concat([
-				pose_series,
-				self.size_policy.position_size_vect(forecast_series).iat[idx:idx + self.freq]
-			])
+			current_pose_block = self.size_policy.position_size_vect(forecast_series).iloc[idx:idx + self.freq]
+			pose_series = pd.concat([pose_series, current_pose_block])
 			# get pnl
-			daily_pnl = pd.concat([
-				daily_pnl,
-				self.product.get_daily_diff_series() * pose_series * self.product.block_size
-			])
+			current_daily_diff_block = self.product.get_daily_diff_series().iloc[idx:idx + self.freq] * current_pose_block * self.product.block_size
+			daily_pnl = pd.concat([daily_pnl, current_daily_diff_block])
 			# adjust vol target with observer if needed
-			self.observer(self.size_policy, daily_pnl)
+			self.update_trading_capital(current_daily_diff_block.sum())
 
 		# run last block
 		last_idx = self.freq * (i + 1)
 		if last_idx < len(self.product.get_dataframe()):
-			pose_series = pd.concat([
-				pose_series,
-				self.size_policy.position_size_vect(forecast_series).iat[last_idx:]
-			])
-			daily_pnl = pd.concat([
-				daily_pnl,
-				self.product.get_daily_diff_series() * pose_series * self.product.block_size
-			])
+			# get pose_series
+			current_pose_block = self.size_policy.position_size_vect(forecast_series).iloc[last_idx:]
+			pose_series = pd.concat([pose_series, current_pose_block])
+			# get pnl
+			current_daily_diff_block = self.product.get_daily_diff_series().iloc[last_idx:] * current_pose_block * self.product.block_size
+			daily_pnl = pd.concat([daily_pnl, current_daily_diff_block])
 
+		self.size_policy.vol_target.trading_capital = start_capital
 		return self.build_tsar(forecast_series, pose_series, daily_pnl)

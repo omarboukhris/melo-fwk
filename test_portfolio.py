@@ -1,4 +1,4 @@
-from melo_fwk.trading_systems import TradingSystem
+from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
 
@@ -11,9 +11,10 @@ import pandas as pd
 import tqdm
 import unittest
 
-class TradingSystemUnitTests(unittest.TestCase):
+class PortfolioUnitTests(unittest.TestCase):
 
-	def test_trading_system_vect(self):
+	def test_portfolio(self):
+		"""WIP"""
 		sma_params = {
 			"fast_span": 16,
 			"slow_span": 64,
@@ -35,14 +36,14 @@ class TradingSystemUnitTests(unittest.TestCase):
 				annual_vol_target=0.4,
 				trading_capital=10000)
 
-			tr_sys = TradingSystem(
+			tr_sys = TradingSystemIter(
 				product=loaded_prod,
 				trading_rules=[sma],
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
 
-			# constant risk simulation
+			# simulation with constant risk
 			tsar = tr_sys.run()
 
 			results.update({product["name"]: tsar})

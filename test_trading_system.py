@@ -4,21 +4,27 @@ import unittest
 import numpy as np
 from tqdm import tqdm
 
-from melo_fwk.market_data import CommodityDataLoader
-from melo_fwk.trading_systems import TradingSystem
+from melo_fwk.market_data import CommodityDataLoader, FxDataLoader
+from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.policies.size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
+from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
+
 
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_trading_system(self):
-		TradingSystemUnitTests.run_simulation("all")
-		TradingSystemUnitTests.run_simulation("linear")
-		TradingSystemUnitTests.run_simulation("compound")
+		TradingSystemUnitTests.run_simulation("all", TradingSystem)
+		TradingSystemUnitTests.run_simulation("linear", TradingSystem)
+		TradingSystemUnitTests.run_simulation("compound", TradingSystem)
+
+		TradingSystemUnitTests.run_simulation("all", TradingSystemIter)
+		TradingSystemUnitTests.run_simulation("linear", TradingSystemIter)
+		TradingSystemUnitTests.run_simulation("compound", TradingSystemIter)
 
 	@staticmethod
-	def run_simulation(x: str):
+	def run_simulation(x: str, tr: callable):
 		product = CommodityDataLoader.Gold
 		# product = FxDataLoader.EURUSD
 
@@ -31,8 +37,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 			EWMAStrategy(
 				fast_span=8,
 				slow_span=32,
-				scale=10.,
-			)
+			).estimate_forecast_scale()
 		]
 		fw = [0.6, 0.4]
 
@@ -41,7 +46,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 			annual_vol_target=25e-2,
 			trading_capital=start_capital)
 
-		trading_subsys = TradingSystem(
+		trading_subsys = tr(
 			product=product,
 			trading_rules=strat,
 			forecast_weights=fw,
@@ -52,20 +57,20 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		if x == "compound":
 			results = {
-				f"Gold_{y}_it": tsar
+				f"{tr.__name__}_Gold_{y}_it": tsar
 				for y, tsar in zip(product.years(), trading_subsys.compound_by_year())
 			}
 
 		elif x == "linear":
 			results = {
-				f"Gold_{year}_it": trading_subsys.run_year(year)
+				f"{tr.__name__}_Gold_{year}_it": trading_subsys.run_year(year)
 				for year in product.years()
 			}
 
 		elif x == "all":
 			tsar = trading_subsys.run()
 			results = {
-				f"Gold_{year}_it": tsar.get_year(year)
+				f"{tr.__name__}_Gold_{year}_it": tsar.get_year(year)
 				for year in product.years()
 			}
 
