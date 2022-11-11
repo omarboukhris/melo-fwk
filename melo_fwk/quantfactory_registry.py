@@ -13,7 +13,8 @@ from melo_fwk.melo_estimators import (
 )
 from melo_fwk.strategies import (
 	EWMAStrategy,
-	SMAStrategy
+	SMAStrategy,
+	BuyAndHold,
 )
 from melo_fwk.policies.size import (
 	BaseSizePolicy,
@@ -59,6 +60,11 @@ def register_estimator():
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", EWMAStrategy)
 	quantflow_factory.QuantFlowFactory.register_strategy("sma", SMAStrategy)
+
+	quantflow_factory.QuantFlowFactory.register_strategy(BuyAndHold.__name__, BuyAndHold)
+	quantflow_factory.QuantFlowFactory.register_strategy(EWMAStrategy.__name__, EWMAStrategy)
+	quantflow_factory.QuantFlowFactory.register_strategy(SMAStrategy.__name__, SMAStrategy)
+
 
 def register_search_spaces():
 	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", EWMAStrategy.search_space)

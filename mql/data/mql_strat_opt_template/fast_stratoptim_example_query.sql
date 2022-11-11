@@ -1,13 +1,12 @@
 create StratOptimExample2
 with
     Commodities (Gold)
-    trade single
 from 2004 to 2007
 
 where strategies
 	are (ewma)
 	with strategyConfig (
-	    ewma.search_space,
+	    ewma.search_space
     )
 
 select StratOptimEstimator

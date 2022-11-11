@@ -1,4 +1,5 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.strategies import BuyAndHold
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.utils import yaml_io
@@ -53,14 +54,14 @@ class StrategyConfigBuilder:
 	def build_strategy(quant_query_dict: dict, strat_config_registry: StratConfigRegistry):
 		logger = GlobalLogger.build_composite_for("StratConfigBuilder")
 		if "StrategiesDef" not in quant_query_dict.keys():
-			logger.warn("No Strategies Parsed; Using default NONE")
-			return [], []
+			logger.warn("No Strategies Parsed; Using default Buy n Hold")
+			return [BuyAndHold()], [1.]
 
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")
 		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyList").split(",")
 		strat_config_points = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyConfigList").split(",")
 
-		logger.info(f"Loading Strategies {strategies_kw}")
+		logger.info(f"Loading Strategies {[s.strip() for s in strategies_kw]}")
 		strategies = []
 		for strat, config in zip(strategies_kw, strat_config_points):
 			if "." in config:

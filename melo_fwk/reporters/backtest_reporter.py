@@ -47,7 +47,7 @@ class BacktestReporter:
 
 		return ss
 
-	def process_results(self, export_dir: str, raw_results: dict):
+	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		"""
 		raw_results dict :
 			key = product name
@@ -55,6 +55,7 @@ class BacktestReporter:
 				key = product_filepath + year
 				value = TSAR
 		"""
+		export_dir = query_path + export_dir
 		self.logger.info("Exporting Tsar data")
 		ss = ""
 		for product_name, tsar_dict in tqdm.tqdm(raw_results.items(), leave=False):

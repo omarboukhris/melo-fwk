@@ -43,11 +43,15 @@ class StratOptimEstimator:
 		out_dict = dict()
 		for i, (product_name, product_dataclass) in enumerate(self.products.items()):
 			self.logger.info(f"Running Strategy Optimizer for Product {product_name} {i+1}/{len(self.products)}")
-			out_dict[product_name] = self._optimize_product_strat(product_dataclass)
+			if self.time_period == [0, 0]:
+				begin, end = product_dataclass.years()[0], product_dataclass.years()[1]
+			else:
+				begin, end = self.time_period
+			out_dict[product_name] = self._optimize_product_strat(product_dataclass, begin, end)
 		self.logger.info("Finished running estimator")
 		return out_dict
 
-	def _optimize_product_strat(self, product: Product):
+	def _optimize_product_strat(self, product: Product, begin: int, end: int):
 		results = dict()
 		StrategyEstimator.product = product
 
@@ -57,11 +61,12 @@ class StratOptimEstimator:
 			"""
 			assert len(strat_metadata) == 2, \
 				"(StratOptimEstimator) Strat metadata is incomplete (length != 2)"
-			StrategyEstimator.strat_class_, strat_search_space_ = strat_metadata
+			strat_class_, strat_search_space_ = strat_metadata
+			StrategyEstimator.strat_class_ = strat_class_
 
-			self.logger.info(f"Optimizing Strategy {StrategyEstimator.strat_class_}")
+			self.logger.info(f"Optimizing Strategy <{strat_class_.__name__}>")
 
-			X = np.array([int(year) for year in range(int(self.time_period[0]), int(self.time_period[1]))])
+			X = np.array([int(year) for year in range(int(begin), int(end))])
 			# set max_train_size for out of sample or expanding cv
 			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1)
 
@@ -73,6 +78,6 @@ class StratOptimEstimator:
 				cv=tscv,
 			)
 			opt.fit(X=X)
-			results.update({f"{product.name}": opt})
+			results.update({f"{strat_class_.__name__}": opt})
 
 		return results

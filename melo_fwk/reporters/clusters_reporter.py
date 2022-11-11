@@ -46,7 +46,8 @@ class ClustersReporter:
 
 		return ss
 
-	def process_results(self, export_dir: str, raw_results: dict):
+	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
+		export_dir = query_path + export_dir
 		ss = ""
 		for year, df in raw_results.items():
 			title = f"Correllation Heat Map {year}"

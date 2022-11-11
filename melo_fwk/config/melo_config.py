@@ -62,12 +62,17 @@ class MeloConfig:
 		:param output_dir:
 		:return:
 		"""
-		if not os.path.isdir(output_dir + self.name):
-			os.mkdir(output_dir + self.name)
-			os.mkdir(output_dir + self.name + "/assets/")
+		if not os.path.isdir(output_dir):
+			os.mkdir(output_dir)
+		if not os.path.isdir(output_dir + "/data/"):
+			os.mkdir(output_dir + "/data/")
+		if not os.path.isdir(output_dir + "/data/" + self.name):
+			os.mkdir(output_dir + "/data/" + self.name)
+		if not os.path.isdir(output_dir + "/data/" + self.name + "/assets/"):
+			os.mkdir(output_dir + "/data/" + self.name + "/assets/")
 		reporter = self.reporter_class_(self)
-		md_ss = reporter.header() + reporter.process_results(output_dir + self.name, estimator_results)
-		MdFormatter.save_md(output_dir + self.name, "report.md", md_ss)
+		md_ss = reporter.header() + reporter.process_results(output_dir, "/data/" + self.name, estimator_results)
+		MdFormatter.save_md(output_dir + "/data/" + self.name, "report.md", md_ss)
 
 	def asdict(self):
 		return {

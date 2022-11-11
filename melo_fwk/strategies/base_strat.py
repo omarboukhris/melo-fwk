@@ -49,7 +49,7 @@ class BaseStrategy:
 		mean_ps = pd.Series(mean)
 		scale_f = 10 / mean_ps.mean()
 
-		self.scale = scale_f
+		self.scale = float(scale_f)
 		return self
 		# scaled_ps = (scale_f * mean_ps)
 		# print(mean_ps.mean(), scale_f, scaled_ps.mean())

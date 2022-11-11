@@ -33,4 +33,5 @@ class StrategyEstimator:
 		)
 
 		tsar = trading_subsys.run_year(X[0])
-		return tsar.get_metric_by_name(StrategyEstimator.metric)
+		# optimizer is minimizing
+		return -tsar.get_metric_by_name(StrategyEstimator.metric)

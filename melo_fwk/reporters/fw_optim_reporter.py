@@ -46,14 +46,16 @@ class ForecastWeightsReporter:
 
 		return ss
 
-	def process_results(self, export_dir: str, raw_results: dict):
+	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
+		export_dir = query_path + export_dir
 		self.logger.info("Exporting optimizarion results")
 		ss = ""
 		for product_name, tsar_dict in tqdm.tqdm(raw_results.items(), leave=False):
 
-			assert isinstance(tsar_dict, dict), \
-				f"(BacktestReporter) TSAR result {product_name} is not associated to a dict"
+			assert isinstance(tsar_dict, list), \
+				f"(ForecastWeightsReporter) TSAR result {product_name} is not associated to a list"
 
-			for prod_fn_y, opt in tsar_dict.items():
+			for opt in tsar_dict:
 				pass
 
+		return ss

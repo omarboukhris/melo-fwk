@@ -2,7 +2,6 @@ create BacktestExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)
     Fx (EURUSD)
-    trade single
 
 from 2004 to 2008
 

@@ -41,7 +41,7 @@ def run_mql_process(mql_query_path: Path):
 	output = estimator_obj_.run()
 	# print(output)
 
-	mql_config.write_report(output, "data/")
+	mql_config.write_report(output, str(mql_query_path.parent))
 
 
 
@@ -51,9 +51,9 @@ if __name__ == "__main__":
 		# "backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 		# "fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 		# "vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-		# "clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
+		"clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
 		# "strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
-		"fast_strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+		# "fast_strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 	}
 	# still missing :
 	# alloc opt

@@ -56,16 +56,16 @@ class BaseTradingSystem:
 	def run(self) -> TsarDataStream:
 		pass
 
-	def run_year(self, year: int, stitch: bool = True):
+	def run_year(self, year: int, stitch: bool = False):
 		product = self.product
 		self.product = self.product.get_year(year, stitch)
 		self.size_policy.setup_product(self.product)
 		try:
-			return self.run().get_year(year)  # if stitch else self.run()
+			return self.run().get_year(year)  if stitch else self.run()
 		finally:
 			self.product = product
 
-	def compound_by_year(self, stitch: bool = True):
+	def compound_by_year(self, stitch: bool = False):
 		output = []
 		for year in self.product.years():
 			tsar = self.run_year(year, stitch)

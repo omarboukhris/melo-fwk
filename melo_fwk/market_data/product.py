@@ -14,7 +14,7 @@ class Product:
 	def years(self):
 		return self.datastream.years
 
-	def get_year(self, year: int, stitch=True):
+	def get_year(self, year: int, stitch: bool = False):
 		assert year in self.years(), f"(AssertionError) Product {self.name} : {year} not in {self.years()}"
 		return Product(
 			name=self.name,

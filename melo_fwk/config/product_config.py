@@ -1,6 +1,5 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.market_data.utils.index_builder import IndexBuilder
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 
 class ProductConfigBuilder:
@@ -8,8 +7,7 @@ class ProductConfigBuilder:
 	def build_products(quant_query_dict: dict):
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProductsDef")
 		products_generator = ConfigBuilderHelper.strip_single(stripped_entry, "ProductsDefList")["ProductsGenerator"]
-		instruments = ConfigBuilderHelper.strip_single(stripped_entry, "instrument")
-		time_period = [int(year) for year in stripped_entry["timeperiod"]]
+		time_period = [int(year) for year in stripped_entry.pop("timeperiod", [0, 0])]
 
 		plogger = GlobalLogger.build_composite_for("ProductConfigBuilder")
 		plogger.info("Loading Products")
@@ -23,11 +21,6 @@ class ProductConfigBuilder:
 				output_products.update(product)
 
 		plogger.info(f"{len(output_products)} Products loaded")
-		# if idx build index otherwise trade singles
-		if instruments == "idx":
-			plogger.warn("Building Product Index: DEPRECATED. Backtest trading Single products")
-			return IndexBuilder.build(output_products), time_period
-		# else: trade singles
 		return output_products, time_period
 
 	@staticmethod

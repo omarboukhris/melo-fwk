@@ -45,8 +45,6 @@ class ForecastWeightsEstimator:
 		forecast_weights = [1./len(strategies) for _ in strategies] if forecast_weights is None else forecast_weights
 		assert len(strategies) == len(forecast_weights), self.logger.error(
 			"Strategies and Forecast weight do not correspond.")
-		assert len(products) == 1, self.logger.error(
-			"Can only optimize weight for 1 product at a time")
 
 		self.products = products
 		self.time_period = time_period
