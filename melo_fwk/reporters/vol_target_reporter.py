@@ -1,8 +1,5 @@
-import tqdm
-
 from melo_fwk.config.melo_config import MeloConfig
-from melo_fwk.reporters.utils.md_formatter import MdFormatter
-from melo_fwk.plots import TsarPlotter
+from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 class VolTargetReporter:

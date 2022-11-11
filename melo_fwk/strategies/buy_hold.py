@@ -12,4 +12,7 @@ import numpy as np
 class BuyAndHold(BaseStrategy):
 
 	def forecast_vect(self, data: pd.Series) -> pd.Series:
-		return pd.Series(np.ones(shape=(len(data),)))
+		# const forecast of 10 for proper vol targeting
+		return 10 * pd.Series(np.ones(shape=(len(data),)))
+
+

@@ -1,8 +1,7 @@
 import tqdm
 
 from melo_fwk.config.melo_config import MeloConfig
-from melo_fwk.reporters.utils.md_formatter import MdFormatter
-from melo_fwk.plots import TsarPlotter
+from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 class ForecastWeightsReporter:
@@ -49,13 +48,21 @@ class ForecastWeightsReporter:
 	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		export_dir = query_path + export_dir
 		self.logger.info("Exporting optimizarion results")
-		ss = ""
-		for product_name, tsar_dict in tqdm.tqdm(raw_results.items(), leave=False):
+		ss = MdFormatter.h2("Optimization Results")
+		for product_name, opt_dict in tqdm.tqdm(raw_results.items(), leave=False):
 
-			assert isinstance(tsar_dict, list), \
+			assert isinstance(opt_dict, dict), \
 				f"(ForecastWeightsReporter) TSAR result {product_name} is not associated to a list"
 
-			for opt in tsar_dict:
-				pass
+			ss += MdFormatter.bold(f"For product {MdFormatter.italic(product_name)}") + "\n"
+			opt_items = []
+			for year, opt in opt_dict.items():
+				sr = -opt["OptimResult"].fun
+				fw = opt["OptimResult"].x
+				div_mult = opt["DivMult"]
+
+				opt_items.append(f"Year {year}: forecast weight are {fw} with multiplier {div_mult} producing SR of {sr}")
+
+			ss += MdFormatter.item_list(opt_items) + "\n"
 
 		return ss

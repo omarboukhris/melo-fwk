@@ -3,11 +3,10 @@ from dataclasses import asdict
 from skopt.plots import plot_objective
 import matplotlib.pyplot as plt
 import pandas as pd
-import json
 import tqdm
 
 from melo_fwk.config.melo_config import MeloConfig
-from melo_fwk.reporters.utils.md_formatter import MdFormatter
+from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils import yaml_io
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory

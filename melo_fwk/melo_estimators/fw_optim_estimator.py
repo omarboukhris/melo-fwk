@@ -64,12 +64,12 @@ class ForecastWeightsEstimator:
 		return out_dict
 
 	def _optimize_weights_by_product(self, product: Product):
-		results = []
+		results = {}
 		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1])), leave=False):
 
 			opt_bounds = Bounds(0., 1.)
 			expected_ret, covmat_ret = self.get_expected_results(product, year)
-			opt_cst = [{'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)}]
+			opt_cst = {'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)}
 
 			opt_result = minimize(
 				ForecastWeightsEstimator.objective,
@@ -81,10 +81,10 @@ class ForecastWeightsEstimator:
 				tol=1e-5
 			)
 			div_mult = ForecastWeightsEstimator.get_div_mult(covmat_ret, opt_result)
-			results.append({
+			results[year] = {
 				"OptimResult": opt_result,
 				"DivMult": div_mult
-			})
+			}
 
 		return results
 

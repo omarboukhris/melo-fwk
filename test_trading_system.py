@@ -1,15 +1,12 @@
-import sys
 import unittest
 
 import numpy as np
-from tqdm import tqdm
 
 from melo_fwk.market_data import CommodityDataLoader, FxDataLoader
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.policies.size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
-from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 
 class TradingSystemUnitTests(unittest.TestCase):

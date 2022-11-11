@@ -3,7 +3,7 @@ from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
-from melo_fwk.reporters.utils.md_formatter import MdFormatter
+from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.policies.size import BaseSizePolicy
 
 from pathlib import Path
