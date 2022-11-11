@@ -3,8 +3,6 @@
 ## Getting started
 
 This project is a quantitative trading backtest ecosystem.
-Common statistics knowledge is required in order to use it properly to build a portfolio.
-Advanced knowledge of software engineering and statistics is required in order to extend melo to your specific needs.
 
 ## Name
 
