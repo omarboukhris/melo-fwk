@@ -77,7 +77,7 @@ class ClustersEstimator:
 			X = df.corr().values
 			d = sch.distance.pdist(X)
 			L = sch.linkage(d, method='complete')
-			ind = sch.fcluster(L, 0.5 * d.max(), 'distance')
+			ind = sch.fcluster(L, 0.5 * d.max(initial=0), 'distance')
 			columns = [df.columns.tolist()[i] for i in list((np.argsort(ind)))]
 			df_dict[year] = df.reindex(columns, axis=1)
 		self.logger.info("Finished building Heatmap")

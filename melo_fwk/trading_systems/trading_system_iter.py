@@ -24,14 +24,16 @@ class TradingSystemIter(BaseTradingSystem):
 
 		self.freq = kwargs["freq"] if "freq" in kwargs.keys() else 5
 
-	def run(self) -> TsarDataStream:
+	def run(self, verbose=True) -> TsarDataStream:
 		"""process trades by block"""
 
 		start_capital = self.size_policy.vol_target.trading_capital
 		forecast_series, i = self.forecast_cumsum(), 0
 		pose_series, daily_pnl = pd.Series(dtype=np.float64), pd.Series(dtype=np.float64)
 		nb_batch = int(len(self.product.get_dataframe())/self.freq)
-		for i in tqdm.tqdm(range(nb_batch), leave=True):
+
+		loop_range = tqdm.tqdm(range(nb_batch), leave=False) if verbose else range(nb_batch)
+		for i in loop_range:
 			# get block starting index
 			idx = i * self.freq
 			# get pose_series

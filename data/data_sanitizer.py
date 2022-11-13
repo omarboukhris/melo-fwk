@@ -21,6 +21,3 @@ if __name__ == "__main__":
 		sanitized_df = loaded_df.interpolate()
 		output_filename = csv_file.replace("CommodityRaw", "Commodity")
 		sanitized_df.to_csv(output_filename)
-
-
-

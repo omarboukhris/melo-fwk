@@ -49,7 +49,6 @@ products_block_size = {
 
 class MarketDataLoader:
 	parent_folder = Path(Path(__file__).parent)
-	mock_datastream_length = 1000
 
 	@staticmethod
 	def products_pool():
@@ -64,11 +63,18 @@ class MarketDataLoader:
 		return pool, len(pool)
 
 	@staticmethod
-	def sample_products_pool(ratio: float):
-		assert 0. < ratio <= 1., \
-			f"(MarketDataLoader) Invalid sampling ratio provided {ratio} not in [0 ,1]"
+	def sample_products(n_products: int):
 		shuffled_pool, size = MarketDataLoader.shuffled_pool()
-		return random.sample(shuffled_pool, int(size * ratio))
+		assert 0. < n_products < size, \
+			f"(MarketDataLoader) Invalid sampling ratio provided {n_products} not in [0 ,{size}]"
+		return random.sample(shuffled_pool, n_products)
+
+	@staticmethod
+	def sample_products_alpha(alpha: float):
+		assert 0. < alpha <= 1., \
+			f"(MarketDataLoader) Invalid sampling ratio provided {alpha} not in [0 ,1]"
+		shuffled_pool, size = MarketDataLoader.shuffled_pool()
+		return random.sample(shuffled_pool, int(size * alpha))
 
 	@staticmethod
 	def get_fx():

@@ -1,16 +1,15 @@
 import numpy as np
 
+from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.trading_systems.trading_system import TradingSystem
-from melo_fwk.market_data.product import Product
-from melo_fwk.policies.size import BaseSizePolicy
 
 class StrategyEstimator:
-	product: Product
-	size_policy: BaseSizePolicy
-	strat_class_: callable
-	metric: str
 
 	def __init__(self, **kwargs):
+		self.product = kwargs.pop("product", None)
+		self.size_policy = kwargs.pop("size_policy", None)
+		self.strat_class_ = kwargs.pop("strat_class_", None)
+		self.metric = kwargs.pop("metric", None)
 		self.strat_params = kwargs
 
 	def get_params(self, deep=True):
@@ -23,15 +22,15 @@ class StrategyEstimator:
 		return self
 
 	def score(self, X: np.ndarray):
-		strat = StrategyEstimator.strat_class_(**self.strat_params)
+		strat = self.strat_class_(**self.strat_params)
 
-		trading_subsys = TradingSystem(
-			product=StrategyEstimator.product,
+		trading_subsys = TradingSystemIter(
+			product=self.product,
 			trading_rules=[strat],
 			forecast_weights=[1.],
-			size_policy=StrategyEstimator.size_policy
+			size_policy=self.size_policy
 		)
 
 		tsar = trading_subsys.run_year(X[0])
 		# optimizer is minimizing
-		return -tsar.get_metric_by_name(StrategyEstimator.metric)
+		return tsar.get_metric_by_name(self.metric)

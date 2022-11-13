@@ -1,16 +1,12 @@
 import numpy as np
-from matplotlib import pyplot as plt
-from skopt.plots import plot_objective
 
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.melo_estimators.utils.strat_optim import StrategyEstimator
+from melo_fwk.estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
 from melo_fwk.policies.size import BaseSizePolicy
 
 from skopt import BayesSearchCV
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
-
-import tqdm
 
 from typing import List
 
@@ -34,8 +30,9 @@ class StratOptimEstimator:
 		self.current_year = -1
 		self.time_period = time_period
 		self.strategies = strategies
-		StrategyEstimator.size_policy = size_policy
-		StrategyEstimator.metric = estimator_params[0] if len(estimator_params) > 0 else "pnl"
+		self.size_policy = size_policy
+		self.metric = estimator_params[0] if len(estimator_params) > 0 else "pnl"
+		self.n_iter = int(estimator_params[1]) if len(estimator_params) > 1 else 128
 
 		self.logger.info("Initialized Estimator")
 
@@ -53,7 +50,6 @@ class StratOptimEstimator:
 
 	def _optimize_product_strat(self, product: Product, begin: int, end: int):
 		results = dict()
-		StrategyEstimator.product = product
 
 		for strat_metadata in self.strategies:
 			"""
@@ -66,16 +62,25 @@ class StratOptimEstimator:
 
 			self.logger.info(f"Optimizing Strategy <{strat_class_.__name__}>")
 
-			X = np.array([int(year) for year in range(int(begin), int(end))])
+			X = np.array([year for year in range(begin, end)])
 			# set max_train_size for out of sample or expanding cv
 			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1)
 
+			static_params = {
+				"product": [product],
+				"strat_class_": [strat_class_],
+				"size_policy": [self.size_policy],
+				"metric": [self.metric],
+			}
+			strat_search_space_.update(static_params)
+
+			self.logger.info(f"Running BayesSearchCV for {self.n_iter * (len(X)-1)} fits")
 			opt = BayesSearchCV(
-				StrategyEstimator(),
+				StrategyEstimator(**static_params),
 				strat_search_space_,
-				n_iter=128,
-				n_points=12,
-				cv=tscv,
+				n_iter=self.n_iter,
+				n_jobs=12, n_points=12,
+				cv=tscv, verbose=1,
 			)
 			opt.fit(X=X)
 			results.update({f"{strat_class_.__name__}": opt})

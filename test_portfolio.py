@@ -29,7 +29,6 @@ class PortfolioUnitTests(unittest.TestCase):
 		balance = 0
 		start_capital = 10000 * len(products)
 
-		"""Linear Vol target, no risk compounding"""
 		for product in tqdm.tqdm(products):
 			loaded_prod = MarketDataLoader.load_datastream(product)
 			size_policy = VolTargetInertiaPolicy(

@@ -28,7 +28,7 @@ class SizePolicyConfigBuilder:
 
 		logger = GlobalLogger.build_composite_for("SizePolicyConfigBuilder")
 		if "PositionSizing" not in quant_query_dict.keys():
-			logger.warn("No PositionSizing Parsed; Using default BuyAndHold")
+			logger.warn("No PositionSizing Parsed; Using default BaseSizePolicy")
 			return QuantFlowFactory.get_size_policy("default")(*vol_target_params)
 
 		position_size_dict = ConfigBuilderHelper.strip_single(quant_query_dict, "PositionSizing")

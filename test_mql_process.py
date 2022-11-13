@@ -49,11 +49,10 @@ if __name__ == "__main__":
 
 	templates = {
 		# "backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
-		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+		# "fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 		# "vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
 		# "clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
-		# "strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/stratoptim_example_query.sql",
-		# "fast_strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+		"fast_strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 	}
 	# still missing :
 	# alloc opt
@@ -64,6 +63,7 @@ if __name__ == "__main__":
 	# register melo components in factory
 	quantfactory_registry.register_all()
 
-	for mql_query in templates.values():
+	for key, mql_query in templates.items():
+		print(42*"=" + key + 42*"=")
 		run_mql_process(mql_query_path=mql_query)
 

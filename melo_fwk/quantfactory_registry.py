@@ -4,7 +4,7 @@ from melo_fwk.market_data import (
 	CommodityDataLoader,
 	FxDataLoader
 )
-from melo_fwk.melo_estimators import (
+from melo_fwk.estimators import (
 	ClustersEstimator,
 	BacktestEstimator,
 	StratOptimEstimator,
@@ -32,7 +32,7 @@ from melo_fwk.reporters.clusters_reporter import ClustersReporter
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 def register_all():
-	log = GlobalLogger.build_composite_for("QuantFactoryRegistryBuilding")
+	log = GlobalLogger.build_composite_for("QuantFactoryRegistry")
 	log.info("Registring Estimators...")
 	register_estimator()
 	log.info("Registring Strategies...")

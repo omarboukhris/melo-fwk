@@ -29,7 +29,7 @@ class BaseStrategy:
 		return f_series
 
 	def estimate_forecast_scale(self, ratio: float = 0.6):
-		sample_products = MarketDataLoader.sample_products_pool(ratio)
+		sample_products = MarketDataLoader.sample_products_alpha(ratio)
 
 		results = {}
 
@@ -47,14 +47,7 @@ class BaseStrategy:
 			r.apply(abs).apply(mean.append)
 
 		mean_ps = pd.Series(mean)
-		scale_f = 10 / mean_ps.mean()
+		scale_f = 10 / mean_ps.mean() if mean_ps.mean() != 0 else 1.
 
 		self.scale = float(scale_f)
 		return self
-		# scaled_ps = (scale_f * mean_ps)
-		# print(mean_ps.mean(), scale_f, scaled_ps.mean())
-
-		# Make plotter, link to appropriate reporter : OptimStrat report
-		# plt.hist(mean, bins=100)
-		# plt.hist(scaled_ps.to_numpy(), bins=100, color="red", alpha=0.5)
-		# plt.show()

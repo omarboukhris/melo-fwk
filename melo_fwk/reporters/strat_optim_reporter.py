@@ -6,52 +6,23 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.config.melo_config import MeloConfig
+from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils import yaml_io
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 
 
-class StratOptimReporter:
+class StratOptimReporter(BaseReporter):
 
 	def __init__(self, input_config: MeloConfig):
-		"""
-		Displays input parameter responsible for the generated results
-		Could be report header
-
-		:param input_config:
-		:return:
-		"""
 		self.logger = GlobalLogger.build_composite_for("StratOptimReporter")
-		self.logger.info("Initializing Reporter")
-		# name:
-		self.name = input_config.name
-
-		# products:
-		self.products_name_list = list(input_config.products_config[0].keys())
-		self.begin, self.end = input_config.products_config[1]
-
-		# size policy:
-		self.size_policy = input_config.size_policy
-
-		# strategies:
-		self.strat_list = [str(list(x)[0]) for x in input_config.strategies_config[0]]
-		self.fw = input_config.strategies_config[1]
+		self.logger.info("Initializing StratOptimReporter")
+		super(StratOptimReporter, self).__init__(input_config)
 
 	def header(self):
 		self.logger.info("Writing header")
-
-		ss = MdFormatter.h1(f"Backtest - {self.name} from {self.begin} to {self.end}")
-		ss += MdFormatter.h2("Products:")
-		ss += MdFormatter.item_list(self.products_name_list)
-
-		ss += MdFormatter.h2("VolTarget:")
-		ss += "Using " + MdFormatter.italic(type(self.size_policy).__name__) + " for Position Sizing\n"
-
-		ss += MdFormatter.h2("Strategies:")
-		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])
-
-		return ss
+		return self.std_header()
 
 	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		export_dir = query_path + export_dir
@@ -75,8 +46,8 @@ class StratOptimReporter:
 				ss += MdFormatter.image(title, opt_result_png, strat_name)
 
 				opt_png = f"{export_dir}/{opt_result_png}"
-				plt.figure(figsize=(10, 10))
-				_ = plot_objective(opt.optimizer_results_[0])
+				_ = plot_objective(opt.optimizer_results_[0], size=4)
+				plt.tight_layout()
 				plt.savefig(opt_png)
 				plt.close()
 
@@ -93,8 +64,9 @@ class StratOptimReporter:
 
 		config_list = {}
 		strat_class_ = QuantFlowFactory.get_strategy(strat_name)
-		for i, (_, config_pt) in enumerate(strat_config_df.iterrows()):
-			params = config_pt["x_iters"]
+		for i, (_, config_pt) in enumerate(strat_config_df.head(5).iterrows()):
+			# remove (product, strat_class, size_policy, metric)
+			params = [p for p in config_pt["x_iters"] if type(p) in [int, float]]
 			strat = asdict(strat_class_(*params).estimate_forecast_scale())
 			strat.pop("search_space", None)
 			config_list[f"{strat_name}_{i}"] = strat

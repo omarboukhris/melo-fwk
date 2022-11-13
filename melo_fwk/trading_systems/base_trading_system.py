@@ -61,7 +61,7 @@ class BaseTradingSystem:
 		self.product = self.product.get_year(year, stitch)
 		self.size_policy.setup_product(self.product)
 		try:
-			return self.run().get_year(year)  if stitch else self.run()
+			return self.run().get_year(year) if stitch else self.run()
 		finally:
 			self.product = product
 

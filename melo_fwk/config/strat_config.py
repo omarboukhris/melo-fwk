@@ -54,7 +54,7 @@ class StrategyConfigBuilder:
 	def build_strategy(quant_query_dict: dict, strat_config_registry: StratConfigRegistry):
 		logger = GlobalLogger.build_composite_for("StratConfigBuilder")
 		if "StrategiesDef" not in quant_query_dict.keys():
-			logger.warn("No Strategies Parsed; Using default Buy n Hold")
+			logger.warn("No Strategies Parsed; Using default BuyAndHold")
 			return [BuyAndHold()], [1.]
 
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")

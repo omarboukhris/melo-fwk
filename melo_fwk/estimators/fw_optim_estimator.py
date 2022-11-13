@@ -89,6 +89,7 @@ class ForecastWeightsEstimator:
 		return results
 
 	def get_expected_results(self, product: Product, year: int):
+		# param is pool sample from products
 		result = []
 		returns = {}
 
