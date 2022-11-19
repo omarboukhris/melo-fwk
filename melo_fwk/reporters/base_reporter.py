@@ -23,7 +23,7 @@ class BaseReporter:
 		self.size_policy = input_config.size_policy
 
 		# strategies:
-		self.strat_list = [str(list(x)[0]) for x in input_config.strategies_config[0]]
+		self.strat_list = [str(x) if not isinstance(x, tuple) else str(list(x)[0]) for x in input_config.strategies_config[0]]
 		self.fw = input_config.strategies_config[1]
 
 	def std_header(self):

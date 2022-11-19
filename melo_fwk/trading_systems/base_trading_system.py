@@ -4,7 +4,7 @@ from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import BaseStrategy
 
-from melo_fwk.policies.size import BaseSizePolicy
+from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
 from melo_fwk.datastreams import (
 	HLOCDataStream,
@@ -80,8 +80,8 @@ class BaseTradingSystem:
 		daily_pnl_series: pd.Series
 	) -> TsarDataStream:
 		return TsarDataStream(dataframe=pd.DataFrame({
-			"Date": self.product.get_date_series(),
-			"Price": self.product.get_close_series(),
+			"Date": self.product.get_date_series().reset_index(drop=True),
+			"Price": self.product.get_close_series().reset_index(drop=True),
 			"Forecast": forecast_series,
 			"Size": pose_series,
 			"Account": daily_pnl_series.expanding(1).sum(),

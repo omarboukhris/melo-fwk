@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
+from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.market_data.product import Product
 from melo_fwk.policies.size.vol_target import VolTarget
-
 
 class BaseSizePolicy:
 	def __init__(
@@ -12,7 +12,7 @@ class BaseSizePolicy:
 		trading_capital: float
 	):
 		self.block_size = 1.
-		self.datastream = None
+		self.datastream: HLOCDataStream = HLOCDataStream.get_empty()
 		self.vol_target = VolTarget(annual_vol_target, trading_capital)
 
 	def update_trading_capital(self, trading_capital: float):

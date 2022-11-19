@@ -37,6 +37,13 @@ class BacktestReporter(BaseReporter):
 				title = prod_fn_y.replace("_", " ")
 				tsar_png = f"assets/{prod_fn_y}.png"
 				ss += MdFormatter.h2(title)
+				metrics = [
+					f"Sharpe ratio  : {tsar.sharpe_ratio()}",
+					f"Sortino ratio : {tsar.sortino_ratio()}",
+					f"Max Drawdown  : {tsar.max_drawdown()}",
+					f"Calmar ration : {tsar.calmar_ratio()}",
+				]
+				ss += MdFormatter.item_list(metrics)
 				ss += MdFormatter.image(title, tsar_png, prod_fn_y)
 
 				tsar_png = f"{export_dir}/{tsar_png}"

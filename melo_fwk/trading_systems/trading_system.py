@@ -20,6 +20,6 @@ class TradingSystem(BaseTradingSystem):
 	def run(self) -> TsarDataStream:
 		forecast_series = self.forecast_cumsum()
 		pose_series = self.size_policy.position_size_vect(forecast_series)
-		daily_pnl = self.product.get_daily_diff_series() * pose_series * self.product.block_size
+		daily_pnl = self.product.get_daily_diff_series().to_numpy() * pose_series * self.product.block_size
 
 		return self.build_tsar(forecast_series, pose_series, daily_pnl)

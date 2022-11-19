@@ -71,20 +71,23 @@ class TsarDataStream(BaseDataStream):
 		return float(self.account_series.iloc[-1])
 
 	def sharpe_ratio(self, rf: float = 0.0):
-		mean = self.account_series.mean() - rf
-		sigma = self.account_series.std()
+		mean = self.daily_pnl_series.mean() - rf
+		sigma = self.daily_pnl_series.std()
+		# pct_returns = self.account_series.diff()/self.account_series
+		# mean = pct_returns.mean()
+		# sigma = pct_returns.std()
 		sharpe_r = mean / sigma if sigma != 0 else mean
 		return sharpe_r
 
 	def gar(self, starting_capital: float):
-		avg_daily_diff = self.account_series.diff().fillna(0).ewm(span=25).mean()
+		avg_daily_diff = self.daily_pnl_series.mean()
 		diff = avg_daily_diff / starting_capital
 		a = (1 + diff).prod() ** 0.5 - 1.
 		return a
 
 	def sortino_ratio(self, rf: float = 0.0):
-		mean = self.account_series.mean() - rf
-		sigma = self.account_series[self.account_series < 0].std()
+		mean = self.daily_pnl_series.mean() - rf
+		sigma = self.daily_pnl_series[self.daily_pnl_series < 0].std()
 		sortino = mean / sigma if sigma != 0 else mean
 		return sortino
 
@@ -92,7 +95,7 @@ class TsarDataStream(BaseDataStream):
 		return self.account_series.iat[-1]
 
 	def return_vol(self):
-		return self.account_series.std()
+		return self.daily_pnl_series.std()
 
 	def get_drawdown(self, trading_days: int = 255):
 		peak = self.account_series.rolling(window=trading_days, min_periods=1).max()

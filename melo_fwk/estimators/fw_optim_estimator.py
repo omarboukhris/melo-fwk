@@ -1,12 +1,11 @@
-
+from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.product import Product
-from melo_fwk.policies.size import BaseSizePolicy
+from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 from melo_fwk.strategies import BaseStrategy
 from melo_fwk.trading_systems import TradingSystem
 
 from scipy.optimize import minimize, Bounds
-from skopt import gp_minimize
 from typing import List
 import pandas as pd
 import numpy as np
@@ -64,11 +63,21 @@ class ForecastWeightsEstimator:
 		return out_dict
 
 	def _optimize_weights_by_product(self, product: Product):
-		results = {}
-		for year in tqdm.tqdm(range(int(self.time_period[0]), int(self.time_period[1])), leave=False):
+		results = []
+		years = [year for year in range(int(self.time_period[0]), int(self.time_period[1]))]
+		prod_datastream = product.get_years(years).datastream
+		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=250)
+		rolling_datastream = prod_datastream.dataframe.rolling(window=indexer, step=20)
+		for i, subset_prod_ds in tqdm.tqdm(enumerate(rolling_datastream), leave=False):
 
 			opt_bounds = Bounds(0., 1.)
-			expected_ret, covmat_ret = self.get_expected_results(product, year)
+			expected_ret, covmat_ret = self.get_expected_results(
+				Product(
+					name=product.name,
+					block_size=product.block_size,
+					datastream=HLOCDataStream(dataframe=subset_prod_ds)
+				)
+			)
 			opt_cst = {'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)}
 
 			opt_result = minimize(
@@ -81,14 +90,15 @@ class ForecastWeightsEstimator:
 				tol=1e-5
 			)
 			div_mult = ForecastWeightsEstimator.get_div_mult(covmat_ret, opt_result)
-			results[year] = {
-				"OptimResult": opt_result,
+			results.append({
+				"OptimResult.fun": -opt_result.fun,
+				"OptimResult.x": opt_result.x,
 				"DivMult": div_mult
-			}
+			})
 
-		return results
+		return pd.DataFrame(results)
 
-	def get_expected_results(self, product: Product, year: int):
+	def get_expected_results(self, product: Product):
 		# param is pool sample from products
 		result = []
 		returns = {}
@@ -101,7 +111,7 @@ class ForecastWeightsEstimator:
 				size_policy=self.size_policy,
 			)
 
-			tsar = trading_subsys.run_year(year)
+			tsar = trading_subsys.run()
 			key = f"{product.name}.{str(strategy)}"
 			returns.update({key: tsar.account_series})
 			result.append(tsar.get_metric_by_name(self.metric))

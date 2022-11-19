@@ -5,7 +5,7 @@ from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
 from melo_fwk.reporters.NopReporterException import NopReporterException
 from melo_fwk.reporters.md_formatter import MdFormatter
-from melo_fwk.policies.size import BaseSizePolicy
+from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
 from pathlib import Path
 

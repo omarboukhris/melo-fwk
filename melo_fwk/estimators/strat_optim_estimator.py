@@ -3,10 +3,10 @@ import numpy as np
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
-from melo_fwk.policies.size import BaseSizePolicy
+from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
 from skopt import BayesSearchCV
-from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+from sklearn.model_selection import TimeSeriesSplit
 
 from typing import List
 
@@ -58,13 +58,12 @@ class StratOptimEstimator:
 			assert len(strat_metadata) == 2, \
 				"(StratOptimEstimator) Strat metadata is incomplete (length != 2)"
 			strat_class_, strat_search_space_ = strat_metadata
-			StrategyEstimator.strat_class_ = strat_class_
 
 			self.logger.info(f"Optimizing Strategy <{strat_class_.__name__}>")
 
 			X = np.array([year for year in range(begin, end)])
 			# set max_train_size for out of sample or expanding cv
-			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1)
+			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1, max_train_size=3)
 
 			static_params = {
 				"product": [product],

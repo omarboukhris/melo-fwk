@@ -1,6 +1,6 @@
 create StratOptimExample2
 with Commodities (Gold)
-from 2004 to 2007
+from 2004 to 2008
 
 where strategies
 	are (ewma)
@@ -8,6 +8,6 @@ where strategies
 	    ewma.search_space
     )
 
-where sizePolicy is VolTargetInertiaPolicy (0.4, 100000)
+where sizePolicy is VolTargetSizePolicy (0.4, 100000)
 
-select StratOptimEstimator<sharpe, 256>
+select StratOptimEstimator<sharpe, 128>

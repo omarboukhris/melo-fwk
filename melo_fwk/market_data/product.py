@@ -1,3 +1,4 @@
+import numpy as np
 
 from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
 from dataclasses import dataclass
@@ -13,6 +14,15 @@ class Product:
 
 	def years(self):
 		return self.datastream.years
+
+	def get_years(self, years: list):
+		assert np.array([year in self.years() for year in years]).all(), \
+			f"(AssertionError) Product {self.name} : {years} not in {self.years()}"
+		return Product(
+			name=self.name,
+			block_size=self.block_size,
+			datastream=self.datastream.get_years(years)
+		)
 
 	def get_year(self, year: int, stitch: bool = False):
 		assert year in self.years(), f"(AssertionError) Product {self.name} : {year} not in {self.years()}"

@@ -6,7 +6,7 @@ with
 from 2004 to 2008
 
 where strategies
-	are (ewma, ewma, sma)
-	with strategyConfig (ewma_strat_0, ewma_strat_1, sma_strat_0)
+	are (ewma, ewma)
+	with strategyConfig (ewma_strat_0, ewma_strat_1)
 
 select ForecastWeightsEstimator
