@@ -19,7 +19,7 @@ pip install dependencies then pip install this repo
 
 ### Requirements
 
-pandas, matplotlib, yfinance, numpy, melodb, pyparse, scikit-optimize, sckit-learn, scipy (list will be updated with time)
+pandas, matplotlib, yfinance, numpy, pyparse, scikit-optimize, mongodb, scikit-learn, scipy
 
 ### Project status
 Work In Progress
