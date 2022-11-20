@@ -40,6 +40,8 @@ class StratOptimEstimator(MeloBaseEstimator):
 
 			self.logger.info(f"Optimizing Strategy <{strat_class_.__name__}>")
 
+			##############################################################
+			# TODO: make it rolling on whole price signal instead of years
 			X = np.array([year for year in range(begin, end)])
 			# set max_train_size for out of sample or expanding cv
 			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1, max_train_size=3)

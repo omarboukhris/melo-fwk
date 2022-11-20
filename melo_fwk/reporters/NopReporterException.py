@@ -1,2 +1,0 @@
-class NopReporterException(Exception):
-	pass

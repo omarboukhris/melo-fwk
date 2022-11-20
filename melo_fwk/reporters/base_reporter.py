@@ -1,6 +1,5 @@
 from melo_fwk.config import MeloConfig
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.reporters.NopReporterException import NopReporterException
 from melo_fwk.reporters.md_formatter import MdFormatter
 
 

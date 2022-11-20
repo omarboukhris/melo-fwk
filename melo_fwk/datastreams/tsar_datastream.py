@@ -73,13 +73,16 @@ class TsarDataStream(BaseDataStream):
 		return float(self.account_series.iloc[-1])
 
 	def sharpe_ratio(self, rf: float = 0.0):
-		# mean = self.account_series.mean() - rf
-		# sigma = self.account_series.std()
-		pct_returns = self.account_series.diff()/self.account_series
-		mean = pct_returns.mean()
-		sigma = pct_returns.std()
+		mean = self.account_series.mean() - rf
+		sigma = self.account_series.std()
 		sharpe_r = mean / sigma if sigma != 0 else mean
-		return sharpe_r * sqrt(250)
+		return sharpe_r
+
+		# pct_returns = self.account_series.diff()/self.account_series
+		# mean = pct_returns.mean()
+		# sigma = pct_returns.std()
+		# sharpe_r = mean / sigma if sigma != 0 else mean
+		# return sharpe_r * sqrt(250)
 
 	def gar(self, starting_capital: float):
 		avg_daily_diff = self.daily_pnl_series.mean()

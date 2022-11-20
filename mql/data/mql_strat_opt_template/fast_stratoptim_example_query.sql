@@ -10,4 +10,4 @@ where strategies
 
 where sizePolicy is VolTargetSizePolicy (0.4, 100000)
 
-select StratOptimEstimator<sharpe, 128>
+select StratOptimEstimator<drawdown, 128>

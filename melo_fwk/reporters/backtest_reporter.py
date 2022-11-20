@@ -13,10 +13,6 @@ class BacktestReporter(BaseReporter):
 		self.logger.info("Initializing BacktestReporter")
 		super(BacktestReporter, self).__init__(input_config)
 
-	def header(self):
-		self.logger.info("Writing header")
-		return self.std_header()
-
 	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		"""
 		raw_results dict :

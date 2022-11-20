@@ -3,7 +3,6 @@ from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
-from melo_fwk.reporters.NopReporterException import NopReporterException
 from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
@@ -63,15 +62,11 @@ class MeloConfig:
 		:param output_dir:
 		:return:
 		"""
-		try:
-			reporter = self.reporter_class_(self)
-			md_ss = reporter.header()
-			self._check_export_directories(output_dir)
-			md_ss += reporter.process_results(output_dir, "/data/" + self.name, estimator_results)
-			MdFormatter.save_md(output_dir + "/data/" + self.name, "report.md", md_ss)
-		except NopReporterException as _:
-			# No Op raised by empty header method to bypass reporter
-			pass
+		reporter = self.reporter_class_(self)
+		md_ss = reporter.header()
+		self._check_export_directories(output_dir)
+		md_ss += reporter.process_results(output_dir, "/data/" + self.name, estimator_results)
+		MdFormatter.save_md(output_dir + "/data/" + self.name, "report.md", md_ss)
 
 	def _check_export_directories(self, output_dir):
 		if not os.path.isdir(output_dir):

@@ -16,13 +16,7 @@ from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 class StratOptimReporter(BaseReporter):
 
 	def __init__(self, input_config: MeloConfig):
-		self.logger = GlobalLogger.build_composite_for("StratOptimReporter")
-		self.logger.info("Initializing StratOptimReporter")
 		super(StratOptimReporter, self).__init__(input_config)
-
-	def header(self):
-		self.logger.info("Writing header")
-		return self.std_header()
 
 	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		export_dir = query_path + export_dir
@@ -64,7 +58,7 @@ class StratOptimReporter(BaseReporter):
 
 		config_list = {}
 		strat_class_ = QuantFlowFactory.get_strategy(strat_name)
-		for i, (_, config_pt) in enumerate(strat_config_df.head(5).iterrows()):
+		for i, (_, config_pt) in tqdm.tqdm(enumerate(strat_config_df.head(5).iterrows()), leave=False):
 			# remove (product, strat_class, size_policy, metric)
 			params = [p for p in config_pt["x_iters"] if type(p) in [int, float]]
 			strat = asdict(strat_class_(*params).estimate_forecast_scale())
