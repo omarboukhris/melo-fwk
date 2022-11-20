@@ -17,12 +17,11 @@ class HeatMapPlotter:
 		return exported_png
 
 	@staticmethod
-	def save_heatmap_to_png(filename: str, df: pd.DataFrame):
-		corr = df.corr()
+	def save_heatmap_to_png(filename: str, corr: pd.DataFrame):
 		fig, ax = plt.subplots(figsize=(15, 10))
-		cax = ax.matshow(corr, cmap='RdYlGn')
+		cax = ax.matshow(corr, cmap='RdYlGn')  # or jet
 		for (i, j), z in np.ndenumerate(corr.to_numpy()):
-			ax.text(j, i, '{:0.1f}'.format(z), ha='center', va='center')
+			ax.text(j, i, '{:0.3f}'.format(z), ha='center', va='center')
 
 		plt.xticks(range(len(corr.columns)), corr.columns, rotation=90)
 		plt.yticks(range(len(corr.columns)), corr.columns)

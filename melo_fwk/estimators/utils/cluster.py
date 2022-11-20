@@ -28,7 +28,7 @@ class ClusterUtils:
 			corr_mat = pd.DataFrame({
 				prod_name: result[i].account_series
 				for prod_name, result in results.items()
-			}).corr()
+			}).corr()  # .apply(abs)
 			correlations.append(corr_mat)
 			avg_corr += corr_mat
 		avg_corr /= len(correlations)
@@ -39,7 +39,7 @@ class ClusterUtils:
 	def cluster_products(avg_corr):
 		# https://github.com/TheLoneNut/CorrelationMatrixClustering/blob/master/CorrelationMatrixClustering.ipynb
 		df = pd.DataFrame(avg_corr)
-		X = df.corr().values
+		X = df.values
 		d = sch.distance.pdist(X)
 		L = sch.linkage(d, method='complete')
 		ind = sch.fcluster(L, 0.5 * d.max(initial=0), 'distance')

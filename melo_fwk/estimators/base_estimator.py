@@ -41,12 +41,3 @@ class MeloBaseEstimator:
 
 	def next_float_param(self, default_val):
 		return float(self.next_str_param(default_val))
-
-	def _get_rolling_datastream(self, product):
-		years = [year for year in range(self.begin, self.end)]
-		prod_datastream = product.get_years(years).datastream
-		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=250)
-		rolling_datastream = prod_datastream.dataframe.rolling(window=indexer, min_periods=250, step=20)
-		for roll in rolling_datastream:
-			if len(roll) >= 249:
-				yield roll
