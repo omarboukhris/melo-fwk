@@ -1,41 +1,16 @@
 
 import tqdm
 
+from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.strategies import BaseStrategy
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
-
-from typing import List
-
-from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 
-class BacktestEstimator:
+class BacktestEstimator(MeloBaseEstimator):
 
-	def __init__(
-		self,
-		products: dict,
-		time_period: List[int],
-		strategies: List[BaseStrategy] = None,
-		forecast_weights: List[int] = None,
-		size_policy: BaseSizePolicy = None,
-		estimator_params: List[str] = None
-	):
-		self.logger = GlobalLogger.build_composite_for("BacktestEstimator")
-
-		strategies = [] if strategies is None else strategies
-		forecast_weights = [] if forecast_weights is None else forecast_weights
-		assert len(strategies) == len(forecast_weights), self.logger.error(
-			"Strategies and Forecast weight do not correspond.")
-
-		self.products = products
-		self.time_period = time_period
-		self.strategies = strategies
-		self.forecast_weights = forecast_weights
-		self.size_policy = size_policy
-		self.compound = "compound" in estimator_params
-
+	def __init__(self, **kwargs):
+		super(BacktestEstimator, self).__init__(**kwargs)
+		self.compound = "compound" in self.estimator_params
 		self.logger.info("BacktestEstimator Initialized")
 
 	def run(self):
@@ -63,7 +38,7 @@ class BacktestEstimator:
 	def _trade_product(self, trading_subsys: BaseTradingSystem):
 		results = {
 			f"{trading_subsys.product.name}_{year}": trading_subsys.run_year(year)
-			for year in range(int(self.time_period[0]), int(self.time_period[1]))
+			for year in range(self.begin, self.end)
 		}
 
 		return results
@@ -71,7 +46,7 @@ class BacktestEstimator:
 	def _trade_product_compound(self, trading_subsys: BaseTradingSystem):
 		results = {
 			f"{trading_subsys.product.name}_{year}": trading_subsys.compound_by_year()
-			for year in range(int(self.time_period[0]), int(self.time_period[1]))
+			for year in range(self.begin, self.end)
 		}
 
 		return results

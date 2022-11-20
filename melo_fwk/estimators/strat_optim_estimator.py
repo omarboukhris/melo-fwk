@@ -1,49 +1,28 @@
 import numpy as np
 
-from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
 from skopt import BayesSearchCV
 from sklearn.model_selection import TimeSeriesSplit
 
-from typing import List
+class StratOptimEstimator(MeloBaseEstimator):
 
-class StratOptimEstimator:
-
-	def __init__(
-		self,
-		products: dict,
-		time_period: List[int],
-		strategies: List[tuple] = None,
-		forecast_weights: List[int] = None,
-		size_policy: BaseSizePolicy = None,
-		estimator_params: List[str] = None
-	):
-		self.logger = GlobalLogger.build_composite_for("StratOptimEstimator")
-
-		strategies = [] if strategies is None else strategies
-		assert len(strategies) != 0, self.logger.error("Strategies are not defined.")
-
-		self.products = products
-		self.current_year = -1
-		self.time_period = time_period
-		self.strategies = strategies
-		self.size_policy = size_policy
-		self.metric = estimator_params[0] if len(estimator_params) > 0 else "pnl"
-		self.n_iter = int(estimator_params[1]) if len(estimator_params) > 1 else 128
-
+	def __init__(self, **kwargs):
+		super(StratOptimEstimator, self).__init__(**kwargs)
+		self.metric = self.next_str_param(default_val="pnl")
+		self.n_iter = self.next_int_param(default_val=128)
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
 		out_dict = dict()
 		for i, (product_name, product_dataclass) in enumerate(self.products.items()):
 			self.logger.info(f"Running Strategy Optimizer for Product {product_name} {i+1}/{len(self.products)}")
-			if self.time_period == [0, 0]:
+			if self.begin == 0 and self.end == 0:
 				begin, end = product_dataclass.years()[0], product_dataclass.years()[1]
 			else:
-				begin, end = self.time_period
+				begin, end = self.begin, self.end
 			out_dict[product_name] = self._optimize_product_strat(product_dataclass, begin, end)
 		self.logger.info("Finished running estimator")
 		return out_dict

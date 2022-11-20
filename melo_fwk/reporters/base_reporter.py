@@ -1,4 +1,5 @@
 from melo_fwk.config import MeloConfig
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.reporters.NopReporterException import NopReporterException
 from melo_fwk.reporters.md_formatter import MdFormatter
 
@@ -12,6 +13,8 @@ class BaseReporter:
 		:param input_config:
 		:return:
 		"""
+		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+
 		# name:
 		self.name = input_config.name
 
@@ -25,8 +28,10 @@ class BaseReporter:
 		# strategies:
 		self.strat_list = [str(x) if not isinstance(x, tuple) else str(list(x)[0]) for x in input_config.strategies_config[0]]
 		self.fw = input_config.strategies_config[1]
+		self.logger.info("Initialized Reporter")
 
-	def std_header(self):
+	def header(self):
+		self.logger.info("Writing header")
 
 		ss = MdFormatter.h1(f"Backtest - {self.name} from {self.begin} to {self.end}")
 		ss += MdFormatter.h2("Products:")
@@ -40,9 +45,6 @@ class BaseReporter:
 		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])
 
 		return ss
-
-	def header(self):
-		raise NopReporterException()
 
 	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		pass

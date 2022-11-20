@@ -1,12 +1,9 @@
 from melo_fwk.datastreams import HLOCDataStream
-from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.market_data.product import Product
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
-from melo_fwk.strategies import BaseStrategy
 from melo_fwk.trading_systems import TradingSystem
 
 from scipy.optimize import minimize, Bounds
-from typing import List
 import pandas as pd
 import numpy as np
 import tqdm
@@ -14,7 +11,7 @@ import tqdm
 import warnings
 warnings.filterwarnings('ignore', message='The objective has been evaluated at this point before.')
 
-class ForecastWeightsEstimator:
+class ForecastWeightsEstimator(MeloBaseEstimator):
 	ForecastDivMultiplier: float = 2.
 
 	@staticmethod
@@ -29,29 +26,9 @@ class ForecastWeightsEstimator:
 		div_mult = min(ForecastWeightsEstimator.ForecastDivMultiplier, raw_div_mult)
 		return div_mult
 
-	def __init__(
-		self,
-		products: dict,
-		time_period: List[int],
-		strategies: List[BaseStrategy] = None,
-		forecast_weights: List[int] = None,
-		size_policy: BaseSizePolicy = None,
-		estimator_params: List[str] = None
-	):
-		self.logger = GlobalLogger.build_composite_for("ForecastWeightsEstimator")
-
-		strategies = [] if strategies is None else strategies
-		forecast_weights = [1./len(strategies) for _ in strategies] if forecast_weights is None else forecast_weights
-		assert len(strategies) == len(forecast_weights), self.logger.error(
-			"Strategies and Forecast weight do not correspond.")
-
-		self.products = products
-		self.time_period = time_period
-		self.strategies = strategies
-		self.forecast_weights = np.array(forecast_weights)
-		self.size_policy = size_policy
-		self.metric = estimator_params[0] if len(estimator_params) > 0 else "sharpe"
-
+	def __init__(self, **kwargs):
+		super(ForecastWeightsEstimator, self).__init__(**kwargs)
+		self.metric = self.next_str_param("sharpe")
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
@@ -64,10 +41,7 @@ class ForecastWeightsEstimator:
 
 	def _optimize_weights_by_product(self, product: Product):
 		results = []
-		years = [year for year in range(int(self.time_period[0]), int(self.time_period[1]))]
-		prod_datastream = product.get_years(years).datastream
-		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=250)
-		rolling_datastream = prod_datastream.dataframe.rolling(window=indexer, step=20)
+		rolling_datastream = self._get_rolling_datastream(product)
 		for i, subset_prod_ds in tqdm.tqdm(enumerate(rolling_datastream), leave=False):
 
 			opt_bounds = Bounds(0., 1.)
@@ -82,7 +56,7 @@ class ForecastWeightsEstimator:
 
 			opt_result = minimize(
 				ForecastWeightsEstimator.objective,
-				self.forecast_weights,
+				np.array(self.forecast_weights),
 				args=(expected_ret, covmat_ret),
 				method='SLSQP',
 				bounds=opt_bounds,

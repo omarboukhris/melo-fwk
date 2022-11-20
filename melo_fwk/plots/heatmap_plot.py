@@ -28,6 +28,7 @@ class HeatMapPlotter:
 		plt.yticks(range(len(corr.columns)), corr.columns)
 		fig.colorbar(cax, ticks=[-1, 0, 1], aspect=40, shrink=.8)
 
+		plt.tight_layout()
 		plt.savefig(filename)
 		plt.close()
 

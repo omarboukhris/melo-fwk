@@ -1,6 +1,5 @@
 import numpy as np
 
-from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.trading_systems.trading_system import TradingSystem
 
 class StrategyEstimator:
@@ -24,7 +23,7 @@ class StrategyEstimator:
 	def score(self, X: np.ndarray):
 		strat = self.strat_class_(**self.strat_params)
 
-		trading_subsys = TradingSystemIter(
+		trading_subsys = TradingSystem(
 			product=self.product,
 			trading_rules=[strat],
 			forecast_weights=[1.],

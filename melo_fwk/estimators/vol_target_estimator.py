@@ -2,45 +2,19 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tqdm
 
-from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.estimators.base_estimator import MeloBaseEstimator
+from melo_fwk.policies.size.vol_target import VolTarget
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.market_data.product import Product
-from melo_fwk.strategies import BaseStrategy
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
-from typing import List
+class VolTargetEstimator(MeloBaseEstimator):
 
-class VolTargetEstimator:
-
-	def __init__(
-		self,
-		products: dict,
-		time_period: List[int],
-		strategies: List[BaseStrategy] = None,
-		forecast_weights: List[int] = None,
-		size_policy: BaseSizePolicy = None,
-		estimator_params: List[str] = None
-	):
-		self.logger = GlobalLogger.build_composite_for("VolTargetEstimator")
-
-		strategies = [] if strategies is None else strategies
-		forecast_weights = [] if forecast_weights is None else forecast_weights
-		assert len(strategies) == len(forecast_weights), self.logger.error(
-			"Strategies and Forecast weight do not correspond.")
-
-		self.products = products
-		self.time_period = time_period
-		self.strategies = strategies
-		self.forecast_weights = forecast_weights
-		self.size_policy_class_ = type(size_policy)
-
-		assert len(estimator_params) > 0, self.logger.error(
-			"Estimator should take trading capital as param")
-		self.trading_capital = float(estimator_params[0])
-		self.step = float(estimator_params[1]) if len(estimator_params) >= 2 else 0.1
-		self.start = float(estimator_params[2]) if len(estimator_params) >= 3 else 0.1
-		self.end = float(estimator_params[3]) if len(estimator_params) >= 4 else 1.
-
+	def __init__(self, **kwargs):
+		super(VolTargetEstimator, self).__init__(**kwargs)
+		self.trading_capital = self.next_float_param(0.)
+		self.step = self.next_float_param(0.1)
+		self.start = self.next_float_param(0.1)
+		self.final = self.next_float_param(1.)
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
@@ -62,15 +36,16 @@ class VolTargetEstimator:
 	def _trade_product(self, product: Product):
 		"""WIP -------------------------------------------"""
 
-		size_policy: BaseSizePolicy = self.size_policy_class_(
+		size_policy = self.size_policy
+		size_policy.vol_target = VolTarget(
 			annual_vol_target=self.start,
 			trading_capital=self.trading_capital
 		)
 		results = dict()
-		for year in range(int(self.time_period[0]), int(self.time_period[1])):
+		for year in range(self.begin, self.end):
 			results[year] = []
 
-		n_iter = int((self.end - self.start) / self.step)
+		n_iter = int((self.final - self.start) / self.step)
 		for _ in tqdm.tqdm(range(n_iter), leave=False):
 			ts = TradingSystem(
 				product=product,
@@ -80,7 +55,7 @@ class VolTargetEstimator:
 			)
 			tsar = ts.run()
 
-			for year in range(int(self.time_period[0]), int(self.time_period[1])):
+			for year in range(self.begin, self.end):
 				yearly_tsar = tsar.get_year(year)
 				results[year].append({
 					"vol_target": size_policy.vol_target.annual_vol_target,
@@ -88,7 +63,7 @@ class VolTargetEstimator:
 				})
 			size_policy.update_annual_vol_target(self.step)
 
-		for year in range(int(self.time_period[0]), int(self.time_period[1])):
+		for year in range(self.begin, self.end):
 			results[year] = pd.DataFrame(results[year])
 
 		return results
