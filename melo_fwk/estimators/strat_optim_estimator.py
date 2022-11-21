@@ -1,18 +1,24 @@
 import numpy as np
 
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.estimators.utils.strat_optim import StrategyEstimator
 from melo_fwk.market_data.product import Product
+from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 
 from skopt import BayesSearchCV
 from sklearn.model_selection import TimeSeriesSplit
+
+from typing import List
 
 class StratOptimEstimator(MeloBaseEstimator):
 
 	def __init__(self, **kwargs):
 		super(StratOptimEstimator, self).__init__(**kwargs)
+
 		self.metric = self.next_str_param(default_val="pnl")
 		self.n_iter = self.next_int_param(default_val=128)
+
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
@@ -40,8 +46,6 @@ class StratOptimEstimator(MeloBaseEstimator):
 
 			self.logger.info(f"Optimizing Strategy <{strat_class_.__name__}>")
 
-			##############################################################
-			# TODO: make it rolling on whole price signal instead of years
 			X = np.array([year for year in range(begin, end)])
 			# set max_train_size for out of sample or expanding cv
 			tscv = TimeSeriesSplit(n_splits=len(X)-1, test_size=1, max_train_size=3)

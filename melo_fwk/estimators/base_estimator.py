@@ -1,10 +1,8 @@
-import pandas as pd
 
 from melo_fwk.strategies import BaseStrategy
 from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
 from melo_fwk.loggers.global_logger import GlobalLogger
 
-from itertools import dropwhile
 from typing import List, Union
 
 class MeloBaseEstimator:

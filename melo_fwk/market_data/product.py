@@ -6,9 +6,6 @@ import pandas as pd
 from melo_fwk.datastreams.hloc_datastream import HLOCDataStream
 from dataclasses import dataclass
 
-from melo_fwk.datastreams.utils import common
-
-
 @dataclass(frozen=True)
 class Product:
 	name: str
