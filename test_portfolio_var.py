@@ -66,15 +66,16 @@ class PortfolioUnitTests(unittest.TestCase):
 		for p, tsar in zip(products, results_list):
 			lp = MarketDataLoader.load_datastream(p)
 			account_df[lp.name] = tsar.account_series
-		n=1
-		var_class_ = VaR99
-		var99 = var_class_(n, 10000, model="sim_path")
+		n=10
+		var_class_ = SVaR99
+		# var99 = var_class_(n, 100000, model="sim_path")
+		var99 = var_class_(n_days=n, sample_param=100000)
 		print(var99(
 			account_df,
 			np.array([1/len(products) for _ in range(len(products))]),
 		))
 
-		var99 = var_class_(n, 10000, model="single_sim")
+		var99 = var_class_(n, 100000, model="single_sim")
 		print(var99(
 			account_df,
 			np.array([1/len(products) for _ in range(len(products))]),

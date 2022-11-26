@@ -8,7 +8,7 @@ from melo_fwk.var.common import VaRFactory
 
 class CVaR97:
 
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
+	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "sim_path"):
 		self.n_days = n_days
 		self.sample_param = sample_param
 		self.method = method

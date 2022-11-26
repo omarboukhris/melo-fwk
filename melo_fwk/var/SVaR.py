@@ -10,7 +10,7 @@ from melo_fwk.var.common import VaRFactory
 # should play out stress as parametric
 class SVaR99:
 
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
+	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "sim_path"):
 		self.n_days = n_days
 		self.sample_param = sample_param
 		self.method = method
@@ -31,7 +31,8 @@ class SVaR99:
 			var_list.append(_var(returns_window, w, self.model))
 
 		# maybe return the whole list, or head
-		return pd.DataFrame(var_list).head(10)
+		# return pd.Series(var_list).sort_values(ascending=True).head(10)
+		return pd.Series(var_list).min()
 		# or return just min, will depend on reporting
 		# return np.min(var_list)
 
