@@ -1,9 +1,9 @@
-from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
+from melo_fwk.trading_systems import TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.policies.size import VolTargetInertiaPolicy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 
 from melo_fwk.plots import AccountPlotter, TsarPlotter
 

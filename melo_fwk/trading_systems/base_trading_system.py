@@ -4,7 +4,7 @@ from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import BaseStrategy
 
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
+from melo_fwk.pose_size import BaseSizePolicy
 
 from melo_fwk.datastreams import (
 	HLOCDataStream,

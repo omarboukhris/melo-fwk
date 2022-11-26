@@ -1,6 +1,6 @@
 import pandas as pd
 
-from melo_fwk.policies.size import VolTargetSizePolicy
+from melo_fwk.pose_size import VolTargetSizePolicy
 
 class VolTargetInertiaPolicy(VolTargetSizePolicy):
 

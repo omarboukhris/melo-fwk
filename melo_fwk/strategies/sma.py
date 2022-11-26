@@ -24,12 +24,9 @@ class SMAStrategy(BaseStrategy, SMAParamSpace):
 		slow_sma = data.rolling(int(self.slow_span), min_periods=1).mean()
 
 		std = data.rolling(25).std()
-
 		sma = fast_sma - slow_sma
 
-		np.seterr(invalid="ignore")
 		forecast_vect = self.scale * (sma / std)
-		np.seterr(invalid="warn")
 		return forecast_vect
 
 

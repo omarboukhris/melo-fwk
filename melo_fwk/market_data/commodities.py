@@ -11,7 +11,7 @@ class CommodityDataLoader:
 
 	# agricultural
 	# plants
-	Cocoa = MarketDataLoader.get_commodity_hloc_datastream("Cocoa")
+	# Cocoa = MarketDataLoader.get_commodity_hloc_datastream("Cocoa")
 	Coffee = MarketDataLoader.get_commodity_hloc_datastream("Coffee")
 	Corn = MarketDataLoader.get_commodity_hloc_datastream("Copper")
 	Cotton = MarketDataLoader.get_commodity_hloc_datastream("Copper")

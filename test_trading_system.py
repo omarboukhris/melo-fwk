@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
-from melo_fwk.market_data import CommodityDataLoader, FxDataLoader
+from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.policies.size import VolTargetInertiaPolicy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
 

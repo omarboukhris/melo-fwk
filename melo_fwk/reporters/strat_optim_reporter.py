@@ -30,7 +30,6 @@ class StratOptimReporter(BaseReporter):
 			assert isinstance(tsar_dict, dict), \
 				f"(BacktestReporter) TSAR result {product_name} is not associated to a dict"
 
-
 			for strat_name, opt in tsar_dict.items():
 				self._export_config_points(opt, query_path, strat_name)
 

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
+from melo_fwk.pose_size.base_size_policy import BaseSizePolicy
 
 class VolTargetSizePolicy(BaseSizePolicy):
 

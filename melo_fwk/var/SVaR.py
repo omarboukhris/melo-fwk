@@ -2,16 +2,19 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
-from melo_fwk.policies.var.common import VaRFactory
+from melo_fwk.var.common import VaRFactory
 
-
+# buggy,
+# should play out stress as parametric
 class SVaR99:
 
-	def __init__(self, n_days: int, sample_param: Union[float, int], method: str = "monte_carlo"):
+	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
 		self.n_days = n_days
 		self.sample_param = sample_param
 		self.method = method
+		self.model = model
 		self.alpha = 0.01
 
 	def __call__(self, returns: pd.DataFrame, w: np.array, window_size: int = 250):
@@ -23,8 +26,9 @@ class SVaR99:
 
 		var_list = []
 		# rolling or expanding
-		for returns_window in returns.rolling():
-			var_list.append(_var(returns_window, w))
+		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
+		for returns_window in tqdm(returns.rolling(indexer, min_periods=window_size, step=25)):
+			var_list.append(_var(returns_window, w, self.model))
 
 		# maybe return the whole list, or head
 		return pd.DataFrame(var_list).head(10)

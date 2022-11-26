@@ -5,7 +5,6 @@ import pandas as pd
 
 from melo_fwk.datastreams.base_datastream import BaseDataStream
 
-
 """This class is used to wrap Tsar Data Frames in an interface and to offer some HLOC operations"""
 # TradingSystemAnnualResult
 class TsarDataStream(BaseDataStream):
@@ -73,26 +72,24 @@ class TsarDataStream(BaseDataStream):
 		return float(self.account_series.iloc[-1])
 
 	def sharpe_ratio(self, rf: float = 0.0):
-		mean = self.account_series.mean() - rf
-		sigma = self.account_series.std()
+		pct_returns = self.account_series.pct_change().dropna()
+		n_days = len(pct_returns)
+		mean = (pct_returns.mean() * n_days) - rf
+		sigma = pct_returns.std() * sqrt(n_days)
 		sharpe_r = mean / sigma if sigma != 0 else mean
 		return sharpe_r
 
-		# pct_returns = self.account_series.diff()/self.account_series
-		# mean = pct_returns.mean()
-		# sigma = pct_returns.std()
-		# sharpe_r = mean / sigma if sigma != 0 else mean
-		# return sharpe_r * sqrt(250)
-
-	def gar(self, starting_capital: float):
-		avg_daily_diff = self.daily_pnl_series.mean()
-		diff = avg_daily_diff / starting_capital
-		a = (1 + diff).prod() ** 0.5 - 1.
-		return a
+	def gar(self):
+		pct_returns = self.account_series.pct_change().replace([np.inf, -np.inf], np.nan).dropna().abs()
+		non_zero_pct = pct_returns[pct_returns != 0]
+		geomean = np.exp(np.log(non_zero_pct).mean())
+		return geomean
 
 	def sortino_ratio(self, rf: float = 0.0):
-		mean = self.daily_pnl_series.mean() - rf
-		sigma = self.daily_pnl_series[self.daily_pnl_series < 0].std()
+		pct_returns = self.account_series.pct_change().dropna()
+		n_days = len(pct_returns)
+		mean = (pct_returns.mean() * n_days) - rf
+		sigma = pct_returns[pct_returns < 0].std() * sqrt(n_days)
 		sortino = mean / sigma if sigma != 0 else mean
 		return sortino
 
@@ -111,5 +108,7 @@ class TsarDataStream(BaseDataStream):
 		return self.get_drawdown().min()
 
 	def calmar_ratio(self):
-		calmars = self.account_series.mean() / abs(self.max_drawdown())
-		return calmars
+		pct_returns = self.account_series.pct_change().dropna()
+		n_days = len(pct_returns)
+		calmar = pct_returns.mean() * n_days / abs(self.max_drawdown())
+		return calmar

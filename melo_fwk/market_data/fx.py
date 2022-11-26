@@ -10,7 +10,7 @@ class FxDataLoader:
 	EURCAD = MarketDataLoader.get_fx_hloc_datastream("EURCAD")
 	EURCHF = MarketDataLoader.get_fx_hloc_datastream("EURCHF")
 	EURGBP = MarketDataLoader.get_fx_hloc_datastream("EURGBP")
-	EURJPY = MarketDataLoader.get_fx_hloc_datastream("EURJPY")
+	# EURJPY = MarketDataLoader.get_fx_hloc_datastream("EURJPY")
 	GBPUSD = MarketDataLoader.get_fx_hloc_datastream("GBPUSD")
 	NZDUSD = MarketDataLoader.get_fx_hloc_datastream("NZDUSD")
 

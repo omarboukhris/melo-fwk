@@ -37,7 +37,7 @@ Tutorial on Mql is cooking
 from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.policies.size import VolTargetInertiaPolicy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
 # fetch product
@@ -70,9 +70,9 @@ trading_subsys = TradingSystem(
 )
 
 # run trading system for each year
-# and save result in dictionary
+#  and save result in dictionary
 results = {
-	f"Gold_{year}": trading_subsys.run_year(year) 
+	f"Gold_{year}": trading_subsys.run_year(year)
 	for year in product.years()
 }
 
@@ -143,9 +143,11 @@ def register_search_spaces():
 
 To add a position sizing component, same as with strategies, we need to create the component
 We need to inherit the basic vol target component and override `position_size_vect` method :
+
 ```python
-from melo_fwk.policies.size import BaseSizePolicy
+from melo_fwk.pose_size import BaseSizePolicy
 import pandas as pd
+
 
 class NewVolTargetPolicy(BaseSizePolicy):
 

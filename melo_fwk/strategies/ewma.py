@@ -20,13 +20,11 @@ class EWMAParamSpace:
 class EWMAStrategy(BaseStrategy, EWMAParamSpace):
 
 	def forecast_vect(self, data: pd.Series):
-		fast_ewma = data.ewm(span=int(self.fast_span)).mean()
-		slow_ewma = data.ewm(span=int(self.slow_span)).mean()
-		std = data.ewm(span=36).std()
+		fast_ewma = data.ewm(span=int(self.fast_span), adjust=False).mean()
+		slow_ewma = data.ewm(span=int(self.slow_span), adjust=False).mean()
 
+		std = data.ewm(span=36, adjust=False).std()
 		ewma = fast_ewma - slow_ewma
 
-		# np.seterr(invalid="ignore")
 		forecast_vect = self.scale * (ewma / std)
-		# np.seterr(invalid="warn")
 		return forecast_vect

@@ -1,6 +1,4 @@
 
-
-
 from melo_fwk.strategies import BaseStrategy
 
 from dataclasses import dataclass

@@ -16,8 +16,9 @@ from melo_fwk.strategies import (
 	SMAStrategy,
 	BuyAndHold,
 )
-from melo_fwk.policies.size.base_size_policy import BaseSizePolicy
-from melo_fwk.policies.size import (
+
+from melo_fwk.pose_size import (
+	BaseSizePolicy,
 	VolTargetSizePolicy,
 	VolTargetInertiaPolicy,
 	VolTargetDiscreteSizePolicy
