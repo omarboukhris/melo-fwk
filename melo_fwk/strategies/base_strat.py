@@ -28,6 +28,9 @@ class BaseStrategy:
 		], dtype=float)
 		return f_series
 
+	def to_dict(self):
+		pass
+
 	def estimate_forecast_scale(self, ratio: float = 0.6):
 		sample_products = MarketDataLoader.sample_products_alpha(ratio)
 

@@ -16,19 +16,18 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 
 	@staticmethod
 	def objective(W, exp_ret, covmat):
-		return -((W.T @ exp_ret) / (W.T @ covmat @ W) ** 0.5)
+		return -(W.T @ exp_ret) * ((W.T @ covmat @ W) ** -0.5)
 
 	@staticmethod
-	def get_div_mult(covmat_ret, opt_result):
+	def get_div_mult(corrmat_ret, opt_result):
 		opt_params = np.array(opt_result.x)
-		covmat_ret[covmat_ret < 0] = 0.
-		raw_div_mult = (opt_params.transpose() @ covmat_ret @ opt_params) ** -0.5
+		corrmat_ret[corrmat_ret < 0] = 0.
+		raw_div_mult = (opt_params.T @ corrmat_ret @ opt_params) ** -0.5
 		div_mult = min(ForecastWeightsEstimator.ForecastDivMultiplier, raw_div_mult)
 		return div_mult
 
 	def __init__(self, **kwargs):
 		super(ForecastWeightsEstimator, self).__init__(**kwargs)
-		self.metric = self.next_str_param("sharpe")
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
@@ -46,7 +45,7 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 		for i, subset_prod_ds in tqdm.tqdm(enumerate(rolling_datastream), leave=False):
 
 			opt_bounds = Bounds(0., 1.)
-			expected_ret, covmat_ret = self.get_expected_results(
+			expected_ret, returns = self.get_expected_results(
 				Product(
 					name=product.name,
 					block_size=product.block_size,
@@ -58,13 +57,13 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 			opt_result = minimize(
 				ForecastWeightsEstimator.objective,
 				np.array(self.forecast_weights),
-				args=(expected_ret, covmat_ret),
+				args=(expected_ret, returns.cov()),
 				method='SLSQP',
 				bounds=opt_bounds,
 				constraints=opt_cst,
 				tol=1e-5
 			)
-			div_mult = ForecastWeightsEstimator.get_div_mult(covmat_ret, opt_result)
+			div_mult = ForecastWeightsEstimator.get_div_mult(returns.corr(), opt_result)
 			results.append({
 				"OptimResult.fun": -opt_result.fun,
 				"OptimResult.x": opt_result.x,
@@ -89,6 +88,6 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 			tsar = trading_subsys.run()
 			key = f"{product.name}.{str(strategy)}"
 			returns.update({key: tsar.account_series})
-			result.append(tsar.get_metric_by_name(self.metric))
+			result.append(tsar.account_series.mean())
 
-		return np.array(result), pd.DataFrame(returns).corr()
+		return np.array(result), pd.DataFrame(returns)

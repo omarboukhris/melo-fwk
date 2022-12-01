@@ -19,6 +19,18 @@ class EWMAParamSpace:
 @dataclass
 class EWMAStrategy(BaseStrategy, EWMAParamSpace):
 
+	def to_dict(self):
+		return {
+			"cap": self.cap,
+			"fast_span": self.fast_span,
+			"slow_span": self.slow_span,
+			"scale": self.scale
+		}
+
+	@staticmethod
+	def from_dict(config: dict):
+		return EWMAStrategy(**config)
+
 	def forecast_vect(self, data: pd.Series):
 		fast_ewma = data.ewm(span=int(self.fast_span), adjust=False).mean()
 		slow_ewma = data.ewm(span=int(self.slow_span), adjust=False).mean()

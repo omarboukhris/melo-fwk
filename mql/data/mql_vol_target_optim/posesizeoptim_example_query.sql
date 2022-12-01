@@ -1,7 +1,7 @@
 create PoseSizeOptimExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)
-    Commodities (Oat, Cocoa)
+    Commodities (Oat)
 from 2004 to 2020
 
 where strategies

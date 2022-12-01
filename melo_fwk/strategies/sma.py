@@ -19,6 +19,18 @@ class SMAParamSpace:
 @dataclass
 class SMAStrategy(BaseStrategy, SMAParamSpace):
 
+	def to_dict(self):
+		return {
+			"cap": self.cap,
+			"fast_span": self.fast_span,
+			"slow_span": self.slow_span,
+			"scale": self.scale
+		}
+
+	@staticmethod
+	def from_dict(config: dict):
+		return SMAStrategy(**config)
+
 	def forecast_vect(self, data: pd.Series) -> pd.Series:
 		fast_sma = data.rolling(int(self.fast_span), min_periods=1).mean()
 		slow_sma = data.rolling(int(self.slow_span), min_periods=1).mean()

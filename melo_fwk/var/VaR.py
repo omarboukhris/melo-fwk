@@ -6,7 +6,7 @@ from melo_fwk.var.common import VaRFactory
 
 class VaR99:
 
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "sim_path"):
+	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
 		self._var = VaRFactory(method)(
 			alpha=0.01,
 			n_days=n_days
@@ -19,7 +19,7 @@ class VaR99:
 
 class VaR95:
 
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "sim_path"):
+	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
 		self._var = VaRFactory(method)(
 			alpha=0.05,
 			n_days=n_days

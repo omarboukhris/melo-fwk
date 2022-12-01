@@ -17,6 +17,7 @@ import pandas as pd
 import tqdm
 import unittest
 
+
 class PortfolioUnitTests(unittest.TestCase):
 
 	def test_portfolio(self):
@@ -66,46 +67,34 @@ class PortfolioUnitTests(unittest.TestCase):
 		for p, tsar in zip(products, results_list):
 			lp = MarketDataLoader.load_datastream(p)
 			account_df[lp.name] = tsar.account_series
-		n=10
-		var_class_ = SVaR99
-		# var99 = var_class_(n, 100000, model="sim_path")
+
+		n = 10
+		var_class_ = VaR95
 		var99 = var_class_(n_days=n, sample_param=100000)
 		print(var99(
 			account_df,
-			np.array([1/len(products) for _ in range(len(products))]),
+			np.array([1 / len(products) for _ in range(len(products))]),
 		))
 
-		var99 = var_class_(n, 100000, model="single_sim")
+		var99 = var_class_(n, 0.8, method="histo")
 		print(var99(
 			account_df,
-			np.array([1/len(products) for _ in range(len(products))]),
-		))
-
-		var99 = var_class_(n, 0.8, method="histo", model="sim_path")
-		print(var99(
-			account_df,
-			np.array([1/len(products) for _ in range(len(products))]),
-		))
-
-		var99 = var_class_(n, 0.8, method="histo", model="single_sim")
-		print(var99(
-			account_df,
-			np.array([1/len(products) for _ in range(len(products))]),
+			np.array([1 / len(products) for _ in range(len(products))]),
 		))
 
 		var99 = var_class_(n, None, method="param")
 		print(var99(
 			account_df,
-			np.array([1/len(products) for _ in range(len(products))]),
+			np.array([1 / len(products) for _ in range(len(products))]),
 		))
 
-		# account_plt = AccountPlotter(account_df)
-		# account_plt.save_png(f"data/residual/all_plot_vect.png")
+	# account_plt = AccountPlotter(account_df)
+	# account_plt.save_png(f"data/residual/all_plot_vect.png")
 
-		# plot tsar
-		# tsar_plotter = TsarPlotter({"pname": results})
-		# tsar_plotter.save_fig(export_folder="data/residual")
-		# return results_list
+	# plot tsar
+	# tsar_plotter = TsarPlotter({"pname": results})
+	# tsar_plotter.save_fig(export_folder="data/residual")
+	# return results_list
 
 
 if __name__ == "__main__":

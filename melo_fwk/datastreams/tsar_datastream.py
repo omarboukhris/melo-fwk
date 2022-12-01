@@ -5,8 +5,8 @@ import pandas as pd
 
 from melo_fwk.datastreams.base_datastream import BaseDataStream
 
-"""This class is used to wrap Tsar Data Frames in an interface and to offer some HLOC operations"""
-# TradingSystemAnnualResult
+"""This class is used to wrap Tsar Data Frames in an interface"""
+# TradingResult
 class TsarDataStream(BaseDataStream):
 	
 	def __init__(self, **kwargs):

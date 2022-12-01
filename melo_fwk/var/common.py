@@ -34,14 +34,6 @@ class BaseVaR:
 	alpha: float
 	n_days: int = 1
 
-	def simulate_prices(
-		self, S0, Z,
-		returns: pd.DataFrame,
-		weights: np.array,
-		method: str = "gbm"
-	):
-		wS0 = np.array(S0.multiply(weights))
-
 	def get_alpha_sensi(self, P):
 		index = int(self.alpha*len(P))
 		return pd.Series(P).sort_values(ascending=True).iat[index]
@@ -83,10 +75,11 @@ class HistVar(BaseVaR):
 		pct_returns = returns.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
 		n_sample = int(len(pct_returns)*self.sample_ratio)
 		if method == "sim_path":
+			# might be problematic because sampling might not keep corr matrix stable
 			Z = np.cumsum([pct_returns.sample(n=n_sample).T for _ in range(self.n_days)], 0)
 			P = (wS0[..., np.newaxis] * Z).sum(axis=1)[-1]
 
-		else:  # sim_path
+		else:  # sim_single
 			Z = np.array(pct_returns.sample(n=n_sample).T)
 			P = np.sqrt(self.n_days) * (wS0[..., np.newaxis] * Z).sum(axis=0)
 		# P = self.simulate_prices(S0, Z, pct_returns, weights, method)

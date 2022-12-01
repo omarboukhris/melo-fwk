@@ -17,6 +17,12 @@ class VolTarget:
 	def to_list(self):
 		return self.__str__().split("\n")[:-1]
 
+	def to_dict(self):
+		return {
+			"annual_vol_target": self.annual_vol_target,
+			"trading_capital": self.trading_capital
+		}
+
 	def __str__(self):
 		return f"Annual vol target : {self.annual_vol_target}\n" +\
 			f"Trading capital : {self.trading_capital}\n" +\

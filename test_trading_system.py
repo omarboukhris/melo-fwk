@@ -12,13 +12,13 @@ from melo_fwk.plots import TsarPlotter
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def test_trading_system(self):
-		TradingSystemUnitTests.run_simulation("all", TradingSystem)
+		# TradingSystemUnitTests.run_simulation("all", TradingSystem)
 		TradingSystemUnitTests.run_simulation("linear", TradingSystem)
-		TradingSystemUnitTests.run_simulation("compound", TradingSystem)
+		# TradingSystemUnitTests.run_simulation("compound", TradingSystem)
 
-		TradingSystemUnitTests.run_simulation("all", TradingSystemIter)
-		TradingSystemUnitTests.run_simulation("linear", TradingSystemIter)
-		TradingSystemUnitTests.run_simulation("compound", TradingSystemIter)
+		# TradingSystemUnitTests.run_simulation("all", TradingSystemIter)
+		# TradingSystemUnitTests.run_simulation("linear", TradingSystemIter)
+		# TradingSystemUnitTests.run_simulation("compound", TradingSystemIter)
 
 	@staticmethod
 	def run_simulation(x: str, tr: callable):
