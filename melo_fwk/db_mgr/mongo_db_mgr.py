@@ -45,6 +45,7 @@ class MongodbManager:
 	def get_data(self, table: str):
 		return self.select_request(table)
 
+
 	def delete_by_id(self, table: str, data_id: str):
 		query = {"_id": boi.ObjectId(data_id)}
 		collection = self.db_connection[table]

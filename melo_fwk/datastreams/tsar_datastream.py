@@ -10,6 +10,7 @@ from melo_fwk.datastreams.base_datastream import BaseDataStream
 class TsarDataStream(BaseDataStream):
 	
 	def __init__(self, **kwargs):
+		self.name = kwargs.pop("name")
 		super(TsarDataStream, self).__init__(**kwargs)
 		self.dates = self.dataframe["Date"]
 		self.price_series = self.dataframe["Price"]
@@ -92,6 +93,9 @@ class TsarDataStream(BaseDataStream):
 		sigma = pct_returns[pct_returns < 0].std() * sqrt(n_days)
 		sortino = mean / sigma if sigma != 0 else mean
 		return sortino
+
+	def last_pose(self):
+		return self.size_series.iat[-1]
 
 	def pnl(self):
 		return self.account_series.iat[-1]

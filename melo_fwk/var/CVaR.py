@@ -15,7 +15,7 @@ class CVaR97:
 		self.model = model
 		self.alpha = 0.025
 
-	def __call__(self, returns: pd.DataFrame, w: np.array, nbins: int = 100):
+	def __call__(self, returns: pd.DataFrame, nbins: int = 100):
 		var_list = []
 		step_size = self.alpha / nbins
 		alpha = step_size
@@ -27,7 +27,7 @@ class CVaR97:
 				alpha=alpha
 			)
 			_var.set_sample_param(self.sample_param)
-			var_list.append(_var(returns, w, self.model))
+			var_list.append(_var(returns, self.model))
 			alpha += step_size
 
 		return np.mean(var_list)

@@ -14,8 +14,8 @@ class VaR99:
 		self.model = model
 		self._var.set_sample_param(sample_param)
 
-	def __call__(self, returns: pd.DataFrame, w: np.array):
-		return self._var(returns, w, self.model)
+	def __call__(self, returns: pd.DataFrame):
+		return self._var(returns, self.model)
 
 class VaR95:
 
@@ -27,5 +27,5 @@ class VaR95:
 		self.model = model
 		self._var.set_sample_param(sample_param)
 
-	def __call__(self, returns: pd.DataFrame, w: np.array):
-		return self._var(returns, w)
+	def __call__(self, returns: pd.DataFrame):
+		return self._var(returns)

@@ -1,17 +1,12 @@
-import numpy as np
-
-from melo_fwk.trading_systems import TradingSystemIter, TradingSystem
+from melo_fwk.var.basket import BasketDataStream
+from melo_fwk.trading_systems import TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 
-from melo_fwk.plots import AccountPlotter, TsarPlotter
-
-from melo_fwk.var.VaR import VaR99, VaR95
-from melo_fwk.var.CVaR import CVaR97
-from melo_fwk.var.SVaR import SVaR99
+from melo_fwk.var.VaR import VaR99
 
 import pandas as pd
 import tqdm
@@ -29,21 +24,24 @@ class PortfolioUnitTests(unittest.TestCase):
 		}
 		sma = EWMAStrategy(**sma_params)
 
-		products = MarketDataLoader.get_fx()
-		products += MarketDataLoader.get_commodities()
-		products = products[:1]
+		# products = MarketDataLoader.get_fx()
+		products = MarketDataLoader.get_commodities()
+		products = [MarketDataLoader.load_datastream(p) for p in products[5:6]]
+		# products = MarketDataLoader.sample_products(3)
 
 		results = {}
 		balance = 0
 		start_capital = 10000 * len(products)
+		tsar_list = []
 		for product in tqdm.tqdm(products):
-			loaded_prod = MarketDataLoader.load_datastream(product)
+			# loaded_prod = MarketDataLoader.load_datastream(product)
 			size_policy = VolTargetInertiaPolicy(
 				annual_vol_target=0.4,
-				trading_capital=10000)
+				trading_capital=start_capital)
 
 			tr_sys = TradingSystemIter(
-				product=loaded_prod,
+				# product=loaded_prod,
+				product=product,  # .get_years([2007, 2008]),
 				trading_rules=[sma],
 				forecast_weights=[1.],
 				size_policy=size_policy
@@ -52,8 +50,14 @@ class PortfolioUnitTests(unittest.TestCase):
 			# simulation with constant risk
 			tsar = tr_sys.run()
 
-			results.update({product["name"]: tsar})
-			balance += tsar.balance_delta()
+			results.update({product.name: tsar})
+			tsar_list.append(product)
+			balance += tsar.balance_delta() * 1/len(products)
+
+		basket = BasketDataStream(tsar_list, [1/len(products)] * len(products))
+		basket.plot_hist(10, 0.15)
+		basket.plot_price(10, 10000)
+		basket.plot_price_paths(10, 10000)
 
 		# plot whole balance
 		results_list = [r for r in results.values()]
@@ -65,28 +69,23 @@ class PortfolioUnitTests(unittest.TestCase):
 		print(f"5% risk free : {risk_free}")
 
 		for p, tsar in zip(products, results_list):
-			lp = MarketDataLoader.load_datastream(p)
-			account_df[lp.name] = tsar.account_series
+			# lp = MarketDataLoader.load_datastream(p)
+			account_df[p.name] = tsar.account_series.fillna(method="bfill")
 
 		n = 10
-		var_class_ = VaR95
-		var99 = var_class_(n_days=n, sample_param=100000)
-		print(var99(
-			account_df,
-			np.array([1 / len(products) for _ in range(len(products))]),
-		))
-
+		var_class_ = VaR99
+		# histo seems broken
+		var99 = var_class_(n_days=n, sample_param=1000000)
+		mc_var = var99(account_df)
+		print(mc_var.sum())
 		var99 = var_class_(n, 0.8, method="histo")
-		print(var99(
-			account_df,
-			np.array([1 / len(products) for _ in range(len(products))]),
-		))
+		print(var99(account_df).sum())
+
+		var99 = var_class_(n_days=n, sample_param=1000000, model="sim_path")
+		print(var99(account_df).sum())
 
 		var99 = var_class_(n, None, method="param")
-		print(var99(
-			account_df,
-			np.array([1 / len(products) for _ in range(len(products))]),
-		))
+		print(var99(account_df).sum())
 
 	# account_plt = AccountPlotter(account_df)
 	# account_plt.save_png(f"data/residual/all_plot_vect.png")

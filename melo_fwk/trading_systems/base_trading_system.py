@@ -24,6 +24,7 @@ class BaseTradingSystem:
 		size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
 	):
 
+		# assert len(product) != 0, "(AssertionError) Data source is None"
 		assert product is not None, "(AssertionError) Data source is None"
 		assert len(trading_rules) == len(forecast_weights), \
 			"(AssertionError) Number of TradingRules must match forcast weights"
@@ -32,7 +33,7 @@ class BaseTradingSystem:
 		self.product = product
 		self.trading_rules = trading_rules
 		self.forecast_weights = forecast_weights
-		self.size_policy = size_policy.setup_product(self.product)
+		self.size_policy = size_policy.setup_product(product)
 
 	@staticmethod
 	def default():
@@ -79,11 +80,14 @@ class BaseTradingSystem:
 		pose_series: pd.Series,
 		daily_pnl_series: pd.Series
 	) -> TsarDataStream:
-		return TsarDataStream(dataframe=pd.DataFrame({
-			"Date": self.product.get_date_series().reset_index(drop=True),
-			"Price": self.product.get_close_series().reset_index(drop=True),
-			"Forecast": forecast_series,
-			"Size": pose_series,
-			"Account": daily_pnl_series.expanding(1).sum(),
-			"Daily_PnL": daily_pnl_series
-		}))
+		return TsarDataStream(
+			name=self.product.name,
+			dataframe=pd.DataFrame({
+				"Date": self.product.get_date_series().reset_index(drop=True),
+				"Price": self.product.get_close_series().reset_index(drop=True),
+				"Forecast": forecast_series,
+				"Size": pose_series,
+				"Account": daily_pnl_series.expanding(1).sum(),
+				"Daily_PnL": daily_pnl_series
+			})
+		)
