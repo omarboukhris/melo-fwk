@@ -1,33 +1,23 @@
-from typing import Union
 
-import numpy as np
-import pandas as pd
+from melo_fwk.var.basket import VaRBasket
+from melo_fwk.var.common import expected_shortfall
 
-from melo_fwk.var.common import VaRFactory
+def CVaR(
+	basket: VaRBasket,
+	n_days: int,
+	sample_param,
+	method: str = "monte_carlo",
+	gen_path: bool = True,
+	nbins: int = 100
+):
+	return expected_shortfall(0.025, basket, n_days, sample_param, method, gen_path, nbins).mean()
 
-
-class CVaR97:
-
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
-		self.n_days = n_days
-		self.sample_param = sample_param
-		self.method = method
-		self.model = model
-		self.alpha = 0.025
-
-	def __call__(self, returns: pd.DataFrame, nbins: int = 100):
-		var_list = []
-		step_size = self.alpha / nbins
-		alpha = step_size
-
-		var_class_ = VaRFactory(self.method)
-		for i in range(nbins):
-			_var = var_class_(
-				n_days=self.n_days,
-				alpha=alpha
-			)
-			_var.set_sample_param(self.sample_param)
-			var_list.append(_var(returns, self.model))
-			alpha += step_size
-
-		return np.mean(var_list)
+def CVaR_vect(
+	basket: VaRBasket,
+	n_days: int,
+	sample_param,
+	method: str = "monte_carlo",
+	gen_path: bool = True,
+	nbins: int = 100
+):
+	return expected_shortfall(0.025, basket, n_days, sample_param, method, gen_path, nbins)

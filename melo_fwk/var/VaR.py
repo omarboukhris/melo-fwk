@@ -1,31 +1,15 @@
-import numpy as np
-import pandas as pd
 
-from melo_fwk.var.common import VaRFactory
+from melo_fwk.var.basket import VaRBasket
+from melo_fwk.var.common import simpleVaR
 
+def VaR99(basket: VaRBasket, n_days: int, sample_param, method: str = "monte_carlo", gen_path: bool = True):
+	return simpleVaR(0.01, basket, n_days, sample_param, method, gen_path, True)
 
-class VaR99:
+def VaR99_vect(basket: VaRBasket, n_days: int, sample_param, method: str = "monte_carlo", gen_path: bool = True):
+	return simpleVaR(0.01, basket, n_days, sample_param, method, gen_path, False)
 
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
-		self._var = VaRFactory(method)(
-			alpha=0.01,
-			n_days=n_days
-		)
-		self.model = model
-		self._var.set_sample_param(sample_param)
+def VaR95(basket: VaRBasket, n_days: int, sample_param, method: str = "monte_carlo", gen_path: bool = True):
+	return simpleVaR(0.05, basket, n_days, sample_param, method, gen_path, True)
 
-	def __call__(self, returns: pd.DataFrame):
-		return self._var(returns, self.model)
-
-class VaR95:
-
-	def __init__(self, n_days: int, sample_param, method: str = "monte_carlo", model: str = "gbm"):
-		self._var = VaRFactory(method)(
-			alpha=0.05,
-			n_days=n_days
-		)
-		self.model = model
-		self._var.set_sample_param(sample_param)
-
-	def __call__(self, returns: pd.DataFrame):
-		return self._var(returns)
+def VaR95_vect(basket: VaRBasket, n_days: int, sample_param, method: str = "monte_carlo", gen_path: bool = True):
+	return simpleVaR(0.05, basket, n_days, sample_param, method, gen_path, False)

@@ -7,7 +7,8 @@ from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 
 from melo_fwk.plots.var_plot import VarPlotter
-from melo_fwk.var.VaR import VaR99
+from melo_fwk.var.VaR import VaR99, VaR95
+from melo_fwk.var.CVaR import CVaR
 
 import pandas as pd
 import tqdm
@@ -37,10 +38,10 @@ class PortfolioUnitTests(unittest.TestCase):
 		for product in tqdm.tqdm(products):
 			# loaded_prod = MarketDataLoader.load_datastream(product)
 			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=0.4,
+				annual_vol_target=0.2,
 				trading_capital=start_capital)
 
-			tr_sys = TradingSystem(
+			tr_sys = TradingSystemIter(
 				# product=loaded_prod,
 				product=product,  # .get_years([2007, 2008]),
 				trading_rules=[sma],
@@ -53,24 +54,69 @@ class PortfolioUnitTests(unittest.TestCase):
 
 			results.update({product.name: tsar})
 			tsar_list.append(tsar)
-			balance += tsar.balance_delta() * 1/len(products)
+			balance += tsar.balance_delta()
 
-		basket = VaRBasket(tsar_list, products)
+		lp = len(products)
+		basket = VaRBasket(tsar_list, products, [1/lp]*lp)
 
-		VarPlotter.plot_prices(basket.simulate_hist(10, 0.9))
-		VarPlotter.plot_prices(basket.simulate_price(10, 10000))
-		VarPlotter.plot_price_paths(basket.simulate_price_paths(10, 10000), basket.tails)
-		VarPlotter.plot_price_paths(basket.simulate_hist_paths(10, 0.9), basket.tails)
+		# VarPlotter.plot_prices(basket.simulate_hist(10, 0.9))
+		# VarPlotter.plot_prices(basket.simulate_price(10, 10000))
+		# VarPlotter.plot_price_paths(basket.simulate_price_paths(10, 10000), basket.tails)
+		# VarPlotter.plot_price_paths(basket.simulate_hist_paths(10, 0.9), basket.tails)
 
-		print(basket.monte_carlo_VaR(0.01, 10, 50000, "path"))
-		print(basket.monte_carlo_VaR(0.01, 10, 50000, "single"))
-		print(basket.histo_VaR(0.01, 10, 0.8, "path"))
-		print(basket.histo_VaR(0.01, 10, 0.8, "single"))
+		# print(basket.monte_carlo_VaR_vect(0.01, 10, 50000, True))
+		# print(basket.monte_carlo_VaR_vect(0.01, 10, 50000, False))
+		# print(basket.histo_VaR_vect(0.01, 10, 0.8, True))
+		# print(basket.histo_VaR_vect(0.01, 10, 0.8, False))
 
 		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
 		print(f"starting capital : {start_capital}")
 		print(f"final balance : {balance}")
 		print(f"5% risk free : {risk_free}")
+
+		n_days = 10
+		n_sim = 20000
+		r_spl = 0.8
+
+		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=True)
+		print(f"VaR99 MC P : {var99}")
+
+		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=False)
+		print(f"VaR99 MC S : {var99}")
+
+		var99 = VaR99(basket, n_days, r_spl, method="h", gen_path=True)
+		print(f"VaR99 H P: {var99}")
+
+		var99 = VaR99(basket, n_days, r_spl, method="h", gen_path=False)
+		print(f"VaR99 H S: {var99}")
+
+
+
+		var95 = VaR95(basket, n_days, n_sim, method="mc", gen_path=True)
+		print(f"VaR95 MC P : {var95}")
+
+		var95 = VaR95(basket, n_days, n_sim, method="mc", gen_path=False)
+		print(f"VaR95 MC S: {var95}")
+
+		var95 = VaR95(basket, n_days, r_spl, method="h", gen_path=True)
+		print(f"VaR95 H P : {var95}")
+
+		var95 = VaR95(basket, n_days, r_spl, method="h", gen_path=False)
+		print(f"VaR95 H S: {var95}")
+
+
+
+		cvar = CVaR(basket, n_days, n_sim, method="mc", gen_path=False)
+		print(f"ES MC S: {cvar}")
+
+		cvar = CVaR(basket, n_days, n_sim, method="mc", gen_path=True)
+		print(f"ES MC P: {cvar}")
+
+		cvar = CVaR(basket, n_days, r_spl, method="h", gen_path=False)
+		print(f"ES H S: {cvar}")
+
+		cvar = CVaR(basket, n_days, r_spl, method="h", gen_path=True)
+		print(f"ES H P: {cvar}")
 
 		# plot whole balance
 		# results_list = [r for r in results.values()]
