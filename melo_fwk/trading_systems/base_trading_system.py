@@ -24,7 +24,6 @@ class BaseTradingSystem:
 		size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
 	):
 
-		# assert len(product) != 0, "(AssertionError) Data source is None"
 		assert product is not None, "(AssertionError) Data source is None"
 		assert len(trading_rules) == len(forecast_weights), \
 			"(AssertionError) Number of TradingRules must match forcast weights"

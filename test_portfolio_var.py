@@ -1,5 +1,5 @@
-from melo_fwk.var.basket import BasketDataStream
-from melo_fwk.trading_systems import TradingSystemIter
+from melo_fwk.var.basket import VaRBasket
+from melo_fwk.trading_systems import TradingSystemIter, TradingSystem
 
 from melo_fwk.market_data import MarketDataLoader
 
@@ -26,7 +26,7 @@ class PortfolioUnitTests(unittest.TestCase):
 
 		# products = MarketDataLoader.get_fx()
 		products = MarketDataLoader.get_commodities()
-		products = [MarketDataLoader.load_datastream(p) for p in products[5:6]]
+		products = [MarketDataLoader.load_datastream(p) for p in products[1:6]]
 		# products = MarketDataLoader.sample_products(3)
 
 		results = {}
@@ -51,41 +51,47 @@ class PortfolioUnitTests(unittest.TestCase):
 			tsar = tr_sys.run()
 
 			results.update({product.name: tsar})
-			tsar_list.append(product)
+			tsar_list.append(tsar)
 			balance += tsar.balance_delta() * 1/len(products)
 
-		basket = BasketDataStream(tsar_list, [1/len(products)] * len(products))
-		basket.plot_hist(10, 0.15)
-		basket.plot_price(10, 10000)
-		basket.plot_price_paths(10, 10000)
+		basket = VaRBasket(tsar_list, products)
+		# basket.plot_hist(10, 0.9, "gbm")
+		# basket.plot_hist(10, 0.9, "lin")
+		# basket.plot_price(10, 10000)
+		# basket.plot_price_paths(10, 10000)
+		# basket.plot_hist_paths(10, 0.9)
 
-		# plot whole balance
-		results_list = [r for r in results.values()]
-		account_df = pd.DataFrame()
+		print(basket.monte_carlo_VaR(0.01, 10, 10000, "path"))
+		print(basket.monte_carlo_VaR(0.01, 10, 10000, "single"))
+		print(basket.histo_VaR(0.01, 10, 0.8, "path"))
+		print(basket.histo_VaR(0.01, 10, 0.8, "single"))
 
 		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
 		print(f"starting capital : {start_capital}")
 		print(f"final balance : {balance}")
 		print(f"5% risk free : {risk_free}")
 
-		for p, tsar in zip(products, results_list):
-			# lp = MarketDataLoader.load_datastream(p)
-			account_df[p.name] = tsar.account_series.fillna(method="bfill")
-
-		n = 10
-		var_class_ = VaR99
-		# histo seems broken
-		var99 = var_class_(n_days=n, sample_param=1000000)
-		mc_var = var99(account_df)
-		print(mc_var.sum())
-		var99 = var_class_(n, 0.8, method="histo")
-		print(var99(account_df).sum())
-
-		var99 = var_class_(n_days=n, sample_param=1000000, model="sim_path")
-		print(var99(account_df).sum())
-
-		var99 = var_class_(n, None, method="param")
-		print(var99(account_df).sum())
+		# plot whole balance
+		# results_list = [r for r in results.values()]
+		# account_df = pd.DataFrame()
+		#
+		# for p, tsar in zip(products, results_list):
+		# 	account_df[p.name] = tsar.account_series.fillna(method="bfill")
+		#
+		# n = 10
+		# var_class_ = VaR99
+		# # histo seems broken
+		# var99 = var_class_(n_days=n, sample_param=1000000)
+		# mc_var = var99(account_df)
+		# print(mc_var.sum())
+		# var99 = var_class_(n, 0.8, method="histo")
+		# print(var99(account_df).sum())
+		#
+		# var99 = var_class_(n_days=n, sample_param=1000000, model="sim_path")
+		# print(var99(account_df).sum())
+		#
+		# var99 = var_class_(n, None, method="param")
+		# print(var99(account_df).sum())
 
 	# account_plt = AccountPlotter(account_df)
 	# account_plt.save_png(f"data/residual/all_plot_vect.png")
