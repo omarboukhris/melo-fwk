@@ -6,6 +6,7 @@ from melo_fwk.market_data import MarketDataLoader
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 
+from melo_fwk.plots.var_plot import VarPlotter
 from melo_fwk.var.VaR import VaR99
 
 import pandas as pd
@@ -39,7 +40,7 @@ class PortfolioUnitTests(unittest.TestCase):
 				annual_vol_target=0.4,
 				trading_capital=start_capital)
 
-			tr_sys = TradingSystemIter(
+			tr_sys = TradingSystem(
 				# product=loaded_prod,
 				product=product,  # .get_years([2007, 2008]),
 				trading_rules=[sma],
@@ -55,14 +56,14 @@ class PortfolioUnitTests(unittest.TestCase):
 			balance += tsar.balance_delta() * 1/len(products)
 
 		basket = VaRBasket(tsar_list, products)
-		# basket.plot_hist(10, 0.9, "gbm")
-		# basket.plot_hist(10, 0.9, "lin")
-		# basket.plot_price(10, 10000)
-		# basket.plot_price_paths(10, 10000)
-		# basket.plot_hist_paths(10, 0.9)
 
-		print(basket.monte_carlo_VaR(0.01, 10, 10000, "path"))
-		print(basket.monte_carlo_VaR(0.01, 10, 10000, "single"))
+		VarPlotter.plot_prices(basket.simulate_hist(10, 0.9))
+		VarPlotter.plot_prices(basket.simulate_price(10, 10000))
+		VarPlotter.plot_price_paths(basket.simulate_price_paths(10, 10000), basket.tails)
+		VarPlotter.plot_price_paths(basket.simulate_hist_paths(10, 0.9), basket.tails)
+
+		print(basket.monte_carlo_VaR(0.01, 10, 50000, "path"))
+		print(basket.monte_carlo_VaR(0.01, 10, 50000, "single"))
 		print(basket.histo_VaR(0.01, 10, 0.8, "path"))
 		print(basket.histo_VaR(0.01, 10, 0.8, "single"))
 

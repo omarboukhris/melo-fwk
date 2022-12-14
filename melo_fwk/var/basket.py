@@ -22,22 +22,19 @@ class VaRBasket:
 		self.dataframe = pd.DataFrame({
 			product.name: product.get_close_series() for product in products
 		}).ffill()
-		self.tails = self.dataframe.tail(10).values.T
+		self.last_prices = np.array([p.datastream.get_close_series().iat[-1] for p in products])
+		self.block_size_vect = np.array([p.block_size for p in products])
+		self.export_filenames = [p.name for p in products]
+		self.tails = [p.datastream.get_close_series().tail(10).values.T for p in products]
 		self.S0 = self.dataframe.iloc[-1].to_numpy()
 		self.pct_returns = self.dataframe.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
 		self.mu = np.array(self.pct_returns.mean(axis=0))
 		self.std = np.array(self.pct_returns.std(axis=0))
 
-	def simulate_hist(self, n_days, sample_ratio: float, method: str = "gbm"):
+	def simulate_hist(self, n_days, sample_ratio: float):
 		Z = np.sqrt(n_days) * self.pct_returns.sample(frac=sample_ratio, axis=0)
-		if method == "gbm":
-			drift = (self.mu - (self.std ** 2 / 2)) * n_days
-			vol = np.einsum("i,ij->ij", np.sqrt(n_days) * self.std, Z.T)
-			e = np.exp(vol + drift[:, np.newaxis])
-			return np.nan_to_num(np.einsum("i,ij->ij", self.S0, e))
-		else:  # method == "lin":
-			e = 1+Z
-			return np.nan_to_num(self.S0 * e).T
+		e = 1+Z
+		return np.nan_to_num(self.S0 * e).T
 
 	def simulate_hist_paths(self, n_days, sample_ratio: float):
 		S0 = self.S0
@@ -75,53 +72,32 @@ class VaRBasket:
 
 		return np.nan_to_num(np.einsum("i,ijk->ijk", self.S0, e))
 
-	def plot_hist(self, n_days, sample_ratio: float, method: str = "gbm"):
-		price = self.simulate_hist(n_days, sample_ratio, method)
-		for p in price:
-			plt.hist(p, bins=int(len(p)/10))
-			plt.show()
-			plt.close()
-
-	def plot_hist_paths(self, n_days, sample_ratio: float):
-		price = self.simulate_hist_paths(n_days, sample_ratio)
-		for t, p in zip(self.tails, price):
-			plt.plot(np.concatenate((np.tile(t, (len(p), 1)).T, p.T)))
-			plt.show()
-			plt.close()
-
-	def plot_price(self, n_days: int = 1, n_simulation: int = 100000):
-		price = self.simulate_price(n_days, n_simulation)
-		for p in price:
-			plt.hist(p, bins=int(len(p)/10))
-			plt.show()
-			plt.close()
-
-	def plot_price_paths(self, n_days: int = 1, n_simulation: int = 100000):
-		price = self.simulate_price_paths(n_days, n_simulation)
-		for t, p in zip(self.tails, price):
-			plt.plot(np.concatenate((np.tile(t, (len(p), 1)).T, p.T)))
-			plt.show()
-			plt.close()
-
 	def monte_carlo_VaR(self, alpha: float, n_days: int = 1, n_simulation: int = 100000, method: str = "single"):
 		pose_vect = np.array([tsar.last_pose() for tsar in self.tsar_list])
+		pose_block_size = np.einsum("i,i->i", pose_vect, self.block_size_vect)
 
 		if method == "path":
-			P = np.array(self.simulate_price_paths(n_days, n_simulation))[:, :, -1]
+			P = np.array(self.simulate_price_paths(n_days, n_simulation))
+			daily_diff = np.diff(P, axis=2)
+			returns = np.einsum("i,ijk->ij", pose_block_size, daily_diff)
 		else:  # single
-			P = self.simulate_price(n_days, n_simulation)
+			generated_prices = self.simulate_price(n_days, n_simulation)
+			generated_price_diff = generated_prices - self.last_prices[:, np.newaxis]
+			returns = np.einsum("i,ij->ij", pose_block_size, generated_price_diff)
 
-		S = np.einsum("i,ij->ij", pose_vect, P)
-		return [pd.Series(p).sort_values(ascending=True).quantile(alpha) for p in S]
+		return [pd.Series(p).sort_values(ascending=True).quantile(alpha) for p in returns]
 
 	def histo_VaR(self, alpha: float, n_days: int = 1, sample_ratio: float = 0.6, method: str = "single"):
 		pose_vect = np.array([tsar.last_pose() for tsar in self.tsar_list])
+		pose_block_size = np.einsum("i,i->i", pose_vect, self.block_size_vect)
 
 		if method == "path":
-			P = np.array(self.simulate_hist_paths(n_days, sample_ratio))[:, :, -1]
+			P = np.array(self.simulate_hist_paths(n_days, sample_ratio))
+			daily_diff = np.diff(P, axis=2)
+			returns = np.einsum("i,ijk->ij", pose_block_size, daily_diff)
 		else:  # single
-			P = self.simulate_hist(n_days, sample_ratio)
+			generated_prices = self.simulate_hist(n_days, sample_ratio)
+			generated_price_diff = generated_prices - self.last_prices[:, np.newaxis]
+			returns = np.einsum("i,ij->ij", pose_block_size, generated_price_diff)
 
-		S = np.einsum("i,ij->ij", pose_vect, P)
-		return [pd.Series(p).sort_values(ascending=True).quantile(alpha) for p in S]
-
+		return [pd.Series(p).sort_values(ascending=True).quantile(alpha) for p in returns]

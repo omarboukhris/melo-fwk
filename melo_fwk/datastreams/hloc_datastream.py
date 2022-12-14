@@ -56,6 +56,7 @@ class HLOCDataStream(BaseDataStream):
 		return self._get_value_at_date("Open", date)
 
 	def get_daily_diff_series(self) -> pd.Series:
+		# it's basically dataframe.diff().fillna(0)
 		return self.dataframe["Daily_diff"]
 
 	def get_diff_at_date(self, date: str) -> float:
