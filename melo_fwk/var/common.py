@@ -1,11 +1,5 @@
-from cmath import sqrt
-from dataclasses import dataclass
 
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-
-from scipy.stats import norm
 
 from melo_fwk.var.basket import VaRBasket
 

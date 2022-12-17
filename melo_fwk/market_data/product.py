@@ -10,6 +10,7 @@ from dataclasses import dataclass
 class Product:
 	name: str
 	block_size: int
+	cap: float
 	datastream: HLOCDataStream
 
 	def years(self):
@@ -21,6 +22,7 @@ class Product:
 		return Product(
 			name=self.name,
 			block_size=self.block_size,
+			cap=self.cap,
 			datastream=self.datastream.get_years(years)
 		)
 
@@ -29,6 +31,7 @@ class Product:
 		return Product(
 			name=self.name,
 			block_size=self.block_size,
+			cap=self.cap,
 			datastream=self.datastream.get_year(year, stitch)
 		)
 
@@ -63,5 +66,6 @@ class Product:
 				yield Product(
 					name=self.name,
 					block_size=self.block_size,
+					cap=self.cap,
 					datastream=roll,
 				)

@@ -12,6 +12,7 @@ class BaseSizePolicy:
 		trading_capital: float
 	):
 		self.block_size = 1.
+		self.cap = 0.
 		self.datastream: HLOCDataStream = HLOCDataStream.get_empty()
 		self.vol_target = VolTarget(annual_vol_target, trading_capital)
 
@@ -24,6 +25,7 @@ class BaseSizePolicy:
 	def setup_product(self, product: Product):
 		self.datastream = product.datastream
 		self.block_size = product.block_size
+		self.cap = product.cap
 		return self
 
 	def position_size_vect(self, forecast: pd.Series) -> pd.Series:

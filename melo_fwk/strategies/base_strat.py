@@ -21,12 +21,8 @@ class BaseStrategy:
 		pass
 
 	def forecast_vect_cap(self, data: pd.Series) -> pd.Series:
-		f_vect = self.forecast_vect(data)
-		f_series = pd.Series([
-			min(f_val, self.cap) if f_val > 0 else max(f_val, -self.cap)
-			for f_val in f_vect
-		], dtype=float)
-		return f_series
+		f_vect = self.forecast_vect(data).clip(upper=self.cap, lower=-self.cap)
+		return f_vect
 
 	def to_dict(self):
 		pass

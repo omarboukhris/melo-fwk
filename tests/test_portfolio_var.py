@@ -47,7 +47,7 @@ class PortfolioUnitTests(unittest.TestCase):
 				annual_vol_target=0.3,
 				trading_capital=start_capital)
 
-			tr_sys = TradingSystem(
+			tr_sys = TradingSystemIter(
 				# product=loaded_prod,
 				product=product,  # .get_years([2007, 2008]),
 				trading_rules=[sma],

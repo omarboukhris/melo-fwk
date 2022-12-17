@@ -10,13 +10,13 @@ from pathlib import Path
 
 products_block_size = {
 	# Commodity
-	"Brent Crude Oil": 1000,
+	"Brent Crude Oil": 100,
 	"Cocoa": 100,  #
 	"Coffee": 100,  #
 	"Copper": 100,  #
 	"Corn": 100,  #
 	"Cotton": 100,  #
-	"Crude Oil": 1000,  #
+	"Crude Oil": 100,  #
 	"Feeder Cattle": 100,  #
 	"Gold": 100,  #
 	"Lean Hogs": 100,  #
@@ -35,16 +35,55 @@ products_block_size = {
 	"Wheat": 100,  #
 
 	# Fx
-	"AUDUSD": 1e+5,
-	"CADUSD": 1e+5,
-	"CHFUSD": 1e+5,
-	"EURCAD": 1e+5,
-	"EURCHF": 1e+5,
-	"EURGBP": 1e+5,
-	"EURJPY": 1e+5,
-	"EURUSD": 1e+5,
-	"GBPUSD": 1e+5,
-	"NZDUSD": 1e+5,
+	"AUDUSD": int(1e+5),
+	"CADUSD": int(1e+5),
+	"CHFUSD": int(1e+5),
+	"EURCAD": int(1e+5),
+	"EURCHF": int(1e+5),
+	"EURGBP": int(1e+5),
+	"EURJPY": int(1e+5),
+	"EURUSD": int(1e+5),
+	"GBPUSD": int(1e+5),
+	"NZDUSD": int(1e+5),
+}
+
+products_cap_size = {
+	# Commodity
+	"Brent Crude Oil": 100,
+	"Cocoa": 100,  #
+	"Coffee": 100,  #
+	"Copper": 100,  #
+	"Corn": 100,  #
+	"Cotton": 100,  #
+	"Crude Oil": 100,  #
+	"Feeder Cattle": 100,  #
+	"Gold": 100,  #
+	"Lean Hogs": 100,  #
+	"Live Cattle": 100,  #
+	"Lumber": 100,  #
+	"Natural Gas": 100,  #
+	"Oat": 100,  #
+	"Palladium": 100,  #
+	"Platinum": 100,  #
+	"RBOB Gasoline": 100,  #
+	"Silver": 100,  #
+	"Soybean": 100,  #
+	"Soybean Meal": 100,  #
+	"Soybean Oil": 100,  #
+	"Sugar": 100,  #
+	"Wheat": 100,  #
+
+	# Fx
+	"AUDUSD": 100,
+	"CADUSD": 100,
+	"CHFUSD": 100,
+	"EURCAD": 100,
+	"EURCHF": 100,
+	"EURGBP": 100,
+	"EURJPY": 100,
+	"EURUSD": 100,
+	"GBPUSD": 100,
+	"NZDUSD": 100,
 }
 
 class MarketDataLoader:
@@ -104,9 +143,10 @@ class MarketDataLoader:
 	def load_datastream(product: dict) -> Product:
 		input_df = pd.read_csv(product["datasource"])
 		return Product(
-			product["name"],
-			products_block_size[product["name"]],
-			ds.HLOCDataStream(dataframe=input_df))
+			name=product["name"],
+			block_size=products_block_size[product["name"]],
+			cap=products_cap_size[product["name"]],
+			datastream=ds.HLOCDataStream(dataframe=input_df))
 
 	@staticmethod
 	def _get_dataset_locations(path: str):

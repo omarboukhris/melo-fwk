@@ -10,7 +10,7 @@ def CVaR(
 	gen_path: bool = True,
 	nbins: int = 100
 ):
-	return expected_shortfall(0.025, basket, n_days, sample_param, method, gen_path, nbins).mean()
+	return expected_shortfall(0.01, basket, n_days, sample_param, method, gen_path, nbins).mean()
 
 def CVaR_vect(
 	basket: VaRBasket,
@@ -20,4 +20,4 @@ def CVaR_vect(
 	gen_path: bool = True,
 	nbins: int = 100
 ):
-	return expected_shortfall(0.025, basket, n_days, sample_param, method, gen_path, nbins)
+	return expected_shortfall(0.01, basket, n_days, sample_param, method, gen_path, nbins)
