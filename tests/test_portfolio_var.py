@@ -47,7 +47,7 @@ class PortfolioUnitTests(unittest.TestCase):
 				annual_vol_target=0.3,
 				trading_capital=start_capital)
 
-			tr_sys = TradingSystemIter(
+			tr_sys = TradingSystem(
 				# product=loaded_prod,
 				product=product,  # .get_years([2007, 2008]),
 				trading_rules=[sma],
@@ -62,13 +62,6 @@ class PortfolioUnitTests(unittest.TestCase):
 			tsar_list.append(tsar)
 			balance += tsar.balance_delta()
 
-		lp = len(products)
-		basket = VaRBasket(tsar_list, products, [1/lp]*lp)
-
-		# VarPlotter.plot_prices(basket.simulate_hist(10, 0.9))
-		# VarPlotter.plot_prices(basket.simulate_price(10, 10000))
-		# VarPlotter.plot_price_paths(basket.simulate_price_paths(10, 10000), basket.tails)
-		# VarPlotter.plot_price_paths(basket.simulate_hist_paths(10, 0.9), basket.tails)
 
 		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
 		self.logger.info(f"starting capital : {start_capital}")
@@ -78,6 +71,14 @@ class PortfolioUnitTests(unittest.TestCase):
 		n_days = 10
 		n_sim = 20000
 		r_spl = 0.8
+		lp = len(products)
+
+		basket = VaRBasket(tsar_list, products, [1/lp]*lp)
+
+		# VarPlotter.plot_prices(basket.simulate_hist(n_days, r_spl))
+		# VarPlotter.plot_prices(basket.simulate_price(n_days, n_sim))
+		# VarPlotter.plot_price_paths(basket.simulate_price_paths(n_days, n_sim), basket.tails)
+		# VarPlotter.plot_price_paths(basket.simulate_hist_paths(n_days, r_spl), basket.tails)
 
 		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=True)
 		self.logger.info(f"VaR99 MC P : {var99}")
@@ -91,8 +92,27 @@ class PortfolioUnitTests(unittest.TestCase):
 		var99 = VaR99(basket, n_days, r_spl, method="h", gen_path=False)
 		self.logger.info(f"VaR99 H S: {var99}")
 
+		print("------------------------------------------")
 
+		basket.reset_vol().static_vol_shock(0.2)
+		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=True)
+		self.logger.info(f"VaR99 MC P : {var99}")
 
+		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=False)
+		self.logger.info(f"VaR99 MC S : {var99}")
+
+		print("------------------------------------------")
+
+		basket.reset_vol().random_vol_shock(0.2, 0.05)
+		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=True)
+		self.logger.info(f"VaR99 MC P : {var99}")
+
+		var99 = VaR99(basket, n_days, n_sim, method="mc", gen_path=False)
+		self.logger.info(f"VaR99 MC S : {var99}")
+
+		print("------------------------------------------")
+
+		basket.reset_vol()
 		var95 = VaR95(basket, n_days, n_sim, method="mc", gen_path=True)
 		self.logger.info(f"VaR95 MC P : {var95}")
 
@@ -105,7 +125,7 @@ class PortfolioUnitTests(unittest.TestCase):
 		var95 = VaR95(basket, n_days, r_spl, method="h", gen_path=False)
 		self.logger.info(f"VaR95 H S: {var95}")
 
-
+		print("------------------------------------------")
 
 		cvar = CVaR(basket, n_days, n_sim, method="mc", gen_path=False)
 		self.logger.info(f"ES MC S: {cvar}")

@@ -69,18 +69,3 @@ def expected_shortfall(
 		alpha += step_size
 
 	return np.array(var_list)
-
-@dataclass(frozen=False)
-class ParametricVar:
-	"""OUTDATED"""
-	alpha: float
-	n_days: int = 1
-
-
-	def __call__(self, returns: pd.DataFrame, method: str = None):
-		S0 = returns.iloc[-1].to_numpy()
-		pct_returns = returns.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
-		mu = pct_returns.mean(axis=0)
-		std = pct_returns.std(axis=0)
-		Z = np.sqrt(self.n_days) * norm.ppf(self.alpha, mu, std)
-		return pd.DataFrame(S0 * Z).fillna(0).to_numpy()

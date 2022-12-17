@@ -31,7 +31,7 @@ class VaRBasket:
 		self.pct_returns = dataframe.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
 		self.mu = np.array(self.pct_returns.mean(axis=0))
 		self.std = np.array(self.pct_returns.std(axis=0))
-
+		self.std_backup = self.std
 		# self.products = products
 		# self.tsar_list = tsar_list
 
@@ -63,6 +63,19 @@ class VaRBasket:
 		e = np.exp(drift[:, np.newaxis] + vol)
 
 		return np.nan_to_num(np.einsum("i,ij->ij", self.S0, e))
+
+	def reset_vol(self):
+		""" std is only used in MC """
+		self.std = self.std_backup
+		return self
+
+	def random_vol_shock(self, loc: float, scale: float):
+		shock_vect = 1 + np.random.normal(loc, scale, len(self.std))
+		self.std = np.einsum("i,i->i", shock_vect, self.std)
+
+	def static_vol_shock(self, loc: float):
+		shock_vect = 1 + np.array([loc]*self.std)
+		self.std = np.einsum("i,i->i", shock_vect, self.std)
 
 	def simulate_price_paths(self, n_days: int = 1, n_simulation: int = 100000):
 		ncols, L = self.get_cholesky()
