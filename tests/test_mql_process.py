@@ -1,3 +1,5 @@
+import unittest
+
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.loggers.console_logger import ConsoleLogger
 
@@ -44,26 +46,30 @@ def run_mql_process(mql_query_path: Path):
 	mql_config.write_report(output, str(mql_query_path.parent))
 
 
+class MqlUnitTests(unittest.TestCase):
+
+	def test_mql_process(self):
+
+		templates = {
+			"backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
+			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
+			"clustering": Path(__file__).parent.parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
+			"fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+		}
+		# still missing :
+		# alloc opt
+
+		# set loggers
+		GlobalLogger.set_loggers([ConsoleLogger])
+
+		# register melo components in factory
+		quantfactory_registry.register_all()
+
+		for key, mql_query in templates.items():
+			print(42*"=" + key + 42*"=")
+			run_mql_process(mql_query_path=mql_query)
+
 
 if __name__ == "__main__":
-
-	templates = {
-		# "backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
-		"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
-		# "vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-		# "clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
-		# "fast_strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
-	}
-	# still missing :
-	# alloc opt
-
-	# set loggers
-	GlobalLogger.set_loggers([ConsoleLogger])
-
-	# register melo components in factory
-	quantfactory_registry.register_all()
-
-	for key, mql_query in templates.items():
-		print(42*"=" + key + 42*"=")
-		run_mql_process(mql_query_path=mql_query)
-
+	unittest.main()

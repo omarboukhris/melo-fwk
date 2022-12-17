@@ -1,3 +1,5 @@
+from melo_fwk.loggers.console_logger import ConsoleLogger
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems import TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
@@ -13,8 +15,12 @@ import unittest
 
 class PortfolioUnitTests(unittest.TestCase):
 
+	def init(self):
+		GlobalLogger.set_loggers([ConsoleLogger])
+		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+
 	def test_portfolio(self):
-		"""WIP"""
+		self.init()
 		sma_params = {
 			"fast_span": 16,
 			"slow_span": 64,
@@ -56,9 +62,9 @@ class PortfolioUnitTests(unittest.TestCase):
 		})
 
 		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
-		print(f"starting capital : {start_capital}")
-		print(f"final balance : {balance}")
-		print(f"5% risk free : {risk_free}")
+		self.logger.info(f"starting capital : {start_capital}")
+		self.logger.info(f"final balance : {balance}")
+		self.logger.info(f"5% risk free : {risk_free}")
 
 		for tsar in results_list:
 			account_df["Balance"] += tsar.account_series

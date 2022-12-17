@@ -20,7 +20,7 @@ class HLOCDataStream(BaseDataStream):
 			dataframe=self.dataframe.loc[
 				self.dataframe["Year"].isin(y)
 				].reset_index(drop=True),
-			date_label=self._date_label,
+			date_label=self.date_label,
 		)
 
 	def get_year(self, y: int, stitch: bool = False):
@@ -29,14 +29,14 @@ class HLOCDataStream(BaseDataStream):
 				dataframe=self.dataframe.loc[
 					self.dataframe["Year"].isin([y, y-1])
 					].reset_index(drop=True),
-				date_label=self._date_label,
+				date_label=self.date_label,
 			)
 		else:
 			return HLOCDataStream(
 				dataframe=self.dataframe.loc[
 					self.dataframe["Year"] == y
 					].reset_index(drop=True),
-				date_label=self._date_label,
+				date_label=self.date_label,
 			)
 
 	def get_close_series(self) -> pd.Series:
@@ -80,6 +80,6 @@ class HLOCDataStream(BaseDataStream):
 		return self._get_value_at_date("Low", date)
 
 	def _get_value_at_date(self, value: str, date: str) -> float:
-		x = self.dataframe.loc[self.dataframe[self._date_label] == date, value].to_numpy()
+		x = self.dataframe.loc[self.dataframe[self.date_label] == date, value].to_numpy()
 		assert len(x) == 1, "(HLOCDataStream) Timestamp is invalid, date not found or not unique"
 		return x[0]

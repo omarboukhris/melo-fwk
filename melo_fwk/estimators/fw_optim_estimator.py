@@ -41,7 +41,7 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 	def optimize_weights_by_product(self, product: Product):
 		results = []
 		years = [year for year in range(self.begin, self.end)]
-		rolling_datastream = product.get_rolling_dataframe(years)
+		rolling_datastream = product.rolling_dataframe(years)
 		for i, subset_prod_ds in tqdm.tqdm(enumerate(rolling_datastream), leave=False):
 
 			opt_bounds = Bounds(0., 1.)

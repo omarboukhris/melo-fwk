@@ -11,7 +11,7 @@ def read_strat_config_point(config_point_fn: str):
 	except yaml.YAMLError as exc:
 		print(f"(YAMLError) {exc}")
 	except Exception as e:
-		print(f"(Exception) {e}")
+		print(f"(Exception) yaml_io.read_strat_config_point : {e}")
 	finally:
 		return config_points_registry
 

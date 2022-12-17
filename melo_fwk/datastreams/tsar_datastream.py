@@ -1,4 +1,5 @@
 from math import sqrt
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -22,7 +23,7 @@ class TsarDataStream(BaseDataStream):
 	def add(self, other):
 		tsar = TsarDataStream(
 			dataframe=pd.concat([self.dataframe, other.dataframe]).reset_index(drop=True),
-			date_label=self._date_label
+			date_label=self.date_label
 		)
 		return tsar
 
@@ -30,10 +31,11 @@ class TsarDataStream(BaseDataStream):
 		# offset account with start capital
 		# useful when running whole history with the same vol target
 		tsar = TsarDataStream(
+			name=self.name,
 			dataframe=self.dataframe.loc[
 				self.dataframe["Year"] == y,
 			].reset_index(drop=True),
-			date_label=self._date_label,
+			date_label=self.date_label,
 		)
 		tsar._offset_account()
 		return tsar

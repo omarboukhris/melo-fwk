@@ -70,29 +70,12 @@ def expected_shortfall(
 
 	return np.array(var_list)
 
-def VaRFactory(var_type: str = "monte_carlo"):
-	if var_type == "param":
-		return ParametricVar
-	if var_type == "histo":
-		return HistVar
-	if var_type == "monte_carlo":
-		return MonteCarloVar
-
 @dataclass(frozen=False)
-class BaseVaR:
+class ParametricVar:
+	"""OUTDATED"""
 	alpha: float
 	n_days: int = 1
 
-	def __call__(self, returns: pd.DataFrame, method: str = "gbm"):
-		pass
-
-	def set_sample_param(self, sample_param):
-		pass
-
-
-@dataclass(frozen=False)
-class ParametricVar(BaseVaR):
-	"""OUTDATED"""
 
 	def __call__(self, returns: pd.DataFrame, method: str = None):
 		S0 = returns.iloc[-1].to_numpy()

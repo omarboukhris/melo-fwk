@@ -43,7 +43,7 @@ class ClustersEstimator(MeloBaseEstimator):
 		results = {}
 		years = [year for year in range(self.begin, self.end)]
 		for product_name, product in tqdm.tqdm(self.products.items(), leave=False):
-			rolling_dataframe = product.get_rolling_dataframe(years)
+			rolling_dataframe = product.rolling_dataframe(years)
 			results[product_name] = []
 			for subset_prod_df in tqdm.tqdm(rolling_dataframe, leave=False):
 				trading_subsys = TradingSystem(

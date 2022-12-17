@@ -44,7 +44,7 @@ class Product:
 	def get_daily_diff_series(self):
 		return self.datastream.get_daily_diff_series()
 
-	def get_rolling_dataframe(self, years: List[int] = None, window_size: int = 250, min_periods: int = 250, step: int = 20):
+	def rolling_dataframe(self, years: List[int] = None, window_size: int = 250, min_periods: int = 250, step: int = 20):
 		years = self.years() if years is None else years
 		prod_datastream = self.get_years(years).datastream
 		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
@@ -52,3 +52,16 @@ class Product:
 		for roll in rolling_datastream:
 			if len(roll) >= window_size:
 				yield roll
+
+	def rolling(self, years: List[int] = None, window_size: int = 250, min_periods: int = 250, step: int = 20):
+		years = self.years() if years is None else years
+		prod_datastream = self.get_years(years).datastream
+		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
+		rolling_datastream = prod_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
+		for roll in rolling_datastream:
+			if len(roll) >= window_size:
+				yield Product(
+					name=self.name,
+					block_size=self.block_size,
+					datastream=roll,
+				)

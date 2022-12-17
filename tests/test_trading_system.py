@@ -2,6 +2,8 @@ import unittest
 
 import numpy as np
 
+from melo_fwk.loggers.console_logger import ConsoleLogger
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
@@ -11,17 +13,29 @@ from melo_fwk.plots import TsarPlotter
 
 class TradingSystemUnitTests(unittest.TestCase):
 
-	def test_trading_system(self):
-		# TradingSystemUnitTests.run_simulation("all", TradingSystem)
-		TradingSystemUnitTests.run_simulation("linear", TradingSystem)
-		# TradingSystemUnitTests.run_simulation("compound", TradingSystem)
+	def init(self):
+		GlobalLogger.set_loggers([ConsoleLogger])
+		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
-		# TradingSystemUnitTests.run_simulation("all", TradingSystemIter)
-		# TradingSystemUnitTests.run_simulation("linear", TradingSystemIter)
-		# TradingSystemUnitTests.run_simulation("compound", TradingSystemIter)
+	def runTest(self):
+		self.init()
+		self.logger.info("run all at once - TradingSystem")
+		self._run_simulation("all", TradingSystem)
+		self.logger.info("run each year seperately - TradingSystem")
+		self._run_simulation("linear", TradingSystem)
+		self.logger.info("run compounded by year - TradingSystem")
+		self._run_simulation("compound", TradingSystem)
 
-	@staticmethod
-	def run_simulation(x: str, tr: callable):
+		self.logger.info("run all at once - TradingSystemIter")
+		self._run_simulation("all", TradingSystemIter)
+		self.logger.info("run each year seperately - TradingSystemIter")
+		self._run_simulation("linear", TradingSystemIter)
+		self.logger.info("run compounded by year - TradingSystemIter")
+		self._run_simulation("compound", TradingSystemIter)
+
+	def _run_simulation(self, x: str, tr: callable):
+		GlobalLogger.set_loggers([ConsoleLogger])
+
 		product = CommodityDataLoader.Gold
 		# product = FxDataLoader.EURUSD
 
@@ -73,9 +87,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		balance = start_capital + np.sum([r.balance_delta() for r in results.values()])
 		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
-		print(f"starting capital : {start_capital}")
-		print(f"final balance : {balance}")
-		print(f"5% risk free : {risk_free}")
+		self.logger.info(f"starting capital : {start_capital}")
+		self.logger.info(f"final balance : {balance}")
+		self.logger.info(f"5% risk free : {risk_free}")
 
 		tsar_plotter = TsarPlotter({"pname": results})
 		tsar_plotter.save_fig(export_folder="data/residual", mute=True)
