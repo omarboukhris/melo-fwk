@@ -13,7 +13,7 @@ class BaseSizePolicy:
 	):
 		self.block_size = 1.
 		self.cap = 0.
-		self.datastream: HLOCDataStream = HLOCDataStream.get_empty()
+		self.datastream = HLOCDataStream.get_empty()
 		self.vol_target = VolTarget(annual_vol_target, trading_capital)
 
 	def update_trading_capital(self, trading_capital: float):

@@ -1,14 +1,14 @@
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.var.basket import VaRBasket
-from melo_fwk.trading_systems import TradingSystemIter, TradingSystem
+from melo_fwk.plots import AccountPlotter
+from melo_fwk.basket.var_basket import VaRBasket
+from melo_fwk.trading_systems import TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 
-from melo_fwk.plots.var_plot import VarPlotter
 from melo_fwk.var.VaR import VaR99, VaR95
 from melo_fwk.var.CVaR import CVaR
 
@@ -33,19 +33,20 @@ class PortfolioUnitTests(unittest.TestCase):
 		sma = EWMAStrategy(**sma_params)
 
 		# products = MarketDataLoader.get_fx()
-		products = MarketDataLoader.get_commodities()
-		products = [MarketDataLoader.load_datastream(p) for p in products[7:16]]
-		# products = MarketDataLoader.sample_products(3)
+		# products = MarketDataLoader.get_commodities()
+		# products = [MarketDataLoader.load_datastream(p) for p in products[7:16]]
+		products = MarketDataLoader.sample_products(9)
 
-		results = {}
+		ts_capital = 10000
+		results = []
 		balance = 0
-		start_capital = 10000 * len(products)
+		start_capital = ts_capital * len(products)
 		tsar_list = []
 		for product in tqdm.tqdm(products):
 			# loaded_prod = MarketDataLoader.load_datastream(product)
 			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=0.3,
-				trading_capital=start_capital)
+				annual_vol_target=0.4,
+				trading_capital=ts_capital)
 
 			tr_sys = TradingSystemIter(
 				# product=loaded_prod,
@@ -58,7 +59,7 @@ class PortfolioUnitTests(unittest.TestCase):
 			# simulation with constant risk
 			tsar = tr_sys.run()
 
-			results.update({product.name: tsar})
+			results.append(tsar)
 			tsar_list.append(tsar)
 			balance += tsar.balance_delta()
 
@@ -68,7 +69,16 @@ class PortfolioUnitTests(unittest.TestCase):
 		self.logger.info(f"final balance : {balance}")
 		self.logger.info(f"5% risk free : {risk_free}")
 
-		n_days = 10
+		account_df = pd.DataFrame({
+			"Date": results[0].dates,
+			"Balance": [0. for _ in results[0].dates]
+		})
+		for tsar in results:
+			account_df["Balance"] += tsar.account_series
+		account_plt = AccountPlotter(account_df)
+		account_plt.save_png(f"data/residual/all_plot_vect.png")
+
+		n_days = 1
 		n_sim = 20000
 		r_spl = 0.8
 		lp = len(products)
@@ -138,14 +148,6 @@ class PortfolioUnitTests(unittest.TestCase):
 
 		cvar = CVaR(basket, n_days, r_spl, method="h", gen_path=True)
 		self.logger.info(f"ES H P: {cvar}")
-
-		# account_plt = AccountPlotter(account_df)
-		# account_plt.save_png(f"data/residual/all_plot_vect.png")
-
-		# plot tsar
-		# tsar_plotter = TsarPlotter({"pname": results})
-		# tsar_plotter.save_fig(export_folder="data/residual")
-		# return results_list
 
 
 if __name__ == "__main__":

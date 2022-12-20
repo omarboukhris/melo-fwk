@@ -110,6 +110,11 @@ class TsarDataStream(BaseDataStream):
 		dd = (self.account_series - peak)  # - 1
 		return dd.replace([np.inf, -np.inf], np.nan).fillna(0)
 
+	def get_pct_drawdown(self, trading_days: int = 255):
+		peak = self.account_series.rolling(window=trading_days, min_periods=1).max()
+		dd = (self.account_series - peak) / peak  # - 1
+		return dd.replace([np.inf, -np.inf], np.nan).fillna(0)
+
 	def max_drawdown(self):
 		return self.get_drawdown().min()
 

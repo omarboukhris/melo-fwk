@@ -31,15 +31,17 @@ class PortfolioUnitTests(unittest.TestCase):
 		products = MarketDataLoader.get_fx()
 		products += MarketDataLoader.get_commodities()
 
+		ts_capital = 10000
+		vol_target = 0.4
 		results = {}
 		balance = 0
-		start_capital = 10000 * len(products)
+		start_capital = ts_capital * len(products)
 
 		for product in tqdm.tqdm(products):
 			loaded_prod = MarketDataLoader.load_datastream(product)
 			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=0.4,
-				trading_capital=10000)
+				annual_vol_target=vol_target,
+				trading_capital=ts_capital)
 
 			tr_sys = TradingSystemIter(
 				product=loaded_prod,

@@ -1,5 +1,5 @@
 
-from melo_fwk.var.basket import VaRBasket
+from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.var.common import expected_shortfall
 
 def CVaR(

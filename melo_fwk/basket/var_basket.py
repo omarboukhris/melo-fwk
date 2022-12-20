@@ -43,7 +43,7 @@ class VaRBasket:
 	def simulate_hist_paths(self, n_days, sample_ratio: float):
 		S0 = self.S0
 		P = []
-		for _ in range(n_days):
+		for _ in range(n_days+1):
 			Z = self.pct_returns.sample(frac=sample_ratio, axis=0)
 			e = 1+Z
 			S0 = np.nan_to_num(S0 * e)
@@ -83,7 +83,7 @@ class VaRBasket:
 		Z = np.array([
 			drift + self.std * np.matmul(
 				L, norm.rvs(size=[ncols, n_simulation])).T
-			for _ in range(n_days)
+			for _ in range(n_days+1)
 		]).T
 		e = np.exp(np.cumsum(Z, 2))
 

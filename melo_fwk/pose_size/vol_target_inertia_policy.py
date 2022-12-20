@@ -15,9 +15,9 @@ class VolTargetInertiaPolicy(VolTargetSizePolicy):
 
 	def position_size_vect(self, forecast: pd.Series, lookback: int = 36) -> pd.Series:
 		def _inertia(pose: float) -> float:
-			pose_diff = pose - _inertia.curr_pose
+			pose_diff = abs(pose - _inertia.curr_pose)
 			thr = _inertia.curr_pose * 0.1
-			if (pose_diff > 0 and pose_diff > thr) or (pose_diff < 0 and pose_diff < thr):
+			if pose_diff > thr:
 				_inertia.curr_pose = pose
 			return _inertia.curr_pose
 

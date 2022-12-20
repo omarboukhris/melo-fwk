@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from melo_fwk.var.basket import VaRBasket
+from melo_fwk.basket.var_basket import VaRBasket
 
 """
 methods : 
@@ -41,8 +41,9 @@ def simpleVaR(
 			gen_path=gen_path,
 		)
 
-	ein_symb = "i,i" if full_sum else "i,i->i"
-	return np.einsum(ein_symb, var_vect, basket.weights)
+	return np.sum(var_vect)
+	# ein_symb = "i,i" if full_sum else "i,i->i"
+	# return np.einsum(ein_symb, var_vect, basket.weights)
 
 def expected_shortfall(
 	alpha: float,
