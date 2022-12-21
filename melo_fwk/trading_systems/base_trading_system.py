@@ -2,6 +2,7 @@ import numpy as np
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.results_basket import ResultsBasket
+from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import BaseStrategy
 
@@ -19,10 +20,10 @@ class BaseTradingSystem:
 
 	def __init__(
 		self,
-		product_basket: ProductBasket,
 		trading_rules: List[BaseStrategy],
 		forecast_weights: List[float],
 		size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
+		product_basket: ProductBasket = ProductBasket([]),
 	):
 
 		assert len(trading_rules) == len(forecast_weights), \
@@ -42,6 +43,14 @@ class BaseTradingSystem:
 			forecast_weights=[]
 		)
 
+	def forecast_cumsum_product(self, product: Product):
+		f_series = np.array([0.] * len(product.get_close_series()))
+
+		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
+			f_series += forecast_weight * trading_rule.forecast_vect_cap(product.get_close_series()).to_numpy()
+
+		return pd.Series(f_series)
+
 	def forecast_cumsum(self):
 		f_df = pd.DataFrame({
 			p.name: np.zeros(shape=len(self.product_basket.close_df()))
@@ -49,12 +58,15 @@ class BaseTradingSystem:
 		})
 
 		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
-			f_df += forecast_weight * trading_rule.forecast_vect_cap(self.product_basket.close_df())
+			f_df += forecast_weight * trading_rule.forecast_df_cap(self.product_basket.close_df())
 
 		return f_df
 
 	def update_trading_capital(self, delta: float):
 		self.size_policy.update_trading_capital(delta)
+
+	def run_product(self, product: Product) -> TsarDataStream:
+		pass
 
 	def run(self) -> ResultsBasket:
 		pass
@@ -69,7 +81,39 @@ class BaseTradingSystem:
 		finally:
 			self.product_basket = product_basket
 
+	def run_product_year(self, product: Product, year: int, stitch: bool = False):
+		product = product.get_year(year, stitch)
+		self.size_policy.setup_product(product)
+		return self.run_product(product).get_year(year) if stitch else self.run_product(product)
+
+	def compound_product_by_year(self, product: Product, stitch: bool = False):
+		output = []
+		for year in product.years():
+			tsar = self.run_product_year(product, year, stitch)
+			self.update_trading_capital(tsar.balance_delta())
+			output.append(tsar)
+		return output
+
+	@staticmethod
 	def build_tsar(
+		product: Product,
+		forecast_series: pd.Series,
+		pose_series: pd.Series,
+		daily_pnl_series: pd.Series
+	) -> TsarDataStream:
+		return TsarDataStream(
+			name=product.name,
+			dataframe=pd.DataFrame({
+				"Date": product.get_date_series().reset_index(drop=True),
+				"Price": product.get_close_series().reset_index(drop=True),
+				"Forecast": forecast_series,
+				"Size": pose_series,
+				"Account": daily_pnl_series.expanding(1).sum(),
+				"Daily_PnL": daily_pnl_series
+			})
+		)
+
+	def build_tsar_basket(
 		self,
 		forecast_df: pd.DataFrame,
 		pose_df: pd.DataFrame,

@@ -1,6 +1,7 @@
 
 import tqdm
 
+from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.cluster import ClusterUtils
@@ -47,16 +48,16 @@ class ClustersEstimator(MeloBaseEstimator):
 			results[product_name] = []
 			for subset_prod_df in tqdm.tqdm(rolling_dataframe, leave=False):
 				trading_subsys = TradingSystem(
-					product=Product(
-						name=product.name,
-						block_size=product.block_size,
-						datastream=HLOCDataStream(dataframe=subset_prod_df)
-					),
 					trading_rules=self.strategies,
 					forecast_weights=self.forecast_weights,
 					size_policy=self.size_policy
 				)
 
-				y_return = trading_subsys.run()
+				y_return = trading_subsys.run_product(Product(
+					name=product.name,
+					block_size=product.block_size,
+					cap=product.cap,
+					datastream=HLOCDataStream(dataframe=subset_prod_df)
+				))
 				results[product_name].append(y_return)
 		return results

@@ -34,7 +34,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 			ewma = EWMAStrategy(**sma_params)
 
 			close_df = prod_basket.close_df()
-			forecast_df = ewma.forecast_vect_cap(close_df).fillna(0)
+			forecast_df = ewma.forecast_df_cap(close_df).fillna(0)
 			# print(forecast_df)
 
 			# compare with tsar forecast series
@@ -57,7 +57,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 			ewma = EWMAStrategy(**sma_params)
 
 			close_df = prod_basket.close_df()
-			forecast_df = ewma.forecast_vect_cap(close_df)
+			forecast_df = ewma.forecast_df_cap(close_df)
 
 			pose_sizer = VolTargetInertiaPolicy(annual_vol_target=0.4, trading_capital=10000).setup_product_basket(prod_basket)
 			pose_df = pose_sizer.position_size_df(forecast_df)
@@ -99,7 +99,7 @@ class BasketUnitTest(unittest.TestCase):
 		ewma = EWMAStrategy(**sma_params)
 
 		close_df = prod_basket.close_df()
-		forecast_df = ewma.forecast_vect_cap(close_df)
+		forecast_df = ewma.forecast_df_cap(close_df)
 		# print(forecast_df)
 
 		# compare with tsar forecast series
@@ -123,7 +123,7 @@ class BasketUnitTest(unittest.TestCase):
 		ewma = EWMAStrategy(**sma_params)
 
 		close_df = prod_basket.close_df()
-		forecast_df = ewma.forecast_vect_cap(close_df)
+		forecast_df = ewma.forecast_df_cap(close_df)
 
 		pose_sizer = VolTargetInertiaPolicy(annual_vol_target=0.4, trading_capital=10000).setup_product_basket(prod_basket)
 		pose_df = pose_sizer.position_size_df(forecast_df)

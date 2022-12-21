@@ -17,11 +17,19 @@ class BaseStrategy:
 		# 	self.estimate_forecast_scale()
 		pass
 
-	def forecast_vect(self, data: pd.DataFrame) -> pd.DataFrame:
+	def forecast_df(self, data: pd.DataFrame) -> pd.DataFrame:
 		pass
 
-	def forecast_vect_cap(self, data: pd.DataFrame) -> pd.DataFrame:
-		f_vect = self.forecast_vect(data).clip(upper=self.cap, lower=-self.cap, axis=0)
+	def forecast_df_cap(self, data: pd.DataFrame) -> pd.DataFrame:
+		f_vect = self.forecast_df(data).clip(upper=self.cap, lower=-self.cap, axis=0)
+		return f_vect
+
+
+	def forecast_vect(self, data: pd.Series) -> pd.Series:
+		pass
+
+	def forecast_vect_cap(self, data: pd.Series) -> pd.Series:
+		f_vect = self.forecast_vect(data).clip(upper=self.cap, lower=-self.cap)
 		return f_vect
 
 	def to_dict(self):

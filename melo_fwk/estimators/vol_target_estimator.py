@@ -36,12 +36,11 @@ class VolTargetEstimator(MeloBaseEstimator):
 		n_iter = int((self.final - self.start) / self.step)
 		for _ in tqdm.tqdm(range(n_iter), leave=False):
 			ts = TradingSystemIter(
-				product=product,
 				trading_rules=self.strategies,
 				forecast_weights=self.forecast_weights,
 				size_policy=size_policy,
 			)
-			tsar = ts.run()
+			tsar = ts.run_product(product)
 
 			results.append({
 				"vol_target": size_policy.vol_target.annual_vol_target,

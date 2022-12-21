@@ -13,7 +13,7 @@ class ResultsBasket:
 	def get_year(self, y: int):
 		return ResultsBasket([r.get_year(y) for r in self.results_map.values()])
 
-	def get_product(self, name: str):
+	def get_product(self, name: str) -> TsarDataStream:
 		return self.results_map[name]
 
 	def balance_delta_vect(self) -> pd.Series:
@@ -33,3 +33,6 @@ class ResultsBasket:
 
 		return pd.DataFrame({y: r.balance_delta_vect() for y, r in results.items()})
 
+	"""
+	ADD METRICS FROM TSARDATASTREAM
+	"""

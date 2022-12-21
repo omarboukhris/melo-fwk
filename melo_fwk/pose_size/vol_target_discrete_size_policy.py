@@ -16,3 +16,7 @@ class VolTargetDiscreteSizePolicy(VolTargetSizePolicy):
 	def position_size_df(self, forecast: pd.DataFrame, lookback: int = 36) -> pd.DataFrame:
 		pose_series = (self.vol_vect(lookback) * forecast) / 10.
 		return pose_series.round()
+
+	def position_size_vect(self, forecast: pd.Series, lookback: int = 36) -> pd.Series:
+		pose_series = (self.vol_scalar(lookback) * forecast) / 10.
+		return pose_series.round()

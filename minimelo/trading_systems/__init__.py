@@ -1,4 +1,0 @@
-
-from minimelo.trading_systems.trading_system import TradingSystem
-from minimelo.trading_systems.trading_system_iter import TradingSystemIter
-

@@ -12,6 +12,13 @@ from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
+from minimelo.trading_systems import (
+	TradingSystem as TradingSystem2,
+	TradingSystemIter as TradingSystemIter2
+)
+from minimelo.strategies import EWMAStrategy as EWMAStrategy2
+from minimelo.pose_size import VolTargetInertiaPolicy as VolTargetInertiaPolicy2
+
 
 class TradingSystemUnitTests(unittest.TestCase):
 
@@ -19,7 +26,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
-	def runTest(self):
+	def test_tsys(self):
 		self.init()
 		self.logger.info("run all at once - TradingSystem")
 		self._run_simulation("all", TradingSystem)
@@ -81,6 +88,68 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		# tsar_plotter = TsarPlotter({"pname": results})
 		# tsar_plotter.save_fig(export_folder="data/residual", mute=True)
+
+	def test_reg(self):
+		GlobalLogger.set_loggers([ConsoleLogger])
+
+		products = MarketDataLoader.sample_products_alpha(1)
+		prod_bsk = ProductBasket(products)
+		# product = FxDataLoader.EURUSD
+
+		strat = [
+			EWMAStrategy(
+				fast_span=16,
+				slow_span=64,
+				scale=16.,
+			),
+			EWMAStrategy(
+				fast_span=8,
+				slow_span=32,
+			).estimate_forecast_scale()
+		]
+		strat2 = [
+			EWMAStrategy2(
+				fast_span=16,
+				slow_span=64,
+				scale=16.,
+			),
+			EWMAStrategy2(
+				fast_span=8,
+				slow_span=32,
+			).estimate_forecast_scale()
+		]
+		fw = [0.6, 0.4]
+
+		start_capital = 60000
+		size_policy = VolTargetInertiaPolicy(
+			annual_vol_target=0.25,
+			trading_capital=start_capital)
+		size_policy2 = VolTargetInertiaPolicy2(
+			annual_vol_target=0.25,
+			trading_capital=start_capital)
+
+		for prod in prod_bsk.products:
+
+			trading_subsys = TradingSystem(
+				product_basket=ProductBasket([prod]),
+				trading_rules=strat,
+				forecast_weights=fw,
+				size_policy=size_policy
+			)
+
+			tr_sys = TradingSystem2(
+				product=prod,
+				trading_rules=strat2,
+				forecast_weights=fw,
+				size_policy=size_policy2
+			)
+
+			ref = tr_sys.run().forecast_series
+			df = trading_subsys.run().get_product(prod.name).forecast_series
+			flags = ref - df
+			flag = flags.mean()
+			# print(flag, flags.std())
+			assert (flag * 1000).round() <= 2, ""
 
 
 if __name__ == "__main__":

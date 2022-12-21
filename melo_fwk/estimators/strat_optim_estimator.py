@@ -7,7 +7,6 @@ from melo_fwk.market_data.product import Product
 from skopt import BayesSearchCV
 from sklearn.model_selection import TimeSeriesSplit
 
-
 class StratOptimEstimator(MeloBaseEstimator):
 
 	def __init__(self, **kwargs):

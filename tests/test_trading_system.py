@@ -7,9 +7,9 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data import CommodityDataLoader
 from melo_fwk.plots import TsarPlotter
 
-from minimelo.trading_systems import TradingSystem, TradingSystemIter
-from minimelo.strategies import EWMAStrategy
-from minimelo.pose_size import VolTargetInertiaPolicy
+from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
+from melo_fwk.strategies import EWMAStrategy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 
 
 class TradingSystemUnitTests(unittest.TestCase):
@@ -59,7 +59,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 			trading_capital=start_capital)
 
 		trading_subsys = tr(
-			product=product,
 			trading_rules=strat,
 			forecast_weights=fw,
 			size_policy=size_policy
@@ -70,17 +69,17 @@ class TradingSystemUnitTests(unittest.TestCase):
 		if x == "compound":
 			results = {
 				f"{tr.__name__}_Gold_{y}_it": tsar
-				for y, tsar in zip(product.years(), trading_subsys.compound_by_year())
+				for y, tsar in zip(product.years(), trading_subsys.compound_product_by_year(product))
 			}
 
 		elif x == "linear":
 			results = {
-				f"{tr.__name__}_Gold_{year}_it": trading_subsys.run_year(year)
+				f"{tr.__name__}_Gold_{year}_it": trading_subsys.run_product_year(product, year)
 				for year in product.years()
 			}
 
 		elif x == "all":
-			tsar = trading_subsys.run()
+			tsar = trading_subsys.run_product(product)
 			results = {
 				f"{tr.__name__}_Gold_{year}_it": tsar.get_year(year)
 				for year in product.years()

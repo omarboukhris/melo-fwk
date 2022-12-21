@@ -12,7 +12,7 @@ class TsarDataStream(BaseDataStream):
 
 	def __init__(self, name: str, dataframe: pd.DataFrame, date_label: str = "Date"):
 		self.name = name
-		dataframe = dataframe[:dataframe.count().min()]
+		dataframe = dataframe.dropna()
 		super(TsarDataStream, self).__init__(dataframe=dataframe, date_label=date_label)
 		self.dates = self.dataframe["Date"]
 		self.price_series = self.dataframe["Price"]

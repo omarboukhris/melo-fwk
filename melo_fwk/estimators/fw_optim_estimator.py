@@ -1,3 +1,4 @@
+from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.market_data.product import Product
@@ -45,13 +46,12 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 		for i, subset_prod_ds in tqdm.tqdm(enumerate(rolling_datastream), leave=False):
 
 			opt_bounds = Bounds(0., 1.)
-			expected_ret, returns = self.get_expected_results(
-				Product(
-					name=product.name,
-					block_size=product.block_size,
-					datastream=HLOCDataStream(dataframe=subset_prod_ds)
-				)
-			)
+			expected_ret, returns = self.get_expected_results(Product(
+				name=product.name,
+				block_size=product.block_size,
+				cap=product.cap,
+				datastream=HLOCDataStream(dataframe=subset_prod_ds)
+			))
 			opt_cst = {'type': 'eq', 'fun': lambda W: 1.0 - np.sum(W)}
 
 			opt_result = minimize(
@@ -79,13 +79,12 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 
 		for strategy in self.strategies:
 			trading_subsys = TradingSystem(
-				product=product,
 				trading_rules=[strategy],
 				forecast_weights=[1.],
 				size_policy=self.size_policy,
 			)
 
-			tsar = trading_subsys.run()
+			tsar = trading_subsys.run_product(product)
 			key = f"{product.name}.{str(strategy)}"
 			returns.update({key: tsar.account_series})
 			result.append(tsar.account_series.mean())

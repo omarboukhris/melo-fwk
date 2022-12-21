@@ -7,7 +7,11 @@ having (
     cluster2,
 )
 
+with weights (
+    0.6, 0.4
+)
+
 exec PortfolioVolTarget
--- could also exec allocOptimWeights
+-- could also exec allocOptimWeights / VaRReport / ...
 -- set it at same level as clustering query
 -- also useful for var reporting on portfolio

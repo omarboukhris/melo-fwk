@@ -24,12 +24,11 @@ class StrategyEstimator:
 		strat = self.strat_class_(**self.strat_params)
 
 		trading_subsys = TradingSystem(
-			product=self.product,
 			trading_rules=[strat],
 			forecast_weights=[1.],
 			size_policy=self.size_policy
 		)
 
-		tsar = trading_subsys.run_year(X[0])
+		tsar = trading_subsys.run_product_year(self.product, X[0])
 		# optimizer is minimizing
 		return np.nan_to_num(tsar.get_metric_by_name(self.metric))

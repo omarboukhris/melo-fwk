@@ -67,5 +67,5 @@ class Product:
 					name=self.name,
 					block_size=self.block_size,
 					cap=self.cap,
-					datastream=roll,
+					datastream=HLOCDataStream(dataframe=roll),
 				)

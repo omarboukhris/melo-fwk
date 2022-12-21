@@ -4,9 +4,9 @@ from melo_fwk.plots import AccountPlotter
 from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.market_data import MarketDataLoader
 
-from minimelo.trading_systems import TradingSystemIter
-from minimelo.strategies import EWMAStrategy
-from minimelo.pose_size import VolTargetInertiaPolicy
+from melo_fwk.trading_systems import TradingSystemIter
+from melo_fwk.strategies import EWMAStrategy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 
 from melo_fwk.var.VaR import VaR99, VaR95
 from melo_fwk.var.CVaR import CVaR
