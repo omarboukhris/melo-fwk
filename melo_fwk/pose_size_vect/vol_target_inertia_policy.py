@@ -33,8 +33,5 @@ class VolTargetInertiaPolicy(VolTargetSizePolicy):
 
 		pose_df = (self.vol_vect(lookback) * forecast) / 10.
 
-		# for p in self.product_names():
-		# 	pose_inertia_df[p].clip(upper=self.cap_vect[p], lower=-self.cap_vect[p])
-		# return pose_inertia_df
 		_inertia_vect.i = 0
 		return pose_df.apply(_inertia_vect, axis=0)

@@ -9,10 +9,11 @@ from melo_fwk.datastreams.base_datastream import BaseDataStream
 """This class is used to wrap Tsar Data Frames in an interface"""
 # TradingResult
 class TsarDataStream(BaseDataStream):
-	
-	def __init__(self, **kwargs):
-		self.name = kwargs.pop("name")
-		super(TsarDataStream, self).__init__(**kwargs)
+
+	def __init__(self, name: str, dataframe: pd.DataFrame, date_label: str = "Date"):
+		self.name = name
+		dataframe = dataframe[:dataframe.count().min()]
+		super(TsarDataStream, self).__init__(dataframe=dataframe, date_label=date_label)
 		self.dates = self.dataframe["Date"]
 		self.price_series = self.dataframe["Price"]
 		self.forecast_series = self.dataframe["Forecast"]
@@ -37,7 +38,8 @@ class TsarDataStream(BaseDataStream):
 			].reset_index(drop=True),
 			date_label=self.date_label,
 		)
-		tsar._offset_account()
+		if len(tsar.dataframe) != 0:
+			tsar._offset_account()
 		return tsar
 
 	def _offset_account(self):

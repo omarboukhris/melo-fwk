@@ -22,6 +22,15 @@ class ProductBasket:
 			for p in self.products
 		})
 
+	def get_year(self, y: int, stitch: bool = False):
+		return ProductBasket([
+			p.get_year(y, stitch)
+			for p in self.products
+		])
+
+	def years(self):
+		return set.intersection(*map(set, [p.years() for p in self.products]))
+
 	def block_size_vect(self) -> pd.Series:
 		return pd.Series([p.block_size for p in self.products])
 

@@ -74,7 +74,7 @@ class VaRBasket:
 		self.std = np.einsum("i,i->i", shock_vect, self.std)
 
 	def static_vol_shock(self, loc: float):
-		shock_vect = 1 + np.array([loc]*self.std)
+		shock_vect = 1 + np.array([loc]*len(self.std))
 		self.std = np.einsum("i,i->i", shock_vect, self.std)
 
 	def simulate_price_paths(self, n_days: int = 1, n_simulation: int = 100000):

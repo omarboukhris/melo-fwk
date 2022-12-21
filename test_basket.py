@@ -6,13 +6,11 @@ from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data import MarketDataLoader
 from melo_fwk.pose_size_vect import (
 	VolTargetInertiaPolicy,
-	VolTargetSizePolicy
 )
 from melo_fwk.strategies_vect import EWMAStrategy
 
 from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy as VolTargetInertiaPolicy2,
-	VolTargetSizePolicy as VolTargetSizePolicy2,
 )
 from melo_fwk.strategies import EWMAStrategy as EWMAStrategy2
 
