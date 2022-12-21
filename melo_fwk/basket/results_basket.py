@@ -23,10 +23,7 @@ class ResultsBasket:
 		})
 
 	def years(self):
-		years = set(self.results_map[0].years)
-		for p in self.results_map[1:]:
-			years.intersection(p.years)
-		return years
+		return set.intersection(*map(set, [r.years for r in self.results_map.values()]))
 
 	def yearly_balance_sheet(self):
 		results = {

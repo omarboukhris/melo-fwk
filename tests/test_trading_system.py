@@ -5,10 +5,11 @@ import numpy as np
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data import CommodityDataLoader
+from melo_fwk.plots import TsarPlotter
+
 from minimelo.trading_systems import TradingSystem, TradingSystemIter
 from minimelo.strategies import EWMAStrategy
 from minimelo.pose_size import VolTargetInertiaPolicy
-from melo_fwk.plots import TsarPlotter
 
 
 class TradingSystemUnitTests(unittest.TestCase):

@@ -51,11 +51,11 @@ class MqlUnitTests(unittest.TestCase):
 	def test_mql_process(self):
 
 		templates = {
-			"backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
-			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
-			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-			"clustering": Path(__file__).parent.parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
-			"fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+			# "backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
+			# "fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+			# "vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
+			# "clustering": Path(__file__).parent.parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
+			# "fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 		}
 		# still missing :
 		# alloc opt
