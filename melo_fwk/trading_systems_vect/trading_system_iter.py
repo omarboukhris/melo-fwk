@@ -39,10 +39,10 @@ class TradingSystemIter(BaseTradingSystem):
 			# get block starting index
 			idx = i * self.freq
 			# get pose_series
-			current_pose_block = self.size_policy.position_size_vect(forecast_df).iloc[idx:idx + self.freq]
+			current_pose_block = self.size_policy.position_size_df(forecast_df).iloc[idx:idx + self.freq]
 			pose_df = pd.concat([pose_df, current_pose_block])
 			# get pnl
-			pose_block_mat = np.einsum("i,ji->ji", block_size_vect, pose_df.to_numpy())
+			pose_block_mat = np.einsum("i,ji->ji", block_size_vect, current_pose_block.to_numpy())
 			current_daily_diff_block = self.product_basket.daily_diff_df().iloc[idx:idx + self.freq] * pose_block_mat
 
 			daily_pnl_df = pd.concat([daily_pnl_df, current_daily_diff_block])
@@ -53,10 +53,10 @@ class TradingSystemIter(BaseTradingSystem):
 		last_idx = self.freq * (i + 1)
 		if last_idx < len(self.product_basket.close_df()):
 			# get pose_series
-			current_pose_block = self.size_policy.position_size_vect(forecast_df).iloc[last_idx:]
+			current_pose_block = self.size_policy.position_size_df(forecast_df).iloc[last_idx:]
 			pose_df = pd.concat([pose_df, current_pose_block])
 			# get pnl
-			pose_block_mat = np.einsum("i,ji->ji", block_size_vect, pose_df.to_numpy())
+			pose_block_mat = np.einsum("i,ji->ji", block_size_vect, current_pose_block.to_numpy())
 			current_daily_diff_block = self.product_basket.daily_diff_df().iloc[last_idx:last_idx + self.freq] * pose_block_mat
 			daily_pnl_df = pd.concat([daily_pnl_df, current_daily_diff_block])
 

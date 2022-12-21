@@ -56,7 +56,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 			annual_vol_target=0.25,
 			trading_capital=start_capital)
 
-		trading_subsys = TradingSystem(
+		trading_subsys = tr(
 			product_basket=prod_bsk,
 			trading_rules=strat,
 			forecast_weights=fw,
