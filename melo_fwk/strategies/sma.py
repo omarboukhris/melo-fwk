@@ -4,7 +4,7 @@ from melo_fwk.strategies import BaseStrategy
 from dataclasses import dataclass
 
 import pandas as pd
-import numpy as np
+
 
 @dataclass
 class SMAParamSpace:
@@ -31,11 +31,11 @@ class SMAStrategy(BaseStrategy, SMAParamSpace):
 	def from_dict(config: dict):
 		return SMAStrategy(**config)
 
-	def forecast_vect(self, data: pd.Series) -> pd.Series:
-		fast_sma = data.rolling(int(self.fast_span), min_periods=1).mean()
-		slow_sma = data.rolling(int(self.slow_span), min_periods=1).mean()
+	def forecast_vect(self, data: pd.DataFrame) -> pd.DataFrame:
+		fast_sma = data.rolling(int(self.fast_span), min_periods=1, axis=1).mean()
+		slow_sma = data.rolling(int(self.slow_span), min_periods=1, axis=1).mean()
 
-		std = data.rolling(25).std()
+		std = data.rolling(25, min_periods=1, axis=1).std()
 		sma = fast_sma - slow_sma
 
 		forecast_vect = self.scale * (sma / std)

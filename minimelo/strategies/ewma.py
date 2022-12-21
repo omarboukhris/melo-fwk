@@ -1,10 +1,10 @@
 
-from melo_fwk.strategies_vect import BaseStrategy
+from minimelo.strategies import BaseStrategy
 
 from dataclasses import dataclass
 
 import pandas as pd
-import numpy as np
+
 
 @dataclass
 class EWMAParamSpace:
@@ -31,11 +31,11 @@ class EWMAStrategy(BaseStrategy, EWMAParamSpace):
 	def from_dict(config: dict):
 		return EWMAStrategy(**config)
 
-	def forecast_vect(self, data: pd.DataFrame) -> pd.DataFrame:
-		fast_ewma = data.ewm(span=int(self.fast_span), adjust=False, axis=0).mean()
-		slow_ewma = data.ewm(span=int(self.slow_span), adjust=False, axis=0).mean()
+	def forecast_vect(self, data: pd.Series):
+		fast_ewma = data.ewm(span=int(self.fast_span), adjust=False).mean()
+		slow_ewma = data.ewm(span=int(self.slow_span), adjust=False).mean()
 
-		std = data.ewm(span=36, adjust=False, axis=0).std()
+		std = data.ewm(span=36, adjust=False).std()
 		ewma = fast_ewma - slow_ewma
 
 		forecast_vect = self.scale * (ewma / std)

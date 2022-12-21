@@ -35,9 +35,9 @@ Tutorial on Mql is cooking
 ```python
 # import necessary packages
 from melo_fwk.market_data import CommodityDataLoader
-from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.pose_size import VolTargetInertiaPolicy
+from minimelo.trading_systems import TradingSystem
+from minimelo.strategies import EWMAStrategy
+from minimelo.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
 # fetch product
@@ -90,13 +90,15 @@ tsar_plotter.save_fig(export_folder="data/residual", mute=True)
 
 To add a new Strategy in the strategy stack, you need to follow a couple of steps.
 First of all, we define the strategy :
+
 ```python
 # import base class, dataclass and other necessary packages
-from melo_fwk.strategies import BaseStrategy
+from minimelo.strategies import BaseStrategy
 from dataclasses import dataclass
 
 import pandas as pd
 import numpy as np
+
 
 # define optimisation search space
 # used by StratOptimEstimator to optimize strategies
@@ -110,6 +112,7 @@ class StratParamSpace:
 		"slow_span": [i for i in range(30, 100)],
 	}
 
+
 # define the actual strategy component
 # needs to inherit base and search space classes
 @dataclass
@@ -118,7 +121,7 @@ class NewStrategy(BaseStrategy, StratParamSpace):
 	# forecast_vect implements the computation 
 	# of all forecast series from price data
 	def forecast_vect(self, data: pd.Series) -> pd.Series:
-		pass # do your calculations here
+		pass  # do your calculations here
 ```
 
 This component on it's own is sufficient to be used in a harcoded backtesting scenario.
@@ -145,7 +148,7 @@ To add a position sizing component, same as with strategies, we need to create t
 We need to inherit the basic vol target component and override `position_size_vect` method :
 
 ```python
-from melo_fwk.pose_size import BaseSizePolicy
+from minimelo.pose_size import BaseSizePolicy
 import pandas as pd
 
 

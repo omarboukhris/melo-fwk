@@ -4,15 +4,15 @@ import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data import MarketDataLoader
-from melo_fwk.pose_size_vect import (
+from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,
 )
-from melo_fwk.strategies_vect import EWMAStrategy
+from melo_fwk.strategies import EWMAStrategy
 
-from melo_fwk.pose_size import (
+from minimelo.pose_size import (
 	VolTargetInertiaPolicy as VolTargetInertiaPolicy2,
 )
-from melo_fwk.strategies import EWMAStrategy as EWMAStrategy2
+from minimelo.strategies import EWMAStrategy as EWMAStrategy2
 
 class BasketRegressionUnitTest(unittest.TestCase):
 

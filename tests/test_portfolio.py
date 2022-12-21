@@ -1,11 +1,11 @@
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.trading_systems import TradingSystemIter
+from minimelo.trading_systems import TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
 
-from melo_fwk.strategies import EWMAStrategy
-from melo_fwk.pose_size import VolTargetInertiaPolicy
+from minimelo.strategies import EWMAStrategy
+from minimelo.pose_size import VolTargetInertiaPolicy
 
 from melo_fwk.plots import AccountPlotter, TsarPlotter
 

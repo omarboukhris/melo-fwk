@@ -4,7 +4,7 @@ import tqdm
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.cluster import ClusterUtils
-from melo_fwk.trading_systems import TradingSystem
+from minimelo.trading_systems import TradingSystem
 from melo_fwk.market_data.product import Product
 
 

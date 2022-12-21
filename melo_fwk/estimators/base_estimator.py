@@ -1,6 +1,6 @@
 
-from melo_fwk.strategies import BaseStrategy
-from melo_fwk.pose_size import BaseSizePolicy
+from minimelo.strategies import BaseStrategy
+from minimelo.pose_size import BaseSizePolicy
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 from typing import List, Union

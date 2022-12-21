@@ -4,8 +4,8 @@ from melo_fwk.db_mgr.mongo_db_mgr import MongodbManager
 from dataclasses import dataclass
 
 from melo_fwk.market_data.product import Product
-from melo_fwk.pose_size import BaseSizePolicy
-from melo_fwk.strategies import BaseStrategy
+from minimelo.pose_size import BaseSizePolicy
+from minimelo.strategies import BaseStrategy
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 

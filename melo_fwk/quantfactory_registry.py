@@ -11,13 +11,13 @@ from melo_fwk.estimators import (
 	ForecastWeightsEstimator,
 	VolTargetEstimator,
 )
-from melo_fwk.strategies import (
+from minimelo.strategies import (
 	EWMAStrategy,
 	SMAStrategy,
 	BuyAndHold,
 )
 
-from melo_fwk.pose_size import (
+from minimelo.pose_size import (
 	BaseSizePolicy,
 	VolTargetSizePolicy,
 	VolTargetInertiaPolicy,

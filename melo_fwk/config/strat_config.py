@@ -1,5 +1,5 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.strategies import BuyAndHold
+from minimelo.strategies import BuyAndHold
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.utils import yaml_io

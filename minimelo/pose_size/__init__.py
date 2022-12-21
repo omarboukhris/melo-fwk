@@ -1,0 +1,5 @@
+
+from minimelo.pose_size.base_size_policy import BaseSizePolicy
+from minimelo.pose_size.vol_target_size_policy import VolTargetSizePolicy
+from minimelo.pose_size.vol_target_discrete_size_policy import VolTargetDiscreteSizePolicy
+from minimelo.pose_size.vol_target_inertia_policy import VolTargetInertiaPolicy

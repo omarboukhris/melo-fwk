@@ -7,9 +7,9 @@ from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data import CommodityDataLoader, MarketDataLoader
-from melo_fwk.trading_systems_vect import TradingSystem, TradingSystemIter
-from melo_fwk.strategies_vect import EWMAStrategy
-from melo_fwk.pose_size_vect import VolTargetInertiaPolicy
+from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
+from melo_fwk.strategies import EWMAStrategy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
 

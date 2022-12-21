@@ -2,8 +2,8 @@
 import tqdm
 
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
-from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
+from minimelo.trading_systems import TradingSystem
+from minimelo.trading_systems import BaseTradingSystem
 
 
 class BacktestEstimator(MeloBaseEstimator):

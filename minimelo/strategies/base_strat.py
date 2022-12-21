@@ -17,17 +17,16 @@ class BaseStrategy:
 		# 	self.estimate_forecast_scale()
 		pass
 
-	def forecast_vect(self, data: pd.DataFrame) -> pd.DataFrame:
+	def forecast_vect(self, data: pd.Series) -> pd.Series:
 		pass
 
-	def forecast_vect_cap(self, data: pd.DataFrame) -> pd.DataFrame:
-		f_vect = self.forecast_vect(data).clip(upper=self.cap, lower=-self.cap, axis=0)
+	def forecast_vect_cap(self, data: pd.Series) -> pd.Series:
+		f_vect = self.forecast_vect(data).clip(upper=self.cap, lower=-self.cap)
 		return f_vect
 
 	def to_dict(self):
 		pass
 
-	""" rewrite for dataframe """
 	def estimate_forecast_scale(self, ratio: float = 0.6):
 		sample_products = MarketDataLoader.sample_products_alpha(ratio)
 
