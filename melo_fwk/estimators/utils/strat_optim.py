@@ -1,6 +1,6 @@
 import numpy as np
 
-from minimelo.trading_systems.trading_system import TradingSystem
+from melo_fwk.trading_systems.trading_system import TradingSystem
 
 class StrategyEstimator:
 

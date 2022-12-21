@@ -2,8 +2,8 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
-from minimelo.pose_size import VolTarget
-from minimelo.trading_systems import TradingSystemIter
+from melo_fwk.pose_size import VolTarget
+from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.market_data.product import Product
 
 class VolTargetEstimator(MeloBaseEstimator):

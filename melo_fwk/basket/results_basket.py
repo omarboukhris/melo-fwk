@@ -8,20 +8,23 @@ from melo_fwk.datastreams import TsarDataStream
 class ResultsBasket:
 
 	def __init__(self, results_list: List[TsarDataStream]):
-		self.results_list = results_list
+		self.results_map = {r.name: r for r in results_list}
 
 	def get_year(self, y: int):
-		return ResultsBasket([r.get_year(y) for r in self.results_list])
+		return ResultsBasket([r.get_year(y) for r in self.results_map.values()])
+
+	def get_product(self, name: str):
+		return self.results_map[name]
 
 	def balance_delta_vect(self) -> pd.Series:
 		return pd.Series({
-			r.name: r.balance_delta()
-			for r in self.results_list
+			name: r.balance_delta()
+			for name, r in self.results_map.items()
 		})
 
 	def years(self):
-		years = set(self.results_list[0].years)
-		for p in self.results_list[1:]:
+		years = set(self.results_map[0].years)
+		for p in self.results_map[1:]:
 			years.intersection(p.years)
 		return years
 

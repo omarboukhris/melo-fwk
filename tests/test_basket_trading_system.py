@@ -63,8 +63,6 @@ class TradingSystemUnitTests(unittest.TestCase):
 			size_policy=size_policy
 		)
 
-		results = {}
-
 		if x == "linear":
 			results = {
 				year: trading_subsys.run_year(year)
