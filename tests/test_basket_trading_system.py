@@ -12,14 +12,6 @@ from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
-from minimelo.trading_systems import (
-	TradingSystem as TradingSystem2,
-	TradingSystemIter as TradingSystemIter2
-)
-from minimelo.strategies import EWMAStrategy as EWMAStrategy2
-from minimelo.pose_size import VolTargetInertiaPolicy as VolTargetInertiaPolicy2
-
-
 class TradingSystemUnitTests(unittest.TestCase):
 
 	def init(self):
@@ -107,28 +99,14 @@ class TradingSystemUnitTests(unittest.TestCase):
 				slow_span=32,
 			).estimate_forecast_scale()
 		]
-		strat2 = [
-			EWMAStrategy2(
-				fast_span=16,
-				slow_span=64,
-				scale=16.,
-			),
-			EWMAStrategy2(
-				fast_span=8,
-				slow_span=32,
-			).estimate_forecast_scale()
-		]
 		fw = [0.6, 0.4]
 
 		start_capital = 60000
 		size_policy = VolTargetInertiaPolicy(
 			annual_vol_target=0.25,
 			trading_capital=start_capital)
-		size_policy2 = VolTargetInertiaPolicy2(
-			annual_vol_target=0.25,
-			trading_capital=start_capital)
 
-		for prod in prod_bsk.products:
+		for prod in prod_bsk.products.values():
 
 			trading_subsys = TradingSystem(
 				product_basket=ProductBasket([prod]),
@@ -137,14 +115,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				size_policy=size_policy
 			)
 
-			tr_sys = TradingSystem2(
-				product=prod,
-				trading_rules=strat2,
-				forecast_weights=fw,
-				size_policy=size_policy2
-			)
-
-			ref = tr_sys.run().forecast_series
+			ref = trading_subsys.run_product(prod).forecast_series
 			df = trading_subsys.run().get_product(prod.name).forecast_series
 			flags = ref - df
 			flag = flags.mean()

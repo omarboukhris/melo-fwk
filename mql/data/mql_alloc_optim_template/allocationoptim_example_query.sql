@@ -9,7 +9,7 @@ having (
 
 with weights (
     0.6, 0.4
-)
+) and divmult is 1.56
 
 exec PortfolioVolTarget
 -- could also exec allocOptimWeights / VaRReport / ...

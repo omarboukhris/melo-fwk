@@ -54,7 +54,7 @@ class BaseTradingSystem:
 	def forecast_cumsum(self):
 		f_df = pd.DataFrame({
 			p.name: np.zeros(shape=len(self.product_basket.close_df()))
-			for p in self.product_basket.products
+			for p in self.product_basket.products.values()
 		})
 
 		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
@@ -120,7 +120,7 @@ class BaseTradingSystem:
 		daily_pnl_df: pd.DataFrame
 	) -> ResultsBasket:
 		results_list = []
-		for product in self.product_basket.products:
+		for product in self.product_basket.products.values():
 			results_list.append(TsarDataStream(
 				name=product.name,
 				dataframe=pd.DataFrame({

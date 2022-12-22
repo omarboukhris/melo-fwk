@@ -1,11 +1,11 @@
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from minimelo.trading_systems import TradingSystemIter
+from melo_fwk.trading_systems import TradingSystemIter
 
 from melo_fwk.market_data import MarketDataLoader
 
-from minimelo.strategies import EWMAStrategy
-from minimelo.pose_size import VolTargetInertiaPolicy
+from melo_fwk.strategies import EWMAStrategy
+from melo_fwk.pose_size import VolTargetInertiaPolicy
 
 from melo_fwk.plots import AccountPlotter, TsarPlotter
 
@@ -38,20 +38,19 @@ class PortfolioUnitTests(unittest.TestCase):
 		start_capital = ts_capital * len(products)
 
 		for product in tqdm.tqdm(products):
-			loaded_prod = MarketDataLoader.load_datastream(product)
+			loaded_prod = MarketDataLoader.load_product(product)
 			size_policy = VolTargetInertiaPolicy(
 				annual_vol_target=vol_target,
 				trading_capital=ts_capital)
 
 			tr_sys = TradingSystemIter(
-				product=loaded_prod,
 				trading_rules=[sma],
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
 
 			# simulation with constant risk
-			tsar = tr_sys.run()
+			tsar = tr_sys.run_product(loaded_prod)
 
 			results.update({product["name"]: tsar})
 			balance += tsar.balance_delta()

@@ -48,15 +48,13 @@ class PortfolioUnitTests(unittest.TestCase):
 				trading_capital=ts_capital)
 
 			tr_sys = TradingSystemIter(
-				# product=loaded_prod,
-				product=product,  # .get_years([2007, 2008]),
 				trading_rules=[sma],
 				forecast_weights=[1.],
 				size_policy=size_policy
 			)
 
 			# simulation with constant risk
-			tsar = tr_sys.run()
+			tsar = tr_sys.run_product(product)
 
 			results.append(tsar)
 			tsar_list.append(tsar)

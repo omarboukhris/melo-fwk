@@ -92,7 +92,7 @@ class MarketDataLoader:
 	@staticmethod
 	def products_pool():
 		products_loc = MarketDataLoader.get_commodities() + MarketDataLoader.get_fx()
-		products = [MarketDataLoader.load_datastream(prod) for prod in products_loc]
+		products = [MarketDataLoader.load_product(prod) for prod in products_loc]
 		return products
 
 	@staticmethod
@@ -129,7 +129,7 @@ class MarketDataLoader:
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
 
-		return MarketDataLoader.load_datastream(product_list[0])
+		return MarketDataLoader.load_product(product_list[0])
 
 	@staticmethod
 	def get_fx_hloc_datastream(product: str):
@@ -137,10 +137,10 @@ class MarketDataLoader:
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get_fx_hloc_datastream, product = {product_list}"
 
-		return MarketDataLoader.load_datastream(product_list[0])
+		return MarketDataLoader.load_product(product_list[0])
 
 	@staticmethod
-	def load_datastream(product: dict) -> Product:
+	def load_product(product: dict) -> Product:
 		input_df = pd.read_csv(product["datasource"])
 		return Product(
 			name=product["name"],

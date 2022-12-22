@@ -9,11 +9,6 @@ from melo_fwk.pose_size import (
 )
 from melo_fwk.strategies import EWMAStrategy
 
-from minimelo.pose_size import (
-	VolTargetInertiaPolicy as VolTargetInertiaPolicy2,
-)
-from minimelo.strategies import EWMAStrategy as EWMAStrategy2
-
 class BasketRegressionUnitTest(unittest.TestCase):
 
 	def test_prod_basket(self):
@@ -38,7 +33,6 @@ class BasketRegressionUnitTest(unittest.TestCase):
 			# print(forecast_df)
 
 			# compare with tsar forecast series
-			ewma = EWMAStrategy2(**sma_params)
 			for p, col in zip([prod], forecast_df.columns):
 				forecast = ewma.forecast_vect_cap(p.get_close_series())
 				flag = (forecast[2:] == forecast_df[col][2:]).all()
@@ -64,8 +58,6 @@ class BasketRegressionUnitTest(unittest.TestCase):
 			# print(pose_df)
 
 			# compare with pose_series from tsar as UT
-			pose_sizer = VolTargetInertiaPolicy2(annual_vol_target=0.4, trading_capital=10000)
-			ewma = EWMAStrategy2(**sma_params)
 			for p, col in zip([prod], pose_df.columns):
 				forecast = ewma.forecast_vect_cap(p.get_close_series())
 
@@ -103,7 +95,6 @@ class BasketUnitTest(unittest.TestCase):
 		# print(forecast_df)
 
 		# compare with tsar forecast series
-		ewma = EWMAStrategy2(**sma_params)
 		for p, col in zip(products, forecast_df.columns):
 			forecast = ewma.forecast_vect_cap(p.get_close_series())
 			ref = forecast_df[col][:len(forecast)]
@@ -130,8 +121,6 @@ class BasketUnitTest(unittest.TestCase):
 		# print(pose_df)
 
 		# compare with pose_series from tsar as UT
-		pose_sizer = VolTargetInertiaPolicy2(annual_vol_target=0.4, trading_capital=10000)
-		ewma = EWMAStrategy2(**sma_params)
 		for p, col in zip(products, pose_df.columns):
 			forecast = ewma.forecast_vect_cap(p.get_close_series())
 

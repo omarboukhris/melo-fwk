@@ -45,7 +45,7 @@ class BaseSizePolicy:
 
 	def product_names(self):
 		"""Basket"""
-		return [p.name for p in self.prod_basket.products]
+		return [p for p in self.prod_basket.products.keys()]
 
 	def setup_product(self, product: Product):
 		self.datastream = product.datastream
