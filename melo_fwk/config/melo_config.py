@@ -35,7 +35,7 @@ class MeloConfig:
 	reporter_class_: callable  # Type[BaseReporter]
 
 	@staticmethod
-	def build(quant_query_path: Path, quant_query: dict):
+	def build_config(quant_query_path: Path, quant_query: dict):
 		"""
 		Should rework into config builder factory
 		ex: parse strat vs strat metadata

@@ -1,5 +1,6 @@
 import unittest
 
+from melo_fwk.config_clusters.melo_clusters_config import MeloClustersConfig
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.loggers.console_logger import ConsoleLogger
 
@@ -31,10 +32,14 @@ def run_mql_process(mql_query_path: Path):
 	# print(parsed_mql)
 
 	if "Clusters" in quant_query.keys():
+		mql_clusters_config = MeloClustersConfig.build_config(quant_query=quant_query)
+		cluster_estim_ = mql_clusters_config.build_clusters_estimator()
+		output = cluster_estim_.run()
+		mql_clusters_config.write_report(output, str(mql_query_path.parent))
 		raise NotImplemented()
 
 	else:
-		mql_config = MeloConfig.build(
+		mql_config = MeloConfig.build_config(
 			quant_query_path=mql_query_path,
 			quant_query=quant_query
 		)

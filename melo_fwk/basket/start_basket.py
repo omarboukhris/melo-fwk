@@ -26,7 +26,7 @@ class StratBasket:
 		for trading_rule, forecast_weight in zip(self.strat_list, self.weights.weights):
 			f_series += forecast_weight * trading_rule.forecast_vect_cap(product.get_close_series()).to_numpy()
 
-		return pd.Series(f_series)
+		return pd.Series(f_series * self.weights.divmult)
 
 	def forecast_cumsum(self, product_basket: ProductBasket) -> pd.DataFrame:
 		f_df = pd.DataFrame({
@@ -38,7 +38,7 @@ class StratBasket:
 		for trading_rule, forecast_weight in zip(self.strat_list, self.weights.weights):
 			f_df += forecast_weight * trading_rule.forecast_df_cap(product_basket.close_df())
 
-		return f_df
+		return f_df * self.weights.divmult
 
 	@classmethod
 	def empty(cls):
