@@ -7,8 +7,4 @@ ProductsDefList ->
     !ProductsGenerator |
     !ProductsGenerator comma. |
 []
-ProductsGenerator -> s:productType. lpar. s:ProductsList rpar.
-ProductsList ->
-    alphanum. |
-    alphanum. comma. |
-[]
+ProductsGenerator -> s:productType. lpar. s:AlphanumList rpar.

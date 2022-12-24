@@ -1,37 +1,32 @@
 
 StrategiesDef ->
     strategies. are.
-        lpar. s:StrategyList rpar.
+        lpar. s:AlphanumList rpar.
     with. strategyconfig.
         lpar. s:StrategyConfigList rpar.
     |
     strategies. are.
-        lpar. s:StrategyList rpar.
+        lpar. s:AlphanumList rpar.
     with. strategyconfig.
         lpar. s:StrategyConfigList rpar.
     with. weights.
         lpar. s:WeightsList rpar.
     |
     strategies. are.
-        lpar. s:StrategyList rpar.
+        lpar. s:AlphanumList rpar.
     with. strategyconfig.
         lpar. s:StrategyConfigList rpar.
     with. weights.
         lpar. s:WeightsList rpar.
     and. divmult. is. DivMult=numeric.
 
-
-
-StrategyList ->
-    alphanum. |
-    alphanum. comma. |
-[]
 StrategyConfigList ->
     alphanum. |
     alphanum. comma. |
     alphanum. pt. alphanum. |
     alphanum. pt. alphanum. comma. |
 []
+
 WeightsList ->
     numeric. |
     numeric. comma. |

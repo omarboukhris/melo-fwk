@@ -14,7 +14,7 @@ class ProductConfigBuilder:
 		output_products = {}
 		for prods in products_generator:
 			products_type = ConfigBuilderHelper.strip_single(prods, "productType")
-			products_name_list = ConfigBuilderHelper.parse_list(prods, "ProductsList")
+			products_name_list = ConfigBuilderHelper.parse_list(prods, "AlphanumList")
 			for product_name in products_name_list:
 				product = ProductConfigBuilder._get_product(products_type, product_name)
 				plogger.info(f"Loaded Product {product.keys()}")

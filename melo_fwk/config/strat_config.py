@@ -58,7 +58,7 @@ class StrategyConfigBuilder:
 			return [BuyAndHold()], [1.]
 
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")
-		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyList").split(",")
+		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "AlphanumList").split(",")
 		strat_config_points = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyConfigList").split(",")
 
 		logger.info(f"Loading Strategies {[s.strip() for s in strategies_kw]}")
