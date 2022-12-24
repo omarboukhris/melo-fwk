@@ -13,7 +13,6 @@ from mql.mql_parser import MqlParser
 
 from pathlib import Path
 
-
 def run_mql_process(mql_query_path: Path):
 	"""
 	Estimators should:
@@ -33,17 +32,21 @@ def run_mql_process(mql_query_path: Path):
 	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
 	# print(parsed_mql)
 
-	mql_config = MeloConfig.build(
-		quant_query_path=mql_query_path,
-		quant_query=quant_query
-	)
-	# print(mql_config)
+	if "Clusters" in quant_query.keys():
+		raise NotImplemented()
 
-	estimator_obj_ = mql_config.build_estimator()
-	output = estimator_obj_.run()
-	# print(output)
+	else:
+		mql_config = MeloConfig.build(
+			quant_query_path=mql_query_path,
+			quant_query=quant_query
+		)
+		# print(mql_config)
 
-	mql_config.write_report(output, str(mql_query_path.parent))
+		estimator_obj_ = mql_config.build_estimator()
+		output = estimator_obj_.run()
+		# print(output)
+
+		mql_config.write_report(output, str(mql_query_path.parent))
 
 
 class MqlUnitTests(unittest.TestCase):
@@ -51,6 +54,7 @@ class MqlUnitTests(unittest.TestCase):
 	def test_mql_process(self):
 
 		templates = {
+			"alloc": Path(__file__).parent.parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",

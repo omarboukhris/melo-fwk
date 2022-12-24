@@ -1,17 +1,10 @@
--- AllocOptim will need to be done on whole portfolio instead of subsystem
-
 create portfolio
 
-having (
-    cluster1,
-    cluster2,
+with clusters (
+    c1,
+    c2
 )
 
-with weights (
-    0.6, 0.4
-) and divmult is 1.56
+with weights (0.5, 0.5) and divmult is 0.7
 
-exec PortfolioVolTarget
--- could also exec allocOptimWeights / VaRReport / ...
--- set it at same level as clustering query
--- also useful for var reporting on portfolio
+select Baktest

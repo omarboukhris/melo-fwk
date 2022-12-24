@@ -1,0 +1,15 @@
+
+Clusters ->
+    clusters. lpar. s:ClustersList rpar.
+    |
+    clusters. lpar. s:ClustersList rpar.
+    with. weights. lpar. s:WeightsList rpar.
+    |
+    clusters. lpar. s:ClustersList rpar.
+    with. weights. lpar. s:WeightsList rpar.
+    and. divmult. is. DivMult=numeric.
+
+ClustersList ->
+    alphanum. |
+    alphanum. comma. |
+[]

@@ -5,9 +5,16 @@
 %import "mql_grm_rc/posesize_def.grm"
 %import "mql_grm_rc/process_def.grm"
 
+%import "mql_grm_rc/clusters_def.grm"
+
 AXIOM -> QuantQuery
 
 QuantQuery ->
+    create. QueryName=alphanum.
+    with. !Clusters
+    select. !ProcessDef
+    |
+
     // User defines all params
     // No default value used
     create. QueryName=alphanum.
