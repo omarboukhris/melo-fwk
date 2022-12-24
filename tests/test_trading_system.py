@@ -10,6 +10,7 @@ from melo_fwk.plots import TsarPlotter
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
+from melo_fwk.utils.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):
@@ -51,7 +52,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				slow_span=32,
 			).estimate_forecast_scale()
 		]
-		fw = [0.6, 0.4]
+		fw = Weights([0.6, 0.4], 1.)
 
 		start_capital = 60000
 		size_policy = VolTargetInertiaPolicy(

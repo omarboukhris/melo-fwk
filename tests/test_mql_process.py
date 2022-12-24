@@ -3,10 +3,8 @@ import unittest
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.loggers.console_logger import ConsoleLogger
 
-from melo_fwk.config import (
-	ConfigBuilderHelper,
-	MeloConfig
-)
+from melo_fwk.config import MeloConfig
+
 from melo_fwk import quantfactory_registry
 
 from mql.mql_parser import MqlParser
@@ -29,7 +27,7 @@ def run_mql_process(mql_query_path: Path):
 
 	mql_parser = MqlParser()
 	parsed_mql = mql_parser.parse_to_json(str(mql_query_path))
-	quant_query = ConfigBuilderHelper.strip_single(parsed_mql, "QuantQuery")
+	quant_query = parsed_mql["QuantQuery"][0]
 	# print(parsed_mql)
 
 	if "Clusters" in quant_query.keys():
@@ -54,7 +52,7 @@ class MqlUnitTests(unittest.TestCase):
 	def test_mql_process(self):
 
 		templates = {
-			"alloc": Path(__file__).parent.parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
+			# "alloc": Path(__file__).parent.parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",

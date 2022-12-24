@@ -5,6 +5,9 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 
 from typing import List, Union
 
+from melo_fwk.utils.weights import Weights
+
+
 class MeloBaseEstimator:
 
 	def __init__(
@@ -12,13 +15,13 @@ class MeloBaseEstimator:
 		products: dict,
 		time_period: List[int],
 		strategies: List[Union[BaseStrategy, tuple]],
-		forecast_weights: List[int],
+		forecast_weights: Weights,
 		size_policy: Union[BaseSizePolicy, callable],
 		estimator_params: List[str]
 	):
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
-		assert len(strategies) == len(forecast_weights), self.logger.error(
+		assert len(strategies) == len(forecast_weights.weights), self.logger.error(
 			"Strategies and Forecast weight do not correspond.")
 
 		self.products = products

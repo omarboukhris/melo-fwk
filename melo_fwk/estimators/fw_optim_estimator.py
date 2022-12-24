@@ -10,6 +10,9 @@ import numpy as np
 import tqdm
 
 import warnings
+
+from melo_fwk.utils.weights import Weights
+
 warnings.filterwarnings('ignore', message='The objective has been evaluated at this point before.')
 
 class ForecastWeightsEstimator(MeloBaseEstimator):
@@ -56,7 +59,7 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 
 			opt_result = minimize(
 				ForecastWeightsEstimator.objective,
-				np.array(self.forecast_weights),
+				np.array(self.forecast_weights.weights),
 				args=(expected_ret, returns.cov()),
 				method='SLSQP',
 				bounds=opt_bounds,
@@ -80,7 +83,7 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 		for strategy in self.strategies:
 			trading_subsys = TradingSystem(
 				trading_rules=[strategy],
-				forecast_weights=[1.],
+				forecast_weights=Weights([1.], 1.),
 				size_policy=self.size_policy,
 			)
 

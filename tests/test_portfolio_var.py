@@ -7,6 +7,7 @@ from melo_fwk.market_data import MarketDataLoader
 from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
+from melo_fwk.utils.weights import Weights
 
 from melo_fwk.var.VaR import VaR99, VaR95
 from melo_fwk.var.CVaR import CVaR
@@ -49,7 +50,7 @@ class PortfolioUnitTests(unittest.TestCase):
 
 			tr_sys = TradingSystemIter(
 				trading_rules=[sma],
-				forecast_weights=[1.],
+				forecast_weights=Weights([1.], 1.),
 				size_policy=size_policy
 			)
 

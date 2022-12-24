@@ -3,7 +3,6 @@ import bson.objectid as boi
 
 from melo_fwk.loggers.global_logger import GlobalLogger
 
-
 class MongodbManager:
 
 	def __init__(self, dburl: str = "mongodb://localhost:27017/"):

@@ -16,17 +16,20 @@ from typing import List
 
 import pandas as pd
 
+from melo_fwk.utils.weights import Weights
+
+
 class BaseTradingSystem:
 
 	def __init__(
 		self,
 		trading_rules: List[BaseStrategy],
-		forecast_weights: List[float],
+		forecast_weights: Weights,
 		size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
 		product_basket: ProductBasket = ProductBasket([]),
 	):
 
-		assert len(trading_rules) == len(forecast_weights), \
+		assert len(trading_rules) == len(forecast_weights.weights), \
 			"(AssertionError) Number of TradingRules must match forcast weights"
 
 		self.time_index = 0
@@ -40,13 +43,13 @@ class BaseTradingSystem:
 		return BaseTradingSystem(
 			product_basket=ProductBasket([HLOCDataStream.get_empty()]),
 			trading_rules=[],
-			forecast_weights=[]
+			forecast_weights=Weights([], 0.)
 		)
 
 	def forecast_cumsum_product(self, product: Product):
 		f_series = np.array([0.] * len(product.get_close_series()))
 
-		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
+		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights.weights):
 			f_series += forecast_weight * trading_rule.forecast_vect_cap(product.get_close_series()).to_numpy()
 
 		return pd.Series(f_series)
@@ -57,7 +60,7 @@ class BaseTradingSystem:
 			for p in self.product_basket.products.values()
 		})
 
-		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights):
+		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights.weights):
 			f_df += forecast_weight * trading_rule.forecast_df_cap(self.product_basket.close_df())
 
 		return f_df

@@ -1,8 +1,13 @@
-from melo_fwk.config import ConfigBuilderHelper
+from typing import List, Type, Tuple, Dict, Union
+
+from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
+from melo_fwk.estimators.base_estimator import MeloBaseEstimator
+from melo_fwk.market_data.product import Product
+# from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.pose_size import BaseSizePolicy
 
@@ -12,15 +17,22 @@ from dataclasses import dataclass
 
 import os
 
+from melo_fwk.strategies import BaseStrategy
+from melo_fwk.utils.weights import Weights
+
+
 @dataclass(frozen=True)
 class MeloConfig:
 	name: str
-	products_config: tuple  # (product[], start..end)
+	# {prod_name: Product}, start..end
+	products_config: Tuple[dict, List[int]]
 	size_policy: BaseSizePolicy
 	strat_config_registry: StratConfigRegistry
-	strategies_config: tuple  # (strategy[], fw[])
-	estimator_config_: tuple  # (estimator, estimator_param[])
-	reporter_class_: callable  # Reporters
+	# (list(strats OR tuple(type(strat), param)), fw)
+	strategies_config: Tuple[List[Union[BaseStrategy, Tuple[Type[BaseStrategy], Dict]]], Weights]
+	# (estimator, **params)
+	estimator_config_: Tuple[Type[MeloBaseEstimator], List[str]]
+	reporter_class_: callable  # Type[BaseReporter]
 
 	@staticmethod
 	def build(quant_query_path: Path, quant_query: dict):
@@ -90,4 +102,3 @@ class MeloConfig:
 
 	def __str__(self):
 		return str(self.asdict())
-

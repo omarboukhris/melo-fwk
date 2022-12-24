@@ -1,6 +1,8 @@
 import numpy as np
 
 from melo_fwk.trading_systems.trading_system import TradingSystem
+from melo_fwk.utils.weights import Weights
+
 
 class StrategyEstimator:
 
@@ -25,7 +27,7 @@ class StrategyEstimator:
 
 		trading_subsys = TradingSystem(
 			trading_rules=[strat],
-			forecast_weights=[1.],
+			forecast_weights=Weights([1.], 1.),
 			size_policy=self.size_policy
 		)
 

@@ -41,7 +41,7 @@ class BaseReporter:
 		ss += MdFormatter.item_list(self.size_policy.vol_target.to_list())
 
 		ss += MdFormatter.h2("Strategies:")
-		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw, self.strat_list)])
+		ss += MdFormatter.item_list([f"{w} x {strat}" for w, strat in zip(self.fw.weights, self.strat_list)])
 
 		return ss
 

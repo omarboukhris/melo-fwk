@@ -8,6 +8,8 @@ from pathlib import Path
 
 import glob
 
+from melo_fwk.utils.weights import Weights
+
 
 @dataclass(frozen=True)
 class StratConfigRegistry:
@@ -55,7 +57,7 @@ class StrategyConfigBuilder:
 		logger = GlobalLogger.build_composite_for("StratConfigBuilder")
 		if "StrategiesDef" not in quant_query_dict.keys():
 			logger.warn("No Strategies Parsed; Using default BuyAndHold")
-			return [BuyAndHold()], [1.]
+			return [BuyAndHold()], Weights([1.], 1.)
 
 		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")
 		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "AlphanumList").split(",")
@@ -79,14 +81,21 @@ class StrategyConfigBuilder:
 					)
 				)
 
-		if "forecastWeightsList" not in stripped_entry.keys():
+		if "WeightsList" not in stripped_entry.keys():
 			logger.warn("No ForecastWeights Parsed; Using default 1/n")
-			return strategies, [1/len(strategies) for _ in strategies]
+			return strategies, Weights([1/len(strategies) for _ in strategies], 1.)
 
-		forecast_weights_str = ConfigBuilderHelper.strip_single(stripped_entry, "forecastWeightsList")
+		forecast_weights_str = ConfigBuilderHelper.strip_single(stripped_entry, "WeightsList")
 		forecast_weights = [float(fw_str) for fw_str in forecast_weights_str.split(",")]
 
-		logger.info(f"ForecastWeights Parsed; Using {forecast_weights}")
-		return strategies, forecast_weights
+		if "DivMult" not in stripped_entry.keys():
+			logger.warn("No DivMult Parsed; Using default 1.")
+			return strategies, Weights(forecast_weights, 1.)
+
+		divmult_str = ConfigBuilderHelper.strip_single(stripped_entry, "DivMult")
+		divmult = float(divmult_str)
+
+		logger.info(f"DivMult Parsed; Using {divmult}")
+		return strategies, Weights(forecast_weights, divmult)
 
 

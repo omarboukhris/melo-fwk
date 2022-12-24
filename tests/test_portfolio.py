@@ -13,6 +13,9 @@ import pandas as pd
 import tqdm
 import unittest
 
+from melo_fwk.utils.weights import Weights
+
+
 class PortfolioUnitTests(unittest.TestCase):
 
 	def init(self):
@@ -45,7 +48,7 @@ class PortfolioUnitTests(unittest.TestCase):
 
 			tr_sys = TradingSystemIter(
 				trading_rules=[sma],
-				forecast_weights=[1.],
+				forecast_weights=Weights([1.], 1.),
 				size_policy=size_policy
 			)
 
