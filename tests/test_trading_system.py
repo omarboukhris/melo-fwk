@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data import CommodityDataLoader
@@ -41,18 +42,20 @@ class TradingSystemUnitTests(unittest.TestCase):
 		product = CommodityDataLoader.Gold
 		# product = FxDataLoader.EURUSD
 
-		strat = [
-			EWMAStrategy(
-				fast_span=16,
-				slow_span=64,
-				scale=16.,
-			),
-			EWMAStrategy(
-				fast_span=8,
-				slow_span=32,
-			).estimate_forecast_scale()
-		]
-		fw = Weights([0.6, 0.4], 1.)
+		strat_basket = StratBasket(
+			strat_list=[
+				EWMAStrategy(
+					fast_span=16,
+					slow_span=64,
+					scale=16.,
+				),
+				EWMAStrategy(
+					fast_span=8,
+					slow_span=32,
+				).estimate_forecast_scale()
+			],
+			weights=Weights([0.6, 0.4], 1.)
+		)
 
 		start_capital = 60000
 		size_policy = VolTargetInertiaPolicy(
@@ -60,8 +63,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 			trading_capital=start_capital)
 
 		trading_subsys = tr(
-			trading_rules=strat,
-			forecast_weights=fw,
+			strat_basket=strat_basket,
 			size_policy=size_policy
 		)
 

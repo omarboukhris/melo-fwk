@@ -3,7 +3,7 @@ from melo_fwk.strategies import BaseStrategy
 from melo_fwk.pose_size import BaseSizePolicy
 from melo_fwk.loggers.global_logger import GlobalLogger
 
-from typing import List, Union
+from typing import List, Union, Type
 
 from melo_fwk.utils.weights import Weights
 
@@ -16,7 +16,7 @@ class MeloBaseEstimator:
 		time_period: List[int],
 		strategies: List[Union[BaseStrategy, tuple]],
 		forecast_weights: Weights,
-		size_policy: Union[BaseSizePolicy, callable],
+		size_policy: Union[BaseSizePolicy, Type[BaseSizePolicy]],
 		estimator_params: List[str]
 	):
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)

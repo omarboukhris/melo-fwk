@@ -24,14 +24,15 @@ class TradingSystem(BaseTradingSystem):
 
 	def run_product(self, product: Product) -> TsarDataStream:
 		self.size_policy.setup_product(product)
-		forecast_series = self.forecast_cumsum_product(product)
+		forecast_series = self.strat_basket.forecast_cumsum_product(product)
 		pose_series = self.size_policy.position_size_vect(forecast_series)
 		daily_pnl = product.get_daily_diff_series().to_numpy() * pose_series * product.block_size
 
 		return TradingSystem.build_tsar(product, forecast_series, pose_series, daily_pnl)
 
 	def run(self) -> ResultsBasket:
-		forecast_df = self.forecast_cumsum()
+		self.size_policy = self.size_policy.setup_product_basket(self.product_basket)
+		forecast_df = self.strat_basket.forecast_cumsum(self.product_basket)
 		pose_df = self.size_policy.position_size_df(forecast_df)
 		pose_block_mat = np.einsum("i,ji->ji", self.product_basket.block_size_vect().to_numpy(), pose_df.to_numpy())
 		daily_pnl_df = self.product_basket.daily_diff_df() * pose_block_mat

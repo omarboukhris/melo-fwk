@@ -1,6 +1,7 @@
 import pandas as pd
 import tqdm
 
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.pose_size.vol_target import VolTarget
 from melo_fwk.trading_systems import TradingSystemIter
@@ -36,8 +37,10 @@ class VolTargetEstimator(MeloBaseEstimator):
 		n_iter = int((self.final - self.start) / self.step)
 		for _ in tqdm.tqdm(range(n_iter), leave=False):
 			ts = TradingSystemIter(
-				trading_rules=self.strategies,
-				forecast_weights=self.forecast_weights,
+				strat_basket=StratBasket(
+					strat_list=self.strategies,
+					weights=self.forecast_weights,
+				),
 				size_policy=size_policy,
 			)
 			tsar = ts.run_product(product)

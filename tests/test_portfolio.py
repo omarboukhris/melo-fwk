@@ -1,3 +1,4 @@
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems import TradingSystemIter
@@ -31,6 +32,11 @@ class PortfolioUnitTests(unittest.TestCase):
 		}
 		sma = EWMAStrategy(**sma_params)
 
+		strat_bsk = StratBasket(
+			strat_list=[sma],
+			weights=Weights([1.], 1.)
+		)
+
 		products = MarketDataLoader.get_fx()
 		products += MarketDataLoader.get_commodities()
 
@@ -47,8 +53,7 @@ class PortfolioUnitTests(unittest.TestCase):
 				trading_capital=ts_capital)
 
 			tr_sys = TradingSystemIter(
-				trading_rules=[sma],
-				forecast_weights=Weights([1.], 1.),
+				strat_basket=strat_bsk,
 				size_policy=size_policy
 			)
 

@@ -1,5 +1,6 @@
 import numpy as np
 
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.trading_systems.trading_system import TradingSystem
 from melo_fwk.utils.weights import Weights
 
@@ -23,11 +24,13 @@ class StrategyEstimator:
 		return self
 
 	def score(self, X: np.ndarray):
-		strat = self.strat_class_(**self.strat_params)
+		strat_basket = StratBasket(
+			strat_list=[self.strat_class_(**self.strat_params)],
+			weights=Weights([1.], 1.)
+		)
 
 		trading_subsys = TradingSystem(
-			trading_rules=[strat],
-			forecast_weights=Weights([1.], 1.),
+			strat_basket=strat_basket,
 			size_policy=self.size_policy
 		)
 

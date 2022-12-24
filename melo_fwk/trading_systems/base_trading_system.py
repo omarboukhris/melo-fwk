@@ -1,7 +1,10 @@
+from dataclasses import dataclass
+
 import numpy as np
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.results_basket import ResultsBasket
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.market_data.product import Product
 
 from melo_fwk.strategies import BaseStrategy
@@ -18,52 +21,11 @@ import pandas as pd
 
 from melo_fwk.utils.weights import Weights
 
-
+@dataclass
 class BaseTradingSystem:
-
-	def __init__(
-		self,
-		trading_rules: List[BaseStrategy],
-		forecast_weights: Weights,
-		size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
-		product_basket: ProductBasket = ProductBasket([]),
-	):
-
-		assert len(trading_rules) == len(forecast_weights.weights), \
-			"(AssertionError) Number of TradingRules must match forcast weights"
-
-		self.time_index = 0
-		self.product_basket = product_basket
-		self.trading_rules = trading_rules
-		self.forecast_weights = forecast_weights
-		self.size_policy = size_policy.setup_product_basket(product_basket)
-
-	@staticmethod
-	def default():
-		return BaseTradingSystem(
-			product_basket=ProductBasket([HLOCDataStream.get_empty()]),
-			trading_rules=[],
-			forecast_weights=Weights([], 0.)
-		)
-
-	def forecast_cumsum_product(self, product: Product):
-		f_series = np.array([0.] * len(product.get_close_series()))
-
-		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights.weights):
-			f_series += forecast_weight * trading_rule.forecast_vect_cap(product.get_close_series()).to_numpy()
-
-		return pd.Series(f_series)
-
-	def forecast_cumsum(self):
-		f_df = pd.DataFrame({
-			p.name: np.zeros(shape=len(self.product_basket.close_df()))
-			for p in self.product_basket.products.values()
-		})
-
-		for trading_rule, forecast_weight in zip(self.trading_rules, self.forecast_weights.weights):
-			f_df += forecast_weight * trading_rule.forecast_df_cap(self.product_basket.close_df())
-
-		return f_df
+	strat_basket: StratBasket = StratBasket.empty()
+	product_basket: ProductBasket = ProductBasket([]),
+	size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
 
 	def update_trading_capital(self, delta: float):
 		self.size_policy.update_trading_capital(delta)

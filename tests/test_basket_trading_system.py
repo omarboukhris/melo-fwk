@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data import CommodityDataLoader, MarketDataLoader
@@ -39,18 +40,20 @@ class TradingSystemUnitTests(unittest.TestCase):
 		prod_bsk = ProductBasket(products)
 		# product = FxDataLoader.EURUSD
 
-		strat = [
-			EWMAStrategy(
-				fast_span=16,
-				slow_span=64,
-				scale=16.,
-			),
-			EWMAStrategy(
-				fast_span=8,
-				slow_span=32,
-			).estimate_forecast_scale()
-		]
-		fw = Weights([0.6, 0.4], 1.)
+		strat_basket = StratBasket(
+			strat_list=[
+				EWMAStrategy(
+					fast_span=16,
+					slow_span=64,
+					scale=16.,
+				),
+				EWMAStrategy(
+					fast_span=8,
+					slow_span=32,
+				).estimate_forecast_scale()
+			],
+			weights=Weights([0.6, 0.4], 1.)
+		)
 
 		start_capital = 60000
 		size_policy = VolTargetInertiaPolicy(
@@ -59,8 +62,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		trading_subsys = tr(
 			product_basket=prod_bsk,
-			trading_rules=strat,
-			forecast_weights=fw,
+			strat_basket=strat_basket,
 			size_policy=size_policy
 		)
 
@@ -90,18 +92,20 @@ class TradingSystemUnitTests(unittest.TestCase):
 		prod_bsk = ProductBasket(products)
 		# product = FxDataLoader.EURUSD
 
-		strat = [
-			EWMAStrategy(
-				fast_span=16,
-				slow_span=64,
-				scale=16.,
-			),
-			EWMAStrategy(
-				fast_span=8,
-				slow_span=32,
-			).estimate_forecast_scale()
-		]
-		fw = Weights([0.6, 0.4], 1.)
+		strat_basket = StratBasket(
+			strat_list=[
+				EWMAStrategy(
+					fast_span=16,
+					slow_span=64,
+					scale=16.,
+				),
+				EWMAStrategy(
+					fast_span=8,
+					slow_span=32,
+				).estimate_forecast_scale()
+			],
+			weights=Weights([0.6, 0.4], 1.)
+		)
 
 		start_capital = 60000
 		size_policy = VolTargetInertiaPolicy(
@@ -112,8 +116,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 			trading_subsys = TradingSystem(
 				product_basket=ProductBasket([prod]),
-				trading_rules=strat,
-				forecast_weights=fw,
+				strat_basket=strat_basket,
 				size_policy=size_policy
 			)
 

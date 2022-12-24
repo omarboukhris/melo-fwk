@@ -1,4 +1,5 @@
 from melo_fwk.basket.product_basket import ProductBasket
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.market_data.product import Product
@@ -82,8 +83,10 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 
 		for strategy in self.strategies:
 			trading_subsys = TradingSystem(
-				trading_rules=[strategy],
-				forecast_weights=Weights([1.], 1.),
+				strat_basket=StratBasket(
+					strat_list=[strategy],
+					weights=Weights([1.], 1.)
+				),
 				size_policy=self.size_policy,
 			)
 

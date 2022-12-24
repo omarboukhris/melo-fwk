@@ -23,13 +23,13 @@ class TradingSystemIter(BaseTradingSystem):
 
 	def __init__(self, **kwargs):
 		super(TradingSystemIter, self).__init__(**kwargs)
-		self.block_size_vect = self.product_basket.block_size_vect().to_numpy()
+		self.block_size_vect = np.array([])
 		self.freq = kwargs["freq"] if "freq" in kwargs.keys() else 5
 
 	def run_product(self, product: Product, verbose: bool = True) -> TsarDataStream:
 		self.size_policy.setup_product(product)
 		start_capital = self.size_policy.vol_target.trading_capital
-		forecast_series, i = self.forecast_cumsum_product(product), 0
+		forecast_series, i = self.strat_basket.forecast_cumsum_product(product), 0
 		pose_series, daily_pnl = pd.Series(dtype=np.float64), pd.Series(dtype=np.float64)
 		nb_batch = int(len(product.get_dataframe())/self.freq)
 
@@ -63,9 +63,11 @@ class TradingSystemIter(BaseTradingSystem):
 
 	def run(self, verbose=True) -> ResultsBasket:
 		"""process trades by block"""
+		self.size_policy = self.size_policy.setup_product_basket(self.product_basket)
+		self.block_size_vect = self.product_basket.block_size_vect().to_numpy()
 
 		start_capital = self.size_policy.vol_target.trading_capital
-		forecast_df, i = self.forecast_cumsum(), 0
+		forecast_df, i = self.strat_basket.forecast_cumsum(self.product_basket), 0
 		pose_df, daily_pnl_df = pd.DataFrame(dtype=np.float64), pd.DataFrame(dtype=np.float64)
 		nb_batch = int(len(self.product_basket.close_df())/self.freq)
 

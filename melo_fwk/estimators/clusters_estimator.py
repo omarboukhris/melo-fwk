@@ -2,6 +2,7 @@
 import tqdm
 
 from melo_fwk.basket.product_basket import ProductBasket
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.cluster import ClusterUtils
@@ -46,10 +47,13 @@ class ClustersEstimator(MeloBaseEstimator):
 		for product_name, product in tqdm.tqdm(self.products.items(), leave=False):
 			rolling_dataframe = product.rolling_dataframe(years)
 			results[product_name] = []
+			strat_basket = StratBasket(
+				strat_list=self.strategies,
+				weights=self.forecast_weights,
+			)
 			for subset_prod_df in tqdm.tqdm(rolling_dataframe, leave=False):
 				trading_subsys = TradingSystem(
-					trading_rules=self.strategies,
-					forecast_weights=self.forecast_weights,
+					strat_basket=strat_basket,
 					size_policy=self.size_policy
 				)
 
