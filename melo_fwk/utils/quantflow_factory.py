@@ -1,6 +1,8 @@
 
 import json
 import glob
+from typing import List
+
 
 class QuantFlowFactory:
 
@@ -75,3 +77,11 @@ class QuantFlowFactory:
 	@staticmethod
 	def get_strat_configs(config_file: str):
 		return QuantFlowFactory.strat_configs[config_file]
+
+	@classmethod
+	def build_strat_basket(cls, strat_basket_config: List[dict]):
+		strat_basket = [
+			QuantFlowFactory.get_strategy(strat_name)(**config)
+			for strat_name, config in strat_basket_config
+		]
+		return strat_basket

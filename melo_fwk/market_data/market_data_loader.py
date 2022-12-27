@@ -91,9 +91,7 @@ class MarketDataLoader:
 
 	@staticmethod
 	def products_pool():
-		products_loc = MarketDataLoader.get_commodities() + MarketDataLoader.get_fx()
-		products = [MarketDataLoader.load_product(prod) for prod in products_loc]
-		return products
+		return MarketDataLoader.get_commodities() + MarketDataLoader.get_fx()
 
 	@staticmethod
 	def shuffled_pool():
@@ -117,11 +115,17 @@ class MarketDataLoader:
 
 	@staticmethod
 	def get_fx():
-		return MarketDataLoader._get_dataset_locations("assets/Fx/*.csv")
+		return [
+			MarketDataLoader.load_product(fx_loc)
+			for fx_loc in MarketDataLoader._get_dataset_locations("assets/Fx/*.csv")
+		]
 
 	@staticmethod
 	def get_commodities():
-		return MarketDataLoader._get_dataset_locations("assets/Commodity/*.csv")
+		return [
+			MarketDataLoader.load_product(comm_loc)
+			for comm_loc in MarketDataLoader._get_dataset_locations("assets/Commodity/*.csv")
+		]
 
 	@staticmethod
 	def get_commodity_hloc_datastream(product: str):

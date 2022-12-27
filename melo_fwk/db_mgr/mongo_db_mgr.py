@@ -16,9 +16,9 @@ class MongodbManager:
 		self.connected = False
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
-	def connect(self):
+	def connect(self, dbname: str = "melo-db"):
 		self.mongo_client = pymongo.MongoClient(self.dburl)
-		self.db_connection = self.mongo_client["melo-db"]
+		self.db_connection = self.mongo_client[dbname]
 		self.connected = True
 
 	def close(self):
@@ -51,7 +51,7 @@ class MongodbManager:
 		query_result = collection.delete_one(query)
 		self.logger.info(f"Deleted document/row {query_result.deleted_count} from table {table} / _id : {data_id}")
 
-	def select_request(self, table: str, request: dict = None):
+	def select_request(self, table: str, request: dict = None, verbose: bool = True):
 		request = {} if request is None else request
 		if not self.connected:
 			self.connect()
@@ -59,10 +59,11 @@ class MongodbManager:
 		collection = self.db_connection[table]
 		orders = collection.find(request, {})
 
-		if orders is not None:
-			self.logger.info("Find request executed. Result is not empty")
-		else:
-			self.logger.warn("Find request executed. Result is empty")
+		if verbose:
+			if orders is not None:
+				self.logger.info("Find request executed. Result is not empty")
+			else:
+				self.logger.warn("Find request executed. Result is empty")
 
 		return orders
 

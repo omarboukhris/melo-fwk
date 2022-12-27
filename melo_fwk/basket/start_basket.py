@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+from uuid import uuid4
 
 import numpy as np
 import pandas as pd
@@ -47,4 +48,8 @@ class StratBasket:
 			weights=Weights([], 0.)
 		)
 
-
+	def to_dict(self):
+		return {
+			type(s).__name__: s.to_dict()
+			for s in self.strat_list
+		}

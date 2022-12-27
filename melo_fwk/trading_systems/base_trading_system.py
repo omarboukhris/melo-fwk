@@ -7,25 +7,17 @@ from melo_fwk.basket.results_basket import ResultsBasket
 from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.market_data.product import Product
 
-from melo_fwk.strategies import BaseStrategy
-
 from melo_fwk.pose_size import BaseSizePolicy
 
-from melo_fwk.datastreams import (
-	HLOCDataStream,
-	TsarDataStream
-)
-from typing import List
+from melo_fwk.datastreams import TsarDataStream
 
 import pandas as pd
-
-from melo_fwk.utils.weights import Weights
 
 @dataclass
 class BaseTradingSystem:
 	strat_basket: StratBasket = StratBasket.empty()
-	product_basket: ProductBasket = ProductBasket([]),
-	size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.),
+	product_basket: ProductBasket = ProductBasket([])
+	size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.)
 
 	def update_trading_capital(self, delta: float):
 		self.size_policy.update_trading_capital(delta)

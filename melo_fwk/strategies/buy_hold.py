@@ -17,5 +17,3 @@ class BuyAndHold(BaseStrategy):
 		# const forecast of 10 for proper vol targeting
 		return 10 * pd.Series(np.ones(shape=(len(data),)))
 
-
-

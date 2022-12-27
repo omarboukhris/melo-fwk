@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import numpy as np
 from typing import List
 
@@ -40,3 +42,9 @@ class ProductBasket:
 
 	def cap_vect(self) -> List[float]:
 		return [p.cap for p in self.products.values()]
+
+	def to_dict(self):
+		return {
+			"products": self.products.keys(),
+			"years": self.years()
+		}

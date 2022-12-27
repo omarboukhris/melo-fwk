@@ -33,7 +33,10 @@ class BaseStrategy:
 		return f_vect
 
 	def to_dict(self):
-		pass
+		return {
+			"cap": self.cap,
+			"scale": self.scale
+		}
 
 	""" rewrite for dataframe """
 	def estimate_forecast_scale(self, ratio: float = 0.6):
