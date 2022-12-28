@@ -7,10 +7,11 @@ from melo_fwk.market_data.product import Product
 
 class MarketDataDbManager(MongodbManager):
 
-	def export_product_to_mongo(self, product: Product):
-		collection = self.db_connection[product.name]
-		self.logger.info(f"Exporting {product.name} into mongodb...")
+	def export_product_to_mongo(self, prefix: str, product: Product):
+		doc = prefix + product.name
+		collection = self.db_connection[doc]
+		self.logger.info(f"Exporting {doc} into mongodb...")
 		df_rows = product.datastream.dataframe.to_dict(orient="index").values()
 		for row in tqdm(df_rows):
 			collection.insert_one(row)
-		self.logger.info(f"Updated rows count to table {product.name} / rows : {len(df_rows)}")
+		self.logger.info(f"Updated rows count to table {doc} / rows : {len(df_rows)}")

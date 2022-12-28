@@ -9,16 +9,15 @@ if __name__ == "__main__":
 	products = MarketDataLoader.get_commodities()
 
 	p = MarketDataDbManager()
-	p.connect("Commodity")
+	p.connect("market")
 
 	for product in products:
-		p.export_product_to_mongo(product)
+		p.export_product_to_mongo("co.", product)
 
 	products = MarketDataLoader.get_fx()
-	p.connect("Fx")
 
 	for product in products:
-		p.export_product_to_mongo(product)
+		p.export_product_to_mongo("fx.", product)
 
 	p.close()
 

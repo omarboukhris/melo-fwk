@@ -54,7 +54,7 @@ class PortfolioMongoUnitTests(unittest.TestCase):
 		start_capital = ts_capital * len(products)
 
 		for product in tqdm.tqdm(products):
-			loaded_prod = market_db_mgr.load_fx(product)
+			loaded_prod = market_db_mgr.load_product(product)
 			size_policy = VolTargetInertiaPolicy(
 				annual_vol_target=vol_target,
 				trading_capital=ts_capital)
