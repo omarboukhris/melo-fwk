@@ -42,7 +42,7 @@ class PortfolioFsManager(BasePortfolioManager):
 
 		# write json file
 		self.logger.info(f"Dumping {name} to {self.filepath}/{name}.json")
-		json_data = json.dumps(output)
+		json_data = json.dumps(output, indent=4)
 		json_path = self.filepath / f"{name}.json"
 		with open(json_path, "w") as fs:
 			fs.write(json_data)

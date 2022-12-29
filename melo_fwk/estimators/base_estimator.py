@@ -1,10 +1,12 @@
-
+from melo_fwk.basket.product_basket import ProductBasket
+from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.strategies import BaseStrategy
 from melo_fwk.pose_size import BaseSizePolicy
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 from typing import List, Union, Type
 
+from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.utils.weights import Weights
 
 
@@ -30,6 +32,18 @@ class MeloBaseEstimator:
 		self.forecast_weights = forecast_weights
 		self.size_policy = size_policy
 		self.estimator_params = iter(estimator_params)
+
+	def build_trading_system_cluster(self):
+		strat_basket = StratBasket(
+			strat_list=self.strategies,
+			weights=self.forecast_weights,
+		)
+		prod_basket = ProductBasket([p for p in self.products.values()])
+		return TradingSystem(
+			product_basket=prod_basket,
+			strat_basket=strat_basket,
+			size_policy=self.size_policy,
+		)
 
 	def next_str_param(self, default_val):
 		try:

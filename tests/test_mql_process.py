@@ -1,6 +1,7 @@
 import unittest
 
 from melo_fwk.config_clusters.melo_clusters_config import MeloClustersConfig
+from melo_fwk.db.portfolio.compo_portfolio_mgr import CompositePortfolioManager
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.loggers.console_logger import ConsoleLogger
 
@@ -11,6 +12,8 @@ from melo_fwk import quantfactory_registry
 from mql.mql_parser import MqlParser
 
 from pathlib import Path
+
+import uuid
 
 def run_mql_process(mql_query_path: Path):
 	"""
@@ -50,6 +53,12 @@ def run_mql_process(mql_query_path: Path):
 		# print(output)
 
 		mql_config.write_report(output, str(mql_query_path.parent))
+
+		pf_mgr = CompositePortfolioManager.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/portfolio/assets"
+		)
+		mql_config.export_trading_system(pf_mgr, str(uuid.uuid4()))
 
 
 class MqlUnitTests(unittest.TestCase):

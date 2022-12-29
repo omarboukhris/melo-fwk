@@ -17,6 +17,7 @@ class PortfoliodbManager(BasePortfolioManager):
 		self.mongo_mgr = MongodbManager(dburl)
 
 	def save_portfolio_config(self, name: str, portfolio: List[BaseTradingSystem]):
+		self.mongo_mgr.connect("tradingSytemConfig")
 		for tsys in portfolio:
 			data_dict = {
 				"name": name,
@@ -30,6 +31,8 @@ class PortfoliodbManager(BasePortfolioManager):
 				PortfoliodbManager.portfolio_table_name, data_dict)
 
 	def load_portfolio_config(self, mongo_market_mgr: MarketDataMongoLoader, name: str):
+		self.mongo_mgr.connect("tradingSytemConfig")
+
 		results = self.mongo_mgr.select_request(
 			PortfoliodbManager.portfolio_table_name, {"name": name})
 

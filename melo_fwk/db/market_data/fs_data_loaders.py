@@ -10,7 +10,7 @@ class FxDataLoader:
 		market_loader = MarketDataLoader()
 		self.fx_data_registry = {}
 		for fx in fx_products:
-			self.fx_data_registry[fx] = market_loader.get_fx_hloc_datastream(fx)
+			self.fx_data_registry[fx] = market_loader.get_fx_product(fx)
 
 class CommodityDataLoader:
 
@@ -29,4 +29,4 @@ class CommodityDataLoader:
 		market_loader = MarketDataLoader()
 		self.commo_data_registry = {}
 		for commo in commo_products:
-			self.commo_data_registry[commo] = market_loader.get_commodity_hloc_datastream(commo)
+			self.commo_data_registry[commo] = market_loader.get_commodity_product(commo)

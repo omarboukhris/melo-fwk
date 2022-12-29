@@ -106,8 +106,8 @@ class MeloConfig:
 	def __str__(self):
 		return str(self.asdict())
 
-	def export_trading_system(self, pf_mgr: BasePortfolioManager):
+	def export_trading_system(self, pf_mgr: BasePortfolioManager, name: str):
 		"""should it take an exportMgr object as param for export ??"""
 		if self.export_name is not None:
 			# do the stuff here
-			pass
+			pf_mgr.save_portfolio_config(name, [self.build_estimator().build_trading_system_cluster()])

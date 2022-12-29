@@ -43,6 +43,6 @@ class ProductBasket:
 
 	def to_dict(self):
 		return {
-			"products": self.products.keys(),
-			"years": self.years()
+			"products": [p for p in self.products.keys()],
+			"years": [y for y in self.years()]
 		}
