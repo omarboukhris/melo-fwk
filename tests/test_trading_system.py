@@ -3,9 +3,10 @@ import unittest
 import numpy as np
 
 from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.db.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.market_data import CommodityDataLoader
+from melo_fwk.db.market_data.fs_data_loaders import CommodityDataLoader
 from melo_fwk.plots import TsarPlotter
 
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
@@ -39,7 +40,8 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def _run_simulation(self, x: str, tr: callable):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		product = CommodityDataLoader.Gold
+		commo_dl = CommodityDataLoader()
+		product = commo_dl.commo_data_registry["Gold"]
 		# product = FxDataLoader.EURUSD
 
 		strat_basket = StratBasket(
@@ -52,7 +54,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				EWMAStrategy(
 					fast_span=8,
 					slow_span=32,
-				).estimate_forecast_scale()
+				).estimate_forecast_scale(MarketDataLoader())
 			],
 			weights=Weights([0.6, 0.4], 1.)
 		)

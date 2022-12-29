@@ -1,17 +1,15 @@
 import unittest
 
-import numpy as np
 import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.db.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.market_data import CommodityDataLoader, MarketDataLoader
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
-from melo_fwk.plots import TsarPlotter
 from melo_fwk.utils.weights import Weights
 
 
@@ -36,7 +34,12 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def _run_simulation(self, x: str, tr: callable):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		products = MarketDataLoader.sample_products(3)
+		market = CompositeMarketLoader.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+		)
+
+		products = market.sample_products(3)
 		prod_bsk = ProductBasket(products)
 		# product = FxDataLoader.EURUSD
 
@@ -50,7 +53,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				EWMAStrategy(
 					fast_span=8,
 					slow_span=32,
-				).estimate_forecast_scale()
+				).estimate_forecast_scale(market)
 			],
 			weights=Weights([0.6, 0.4], 1.)
 		)
@@ -88,9 +91,13 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def test_reg(self):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		products = MarketDataLoader.sample_products_alpha(1)
+		market = CompositeMarketLoader.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+		)
+
+		products = market.sample_products_alpha(1)
 		prod_bsk = ProductBasket(products)
-		# product = FxDataLoader.EURUSD
 
 		strat_basket = StratBasket(
 			strat_list=[
@@ -102,7 +109,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				EWMAStrategy(
 					fast_span=8,
 					slow_span=32,
-				).estimate_forecast_scale()
+				).estimate_forecast_scale(market)
 			],
 			weights=Weights([0.6, 0.4], 1.)
 		)

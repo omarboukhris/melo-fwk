@@ -6,6 +6,7 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.config.melo_config import MeloConfig
+from melo_fwk.db.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.loggers.global_logger import GlobalLogger
@@ -56,11 +57,12 @@ class StratOptimReporter(BaseReporter):
 		# might eliminate different candidates with exact same score (low probability but exists)
 
 		config_list = {}
+		market = MarketDataLoader()
 		strat_class_ = QuantFlowFactory.get_strategy(strat_name)
 		for i, (_, config_pt) in tqdm.tqdm(enumerate(strat_config_df.head(5).iterrows()), leave=False):
 			# remove (product, strat_class, size_policy, metric)
 			params = [p for p in config_pt["x_iters"] if type(p) in [int, float]]
-			strat = asdict(strat_class_(*params).estimate_forecast_scale())
+			strat = asdict(strat_class_(*params).estimate_forecast_scale(market))
 			strat.pop("search_space", None)
 			config_list[f"{strat_name}_{i}"] = strat
 

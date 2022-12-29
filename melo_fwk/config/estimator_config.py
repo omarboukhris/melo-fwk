@@ -4,6 +4,15 @@ from melo_fwk.config.config_helper import ConfigBuilderHelper
 
 
 class EstimatorConfigBuilder:
+
+	@staticmethod
+	def get_export_name(quant_query_dict: dict):
+		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProcessDef")
+		if "ExportName" in stripped_entry.keys():
+			return ConfigBuilderHelper.strip_single(stripped_entry, "ExportName")
+		else:
+			return None
+
 	@staticmethod
 	def get_reporter(quant_query_dict: dict):
 		estim_name = EstimatorConfigBuilder.get_estimator_name(quant_query_dict)

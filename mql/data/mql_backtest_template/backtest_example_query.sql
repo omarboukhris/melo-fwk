@@ -11,3 +11,4 @@ with weights (0.5, 0.5) and divmult is 0.7
 where sizePolicy is VolTargetInertiaPolicy (0.5, 100000)
 
 select BacktestEstimator
+export as Backtest1

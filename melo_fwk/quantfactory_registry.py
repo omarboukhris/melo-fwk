@@ -1,6 +1,6 @@
 from melo_fwk.utils import quantflow_factory
 
-from melo_fwk.market_data import (
+from melo_fwk.db.market_data.fs_data_loaders import (
 	CommodityDataLoader,
 	FxDataLoader
 )
@@ -83,18 +83,18 @@ def register_products():
 	# =============================================================
 	# Commodities
 	# -------------------------------------------------------------
-	for prod_name in CommodityDataLoader.get_product_pool():
+	commo_loader = CommodityDataLoader()
+	for prod_name, prod_hloc in commo_loader.commo_data_registry.items():
 		quantflow_factory.QuantFlowFactory.register_product(
-			f"Commodities.{prod_name}",
-			CommodityDataLoader.get_product_by_name(prod_name)
+			f"Commodities.{prod_name}", prod_hloc
 		)
 
 	# -------------------------------------------------------------
 	# Fx
 	# -------------------------------------------------------------
-	for prod_name in FxDataLoader.get_product_pool():
+	fx_loader = FxDataLoader()
+	for prod_name, prod_hloc in fx_loader.fx_data_registry.items():
 		quantflow_factory.QuantFlowFactory.register_product(
-			f"Fx.{prod_name}",
-			FxDataLoader.get_product_by_name(prod_name)
+			f"Fx.{prod_name}", prod_hloc
 		)
 

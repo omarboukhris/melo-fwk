@@ -5,20 +5,17 @@ import pandas as pd
 from scipy.stats import norm
 
 from melo_fwk.datastreams import TsarDataStream
-from melo_fwk.market_data.product import Product
+from melo_fwk.db.market_data.product import Product
 
 class VaRBasket:
 
-	def __init__(self, tsar_list: List[TsarDataStream], products: List[Product], weights: List[float]):
+	def __init__(self, tsar_list: List[TsarDataStream], products: List[Product]):
 		assert len(tsar_list) == len(products), \
 			f"len(Tsar) != len(Products) == {len(tsar_list)} != {len(products)}"
-		assert len(weights) == len(products), \
-			f"len(Weights) != len(Products) == {len(weights)} != {len(products)}"
 
 		pose_vect = np.array([tsar.last_pose() for tsar in tsar_list])
 		block_size_vect = np.array([p.block_size for p in products])
 		self.pose_block_size = np.einsum("i,i->i", pose_vect, block_size_vect)
-		self.weights = np.array(weights)
 
 		dataframe = pd.DataFrame({
 			product.name: product.get_close_series() for product in products

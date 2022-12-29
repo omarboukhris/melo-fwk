@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
-from melo_fwk.market_data import MarketDataLoader
+from melo_fwk.db.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,
 )
@@ -11,14 +11,23 @@ from melo_fwk.strategies import EWMAStrategy
 
 class BasketRegressionUnitTest(unittest.TestCase):
 
+	def init(self):
+		self.market = CompositeMarketLoader.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+		)
+
 	def test_prod_basket(self):
-		for prod in MarketDataLoader.sample_products_alpha(1.):
+		self.init()
+		for prod in self.market.sample_products_alpha(1.):
 			prod_basket = ProductBasket([prod])
 
 			assert (prod_basket.close_df()[prod.name] == prod.get_close_series()).all(), prod.name
 
 	def test_basket_forecast(self):
-		for prod in MarketDataLoader.sample_products_alpha(1.):
+		self.init()
+
+		for prod in self.market.sample_products_alpha(1.):
 			prod_basket = ProductBasket([prod])
 
 			sma_params = {
@@ -40,7 +49,9 @@ class BasketRegressionUnitTest(unittest.TestCase):
 				assert flag, p.name
 
 	def test_basket_pose_size(self):
-		for prod in MarketDataLoader.sample_products_alpha(1.):
+		self.init()
+
+		for prod in self.market.sample_products_alpha(1.):
 			prod_basket = ProductBasket([prod])
 
 			sma_params = {
@@ -72,15 +83,25 @@ class BasketRegressionUnitTest(unittest.TestCase):
 
 class BasketUnitTest(unittest.TestCase):
 
+	def init(self):
+		self.market = CompositeMarketLoader.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+		)
+
 	def test_prod_basket(self):
-		products = MarketDataLoader.sample_products_alpha(.1)
+		self.init()
+
+		products = self.market.sample_products_alpha(.1)
 		prod_basket = ProductBasket(products)
 
 		for prod in products:
 			assert (prod_basket.close_df()[prod.name].dropna() == prod.get_close_series()).all(), prod.name
 
 	def test_basket_forecast(self):
-		products = MarketDataLoader.sample_products_alpha(.1)
+		self.init()
+
+		products = self.market.sample_products_alpha(.1)
 		prod_basket = ProductBasket(products)
 
 		sma_params = {
@@ -103,7 +124,9 @@ class BasketUnitTest(unittest.TestCase):
 			assert flag, p.name
 
 	def test_basket_pose_size(self):
-		products = MarketDataLoader.sample_products_alpha(.1)
+		self.init()
+
+		products = self.market.sample_products_alpha(.1)
 		prod_basket = ProductBasket(products)
 
 		sma_params = {

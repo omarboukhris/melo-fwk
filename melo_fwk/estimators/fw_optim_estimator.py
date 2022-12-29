@@ -1,8 +1,7 @@
-from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.start_basket import StratBasket
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
-from melo_fwk.market_data.product import Product
+from melo_fwk.db.market_data.product import Product
 from melo_fwk.trading_systems import TradingSystem
 
 from scipy.optimize import minimize, Bounds

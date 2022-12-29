@@ -5,8 +5,8 @@ class ConfigBuilderHelper:
 
 	@staticmethod
 	def strip(parsed_dict: dict, key: str):
-		assert key in parsed_dict.keys(), GlobalLogger.build_composite_for("ConfigBuilderHelper").error(
-			f"Key [{key}] not in Dictionary keys [{parsed_dict.keys()}]")
+		assert key in parsed_dict.keys(), \
+			f"Key [{key}] not in Dictionary keys [{parsed_dict.keys()}]"
 		return parsed_dict[key]
 
 	@staticmethod

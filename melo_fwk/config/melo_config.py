@@ -6,7 +6,6 @@ from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuil
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
-from melo_fwk.market_data.product import Product
 # from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.pose_size import BaseSizePolicy
@@ -33,6 +32,7 @@ class MeloConfig:
 	# (estimator, **params)
 	estimator_config_: Tuple[Type[MeloBaseEstimator], List[str]]
 	reporter_class_: callable  # Type[BaseReporter]
+	export_name: str
 
 	@staticmethod
 	def build_config(quant_query_path: Path, quant_query: dict):
@@ -51,7 +51,8 @@ class MeloConfig:
 			strat_config_registry=strat_config_registry,
 			strategies_config=StrategyConfigBuilder.build_strategy(quant_query, strat_config_registry),
 			estimator_config_=EstimatorConfigBuilder.build_estimator(quant_query),
-			reporter_class_=EstimatorConfigBuilder.get_reporter(quant_query)
+			reporter_class_=EstimatorConfigBuilder.get_reporter(quant_query),
+			export_name=EstimatorConfigBuilder.get_export_name(quant_query)
 		)
 
 	def build_estimator(self):
@@ -97,8 +98,15 @@ class MeloConfig:
 			"strat_config_registry": self.strat_config_registry,
 			"strategies_config": self.strategies_config,
 			"estimator_config_": self.estimator_config_,
-			"reporter_class_": self.reporter_class_
+			"reporter_class_": self.reporter_class_,
+			"export_name": self.export_name,
 		}
 
 	def __str__(self):
 		return str(self.asdict())
+
+	def export_trading_system(self):
+		"""should it take an exportMgr object as param for export ??"""
+		if self.export_name is not None:
+			# do the stuff here
+			pass

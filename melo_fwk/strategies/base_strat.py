@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from typing import ClassVar
 
 import pandas as pd
-import tqdm
 
-from melo_fwk.market_data import MarketDataLoader
+from melo_fwk.db.market_data.base_market_loader import BaseMarketLoader
+
 
 @dataclass
 class BaseStrategy:
@@ -39,8 +39,8 @@ class BaseStrategy:
 		}
 
 	""" rewrite for dataframe """
-	def estimate_forecast_scale(self, ratio: float = 0.6):
-		sample_products = MarketDataLoader.sample_products_alpha(ratio)
+	def estimate_forecast_scale(self, market: BaseMarketLoader, ratio: float = 0.6):
+		sample_products = market.sample_products_alpha(ratio)
 
 		results = {}
 

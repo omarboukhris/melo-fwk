@@ -3,7 +3,7 @@ from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.plots import AccountPlotter
 from melo_fwk.basket.var_basket import VaRBasket
-from melo_fwk.market_data import MarketDataLoader
+from melo_fwk.db.market_data.compo_market_loader import CompositeMarketLoader
 
 from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
@@ -38,32 +38,30 @@ class PortfolioUnitTests(unittest.TestCase):
 			weights=Weights([1.], 1.)
 		)
 
-		# products = MarketDataLoader.get_fx()
-		# products = MarketDataLoader.get_commodities()
-		# products = [MarketDataLoader.load_datastream(p) for p in products[7:16]]
-		products = MarketDataLoader.sample_products(9)
+		market = CompositeMarketLoader.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+		)
+
+		products = market.sample_products(9)
 
 		ts_capital = 10000
 		results = []
 		balance = 0
 		start_capital = ts_capital * len(products)
-		tsar_list = []
+		size_policy = VolTargetInertiaPolicy(
+			annual_vol_target=0.4,
+			trading_capital=ts_capital)
+
+		tr_sys = TradingSystemIter(
+			strat_basket=strat_bsk,
+			size_policy=size_policy
+		)
+
 		for product in tqdm.tqdm(products):
-			# loaded_prod = MarketDataLoader.load_datastream(product)
-			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=0.4,
-				trading_capital=ts_capital)
-
-			tr_sys = TradingSystemIter(
-				strat_basket=strat_bsk,
-				size_policy=size_policy
-			)
-
-			# simulation with constant risk
 			tsar = tr_sys.run_product(product)
 
 			results.append(tsar)
-			tsar_list.append(tsar)
 			balance += tsar.balance_delta()
 
 
@@ -84,9 +82,8 @@ class PortfolioUnitTests(unittest.TestCase):
 		n_days = 1
 		n_sim = 20000
 		r_spl = 0.8
-		lp = len(products)
 
-		basket = VaRBasket(tsar_list, products, [1/lp]*lp)
+		basket = VaRBasket(results, products)
 
 		# VarPlotter.plot_prices(basket.simulate_hist(n_days, r_spl))
 		# VarPlotter.plot_prices(basket.simulate_price(n_days, n_sim))

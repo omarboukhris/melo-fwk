@@ -20,6 +20,10 @@ if __name__ == "__main__":
 		"AAPL": "AAPL",
 		"GOOG": "GOOG",
 		"GOOGL": "GOOGL",
+		"TSLA": "TSLA",
+		"NFLX": "NFLX",
+		"INTC": "INTC",
+		"META": "META",
 	}
 
 	# resolution: period

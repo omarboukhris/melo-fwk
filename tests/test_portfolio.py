@@ -1,9 +1,8 @@
 from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.db.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems import TradingSystemIter
-
-from melo_fwk.market_data import MarketDataLoader
 
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
@@ -37,8 +36,11 @@ class PortfolioUnitTests(unittest.TestCase):
 			weights=Weights([1.], 1.)
 		)
 
-		products = MarketDataLoader.get_fx()
-		products += MarketDataLoader.get_commodities()
+		market = CompositeMarketLoader.with_mongo_second(
+			dburl="mongodb://localhost:27017/",
+			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+		)
+		products = market.products_pool()
 
 		ts_capital = 10000
 		vol_target = 0.4
@@ -47,7 +49,6 @@ class PortfolioUnitTests(unittest.TestCase):
 		start_capital = ts_capital * len(products)
 
 		for product in tqdm.tqdm(products):
-			loaded_prod = MarketDataLoader.load_product(product)
 			size_policy = VolTargetInertiaPolicy(
 				annual_vol_target=vol_target,
 				trading_capital=ts_capital)
@@ -58,9 +59,9 @@ class PortfolioUnitTests(unittest.TestCase):
 			)
 
 			# simulation with constant risk
-			tsar = tr_sys.run_product(loaded_prod)
+			tsar = tr_sys.run_product(product)
 
-			results.update({product["name"]: tsar})
+			results.update({product.name: tsar})
 			balance += tsar.balance_delta()
 
 		# plot whole balance

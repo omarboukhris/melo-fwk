@@ -17,6 +17,12 @@ class MeloClustersConfig:
 	pose_size_list: List[BaseSizePolicy]
 	# add estimator
 
+	def __post_init__(self):
+		assert len(self.product_baskets) == len(self.strats_list), \
+			f"len product != strat ({len(self.product_baskets)} != {len(self.strats_list)})"
+		assert len(self.product_baskets) == len(self.pose_size_list), \
+			f"len product != size_policy ({len(self.product_baskets)} != {len(self.pose_size_list)})"
+
 	def build_trading_systems(self):
 		return [
 			TradingSystem(product_basket=p_basket, strat_basket=s_basket, size_policy=size_policy)
@@ -32,5 +38,5 @@ class MeloClustersConfig:
 		)
 
 	def build_clusters_estimator(self):
-		pass
+		raise NotImplemented
 

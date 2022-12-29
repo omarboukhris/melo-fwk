@@ -25,6 +25,7 @@ class ProductConfigBuilder:
 
 	@staticmethod
 	def _get_product(products_type: str, product_name: str) -> dict:
+		""" add option to load from market ??"""
 		product_factory_name = f"{products_type}.{product_name}"
 		assert product_factory_name in QuantFlowFactory.products.keys(), \
 			GlobalLogger.build_composite_for("ProductConfigBuilder").error(
