@@ -2,17 +2,19 @@ from typing import List
 
 from melo_fwk.db.market_data.market_data_mongo_loader import MarketDataMongoLoader
 from melo_fwk.db.mongo_db_mgr import MongodbManager
+from melo_fwk.db.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 
 
-class PortfoliodbManager(MongodbManager):
+class PortfoliodbManager(BasePortfolioManager):
 
 	portfolio_table_name: str = "portfolio"
 
 	def __init__(self, dburl: str):
-		super().__init__(dburl)
+		super().__init__()
+		self.mongo_mgr = MongodbManager(dburl)
 
 	def save_portfolio_config(self, name: str, portfolio: List[BaseTradingSystem]):
 		for tsys in portfolio:
@@ -24,11 +26,11 @@ class PortfoliodbManager(MongodbManager):
 				"vol_target": tsys.size_policy.vol_target.to_dict(),
 			}
 
-			self.insert_data(
+			self.mongo_mgr.insert_data(
 				PortfoliodbManager.portfolio_table_name, data_dict)
 
 	def load_portfolio_config(self, mongo_market_mgr: MarketDataMongoLoader, name: str):
-		results = self.select_request(
+		results = self.mongo_mgr.select_request(
 			PortfoliodbManager.portfolio_table_name, {"name": name})
 
 		for result in results:

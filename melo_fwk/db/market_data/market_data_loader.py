@@ -6,6 +6,7 @@ from typing import List
 
 import pandas as pd
 import melo_fwk.datastreams.hloc_datastream as ds
+from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.db.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.db.market_data.product import Product
 
@@ -15,6 +16,16 @@ class MarketDataLoader(BaseMarketLoader):
 	def __init__(self, asset_path: Path = BaseMarketLoader.parent_folder):
 		super().__init__()
 		self.asset_path = asset_path
+
+	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
+		registry = pd.DataFrame(self._get_dataset_locations("assets/*.csv"))
+		years = product_basket_config["years"]
+		output = []
+		for prod_name in product_basket_config["products"]:
+			prod_dict = dict(registry[registry.name == prod_name])
+			output.append(self._load_product(prod_dict).get_years(years))
+
+		return ProductBasket(output)
 
 	def get_fx(self) -> List[Product]:
 		return [self._load_product(p) for p in self._get_dataset_locations("assets/Fx/*.csv")]

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 
 from melo_fwk.db.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.db.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
@@ -16,16 +17,16 @@ link to config
 add unittest
 """
 
-class PortfolioFsManager:
+class PortfolioFsManager(BasePortfolioManager):
 	parent_folder = Path(Path(__file__).parent)
 	portfolio_fs_name: str = "portfolio"
 
-	def __init__(self, filepath: str):
+	def __init__(self, filepath: Path):
+		super().__init__()
 		if filepath is not None:
-			self.filepath = Path(filepath)
+			self.filepath = filepath
 		else:
-			self.filepath = Path(PortfolioFsManager.parent_folder) / "assets"
-		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+			self.filepath = PortfolioFsManager.parent_folder / "assets"
 
 	def save_portfolio_config(self, name: str, portfolio: List[BaseTradingSystem]):
 		output = []

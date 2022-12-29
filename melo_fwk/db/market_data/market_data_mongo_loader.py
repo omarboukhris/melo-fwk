@@ -17,26 +17,33 @@ class MarketDataMongoLoader(BaseMarketLoader):
 		self.mongo_mgr = MongodbManager(dburl)
 
 	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
-		# rework this properly
 		years = product_basket_config["years"]
 		output = []
 		for prod_name in product_basket_config["products"]:
 			output.append(self._load_product(prod_name).get_years(years))
 
 		return ProductBasket(output)
-	
+
 	def products_pool(self):
 		self.mongo_mgr.connect("market")
-		output = self.mongo_mgr.db_connection.list_collection_names()
-		return output
+		products = self.mongo_mgr.db_connection.list_collection_names()
+		return [self._load_product(p) for p in products]
 
 	def get_fx(self):
 		self.mongo_mgr.connect("market")
-		return [self._load_product(cname) for cname in self.mongo_mgr.db_connection.list_collection_names() if cname[:2] == "fx"]
+		return [
+			self._load_product(cname)
+			for cname in self.mongo_mgr.db_connection.list_collection_names()
+			if cname[:2] == "fx"
+		]
 
 	def get_commodities(self):
 		self.mongo_mgr.connect("market")
-		return [self._load_product(cname) for cname in self.mongo_mgr.db_connection.list_collection_names() if cname[:2] == "co"]
+		return [
+			self._load_product(cname)
+			for cname in self.mongo_mgr.db_connection.list_collection_names()
+			if cname[:2] == "co"
+		]
 
 	def _load_product(self, product: str) -> Product:
 		self.mongo_mgr.connect("market")
