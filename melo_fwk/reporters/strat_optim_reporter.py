@@ -6,10 +6,9 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.config.melo_config import MeloConfig
-from melo_fwk.db.market_data.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
-from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils import yaml_io
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 

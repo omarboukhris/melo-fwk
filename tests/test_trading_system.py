@@ -3,10 +3,10 @@ import unittest
 import numpy as np
 
 from melo_fwk.basket.start_basket import StratBasket
-from melo_fwk.db.market_data.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.db.market_data.fs_data_loaders import CommodityDataLoader
+from melo_fwk.market_data.fs_data_loaders import CommodityDataLoader
 from melo_fwk.plots import TsarPlotter
 
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter

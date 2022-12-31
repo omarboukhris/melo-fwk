@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import List
 
-from melo_fwk.db.market_data.market_data_mongo_loader import MarketDataMongoLoader
-from melo_fwk.db.portfolio.base_portfolio_mgr import BasePortfolioManager
-from melo_fwk.db.portfolio.portfolio_db_mgr import PortfoliodbManager
-from melo_fwk.db.portfolio.portfolio_fs_mgr import PortfolioFsManager
+from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
+from melo_fwk.portfolio.portfolio_db_mgr import PortfoliodbManager
+from melo_fwk.portfolio.portfolio_fs_mgr import PortfolioFsManager
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 

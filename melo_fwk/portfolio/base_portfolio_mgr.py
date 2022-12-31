@@ -1,6 +1,6 @@
 from typing import List
 
-from melo_fwk.db.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 

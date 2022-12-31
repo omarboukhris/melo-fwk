@@ -2,7 +2,7 @@ import numpy as np
 
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.strat_optim import StrategyEstimator
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.product import Product
 
 from skopt import BayesSearchCV
 from sklearn.model_selection import TimeSeriesSplit

@@ -1,7 +1,7 @@
 import unittest
 
 from melo_fwk.config_clusters.melo_clusters_config import MeloClustersConfig
-from melo_fwk.db.portfolio.compo_portfolio_mgr import CompositePortfolioManager
+from melo_fwk.portfolio.compo_portfolio_mgr import CompositePortfolioManager
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.loggers.console_logger import ConsoleLogger
 
@@ -56,7 +56,7 @@ def run_mql_process(mql_query_path: Path):
 
 		pf_mgr = CompositePortfolioManager.with_mongo_second(
 			dburl="mongodb://localhost:27017/",
-			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/portfolio/assets"
+			fallback_path="melo_fwk/portfolio/assets"
 		)
 		mql_config.export_trading_system(pf_mgr, str(uuid.uuid4()))
 
@@ -71,7 +71,7 @@ class MqlUnitTests(unittest.TestCase):
 			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
 			"clustering": Path(__file__).parent.parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
-			# "fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+			"fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 		}
 		# still missing :
 		# alloc opt

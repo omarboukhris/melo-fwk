@@ -4,7 +4,7 @@ import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.start_basket import StratBasket
-from melo_fwk.db.market_data.compo_market_loader import CompositeMarketLoader
+from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
@@ -36,7 +36,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		market = CompositeMarketLoader.with_mongo_second(
 			dburl="mongodb://localhost:27017/",
-			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+			fallback_path="melo_fwk/market_data"
 		)
 
 		products = market.sample_products(3)
@@ -93,7 +93,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		market = CompositeMarketLoader.with_mongo_second(
 			dburl="mongodb://localhost:27017/",
-			fallback_path="/home/omar/PycharmProjects/melo-fwk/melo_fwk/db/market_data"
+			fallback_path="melo_fwk/market_data"
 		)
 
 		products = market.sample_products_alpha(1)

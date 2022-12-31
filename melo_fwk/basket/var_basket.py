@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.stats import norm
 
 from melo_fwk.datastreams import TsarDataStream
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.product import Product
 
 class VaRBasket:
 

@@ -1,7 +1,7 @@
-from melo_fwk.db.market_data.assets.products_db_mgr import MarketDataDbManager
+from melo_fwk.market_data.assets.products_db_mgr import MarketDataDbManager
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.db.market_data import MarketDataLoader
+from melo_fwk.market_data import MarketDataLoader
 
 
 if __name__ == "__main__":

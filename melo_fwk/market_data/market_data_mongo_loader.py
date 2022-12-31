@@ -1,14 +1,10 @@
-import json
-import random
-
 import pandas as pd
 import melo_fwk.datastreams.hloc_datastream as ds
 from melo_fwk.basket.product_basket import ProductBasket
-from melo_fwk.db.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.db.mongo_db_mgr import MongodbManager
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.base_market_loader import BaseMarketLoader
+from melo_fwk.utils.mongo_db_mgr import MongodbManager
+from melo_fwk.market_data.product import Product
 
-from pathlib import Path
 
 class MarketDataMongoLoader(BaseMarketLoader):
 

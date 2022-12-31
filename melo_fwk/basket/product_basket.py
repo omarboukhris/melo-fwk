@@ -3,7 +3,7 @@ from typing import List
 
 import pandas as pd
 
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.product import Product
 
 
 class ProductBasket:

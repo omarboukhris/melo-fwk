@@ -1,10 +1,10 @@
-
+import numpy as np
 from dataclasses import dataclass, field
 from typing import ClassVar
 
 import pandas as pd
 
-from melo_fwk.db.market_data.base_market_loader import BaseMarketLoader
+from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 
 
 @dataclass
@@ -54,10 +54,10 @@ class BaseStrategy:
 
 		mean = []
 		for key, result in results.items():
-			r = pd.Series(result)
+			r = pd.Series(result, dtype=np.float64)
 			r.apply(abs).apply(mean.append)
 
-		mean_ps = pd.Series(mean)
+		mean_ps = pd.Series(mean, dtype=np.float64)
 		scale_f = 10 / mean_ps.mean() if mean_ps.mean() != 0 else 1.
 
 		self.scale = float(scale_f)

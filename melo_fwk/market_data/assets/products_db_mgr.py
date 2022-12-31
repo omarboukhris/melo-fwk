@@ -1,8 +1,8 @@
 
 from tqdm import tqdm
 
-from melo_fwk.db.mongo_db_mgr import MongodbManager
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.utils.mongo_db_mgr import MongodbManager
+from melo_fwk.market_data.product import Product
 
 
 class MarketDataDbManager(MongodbManager):

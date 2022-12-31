@@ -1,10 +1,10 @@
 import json
 import random
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 from melo_fwk.basket.product_basket import ProductBasket
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.product import Product
 
 
 class BaseMarketLoader:
@@ -37,7 +37,7 @@ class BaseMarketLoader:
 	def sample_products(self, n_products: int) -> List[Product]:
 		shuffled_pool = self.shuffled_pool()
 		assert 0. < n_products < len(shuffled_pool), \
-			f"(MarketDataLoader) Invalid sampling ratio provided {n_products} not in [0 ,{size}]"
+			f"(MarketDataLoader) Invalid sampling ratio provided {n_products} not in [0 ,{len(shuffled_pool)}]"
 		return random.sample(shuffled_pool, n_products)
 
 	def sample_products_alpha(self, alpha: float) -> List[Product]:

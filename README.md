@@ -34,7 +34,7 @@ Tutorial on Mql is cooking
 
 ```python
 # import necessary packages
-from melo_fwk.db.market_data import CommodityDataLoader
+from melo_fwk.market_data import CommodityDataLoader
 from minimelo.trading_systems import TradingSystem
 from minimelo.strategies import EWMAStrategy
 from minimelo.pose_size import VolTargetInertiaPolicy

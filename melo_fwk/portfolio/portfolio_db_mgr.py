@@ -1,8 +1,8 @@
 from typing import List
 
-from melo_fwk.db.market_data.market_data_mongo_loader import MarketDataMongoLoader
-from melo_fwk.db.mongo_db_mgr import MongodbManager
-from melo_fwk.db.portfolio.base_portfolio_mgr import BasePortfolioManager
+from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.utils.mongo_db_mgr import MongodbManager
+from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory

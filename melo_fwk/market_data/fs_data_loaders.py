@@ -1,4 +1,4 @@
-from melo_fwk.db.market_data.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
 
 
 class FxDataLoader:

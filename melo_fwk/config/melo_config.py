@@ -5,7 +5,7 @@ from melo_fwk.config.product_config import ProductConfigBuilder
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
-from melo_fwk.db.portfolio.base_portfolio_mgr import BasePortfolioManager
+from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 # from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter

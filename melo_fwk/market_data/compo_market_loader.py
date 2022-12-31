@@ -1,12 +1,10 @@
 from pathlib import Path
 from typing import List
 
-from pymongo.errors import ServerSelectionTimeoutError
-
-from melo_fwk.db.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.db.market_data.market_data_loader import MarketDataLoader
-from melo_fwk.db.market_data.market_data_mongo_loader import MarketDataMongoLoader
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.base_market_loader import BaseMarketLoader
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.market_data.product import Product
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 

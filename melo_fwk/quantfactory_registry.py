@@ -1,6 +1,6 @@
 from melo_fwk.utils import quantflow_factory
 
-from melo_fwk.db.market_data.fs_data_loaders import (
+from melo_fwk.market_data.fs_data_loaders import (
 	CommodityDataLoader,
 	FxDataLoader
 )

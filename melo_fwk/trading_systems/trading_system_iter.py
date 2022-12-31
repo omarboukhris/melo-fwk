@@ -4,7 +4,7 @@ import tqdm
 
 from melo_fwk.basket.results_basket import ResultsBasket
 from melo_fwk.datastreams import TsarDataStream
-from melo_fwk.db.market_data.product import Product
+from melo_fwk.market_data.product import Product
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 class TradingSystemIter(BaseTradingSystem):
