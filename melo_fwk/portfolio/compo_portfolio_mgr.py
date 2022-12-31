@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import List
 
@@ -47,3 +48,15 @@ class CompositePortfolioManager(BasePortfolioManager):
 			except Exception as e:
 				self.logger.warn(f"{type(pf_mgr).__name__} failed .load_portfolio_config() : {e}")
 		raise Exception("(CompositePortfolioManager) All alternatives failed")
+
+	@staticmethod
+	def from_config(config_path: str):
+		with open(config_path, "r") as fs:
+			out = json.load(fs)
+		pf_loaders = [
+			PortfoliodbManager(out["dburl"]),
+			PortfolioFsManager(Path(out["fallback_path"])),
+		]
+		if not out["mongo_first"]:
+			pf_loaders.reverse()
+		return CompositePortfolioManager(pf_loaders)

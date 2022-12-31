@@ -54,10 +54,7 @@ def run_mql_process(mql_query_path: Path):
 
 		mql_config.write_report(output, str(mql_query_path.parent))
 
-		pf_mgr = CompositePortfolioManager.with_mongo_second(
-			dburl="mongodb://localhost:27017/",
-			fallback_path="melo_fwk/portfolio/assets"
-		)
+		pf_mgr = CompositePortfolioManager.from_config("tests/rc/loader_config.json")
 		mql_config.export_trading_system(pf_mgr, str(uuid.uuid4()))
 
 

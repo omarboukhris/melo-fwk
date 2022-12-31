@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import List
 
@@ -14,6 +15,18 @@ class CompositeMarketLoader(BaseMarketLoader):
 		super().__init__()
 		self.market_loaders = market_loaders
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+
+	@staticmethod
+	def from_config(config_path: str):
+		with open(config_path, "r") as fs:
+			out = json.load(fs)
+		market_loaders = [
+			MarketDataMongoLoader(out["dburl"]),
+			MarketDataLoader(Path(out["fallback_path"])),
+		]
+		if not out["mongo_first"]:
+			market_loaders.reverse()
+		return CompositeMarketLoader(market_loaders)
 
 	@staticmethod
 	def with_mongo_first(dburl: str, fallback_path: str):

@@ -34,10 +34,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def _run_simulation(self, x: str, tr: callable):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.with_mongo_second(
-			dburl="mongodb://localhost:27017/",
-			fallback_path="melo_fwk/market_data"
-		)
+		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
 
 		products = market.sample_products(3)
 		prod_bsk = ProductBasket(products)
@@ -91,10 +88,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def test_reg(self):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.with_mongo_second(
-			dburl="mongodb://localhost:27017/",
-			fallback_path="melo_fwk/market_data"
-		)
+		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
 
 		products = market.sample_products_alpha(1)
 		prod_bsk = ProductBasket(products)

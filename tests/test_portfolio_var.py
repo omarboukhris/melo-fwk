@@ -38,11 +38,7 @@ class PortfolioUnitTests(unittest.TestCase):
 			weights=Weights([1.], 1.)
 		)
 
-		market = CompositeMarketLoader.with_mongo_second(
-			dburl="mongodb://localhost:27017/",
-			fallback_path="melo_fwk/market_data"
-		)
-
+		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
 		products = market.sample_products(9)
 
 		ts_capital = 10000

@@ -12,10 +12,7 @@ from melo_fwk.strategies import EWMAStrategy
 class BasketRegressionUnitTest(unittest.TestCase):
 
 	def init(self):
-		self.market = CompositeMarketLoader.with_mongo_second(
-			dburl="mongodb://localhost:27017/",
-			fallback_path="melo_fwk/market_data"
-		)
+		self.market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
 
 	def test_prod_basket(self):
 		self.init()
@@ -84,10 +81,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 class BasketUnitTest(unittest.TestCase):
 
 	def init(self):
-		self.market = CompositeMarketLoader.with_mongo_second(
-			dburl="mongodb://localhost:27017/",
-			fallback_path="/melo_fwk/market_data"
-		)
+		self.market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
 
 	def test_prod_basket(self):
 		self.init()
