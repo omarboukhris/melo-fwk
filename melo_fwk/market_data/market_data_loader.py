@@ -17,11 +17,11 @@ class MarketDataLoader(BaseMarketLoader):
 		self.asset_path = asset_path
 
 	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
-		registry = pd.DataFrame(self._get_dataset_locations("assets/*.csv"))
+		registry = pd.DataFrame(self._get_dataset_locations("assets/**/*.csv"))
 		years = product_basket_config["years"]
 		output = []
 		for prod_name in product_basket_config["products"]:
-			prod_dict = dict(registry[registry.name == prod_name])
+			prod_dict = (registry[registry.name == prod_name]).to_dict("records")[0]
 			output.append(self._load_product(prod_dict).get_years(years))
 
 		return ProductBasket(output)
@@ -62,7 +62,7 @@ class MarketDataLoader(BaseMarketLoader):
 		:return: list of products with each product a key/value pair = {"name", "datasource"}
 		"""
 		btpath = str(self.asset_path / path)
-		product_path_list = glob.glob(btpath)
+		product_path_list = glob.glob(btpath, recursive=True)
 		output = []
 		for path in product_path_list:
 			product_name = path.split("/")[-1][:-4]

@@ -1,5 +1,5 @@
 {
   "mongo_first": false,
   "dburl": "mongodb://localhost:27017/",
-  "fallback_path": "melo_fwk/market_data"
+  "fallback_path": "/home/omar/PycharmProjects/melo-fwk/melo_fwk/market_data"
 }

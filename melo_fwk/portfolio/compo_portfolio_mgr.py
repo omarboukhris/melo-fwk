@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import List
 
-from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.portfolio.portfolio_db_mgr import PortfoliodbManager
 from melo_fwk.portfolio.portfolio_fs_mgr import PortfolioFsManager
@@ -33,7 +33,7 @@ class CompositePortfolioManager(BasePortfolioManager):
 			]
 		)
 
-	def save_portfolio_config(self, name: str, portfolio: List[BaseTradingSystem]):
+	def save_portfolio_config(self, name: str, portfolio: BaseTradingSystem):
 		for pf_mgr in self.pf_mgr_list:
 			try:
 				return pf_mgr.save_portfolio_config(name, portfolio)
@@ -41,12 +41,12 @@ class CompositePortfolioManager(BasePortfolioManager):
 				self.logger.warn(f"{type(pf_mgr).__name__} failed .save_portfolio_config() : {e}")
 		raise Exception("(CompositePortfolioManager) All alternatives failed")
 
-	def load_portfolio_config(self, mongo_market_mgr: MarketDataMongoLoader, name: str):
+	def load_portfolio_config(self, mongo_market_mgr: BaseMarketLoader, name: str) -> BaseTradingSystem:
 		for pf_mgr in self.pf_mgr_list:
-			try:
-				return pf_mgr.load_portfolio_config(mongo_market_mgr, name)
-			except Exception as e:
-				self.logger.warn(f"{type(pf_mgr).__name__} failed .load_portfolio_config() : {e}")
+			# try:
+			return pf_mgr.load_portfolio_config(mongo_market_mgr, name)
+			# except Exception as e:
+			# 	self.logger.warn(f"{type(pf_mgr).__name__} failed .load_portfolio_config() : {e}")
 		raise Exception("(CompositePortfolioManager) All alternatives failed")
 
 	@staticmethod

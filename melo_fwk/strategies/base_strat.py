@@ -9,7 +9,7 @@ from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 
 @dataclass
 class BaseStrategy:
-	cap: ClassVar[float] = 20.
+	cap: float = 20.
 	scale: float = field(default=1.)
 
 	def __post_init__(self):

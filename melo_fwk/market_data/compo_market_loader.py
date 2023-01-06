@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import List
 
+from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
@@ -45,6 +46,16 @@ class CompositeMarketLoader(BaseMarketLoader):
 				MarketDataMongoLoader(dburl),
 			]
 		)
+
+	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
+		# mongo can fail with ServerSelectionTimeoutError
+		for market_loader in self.market_loaders:
+			try:
+				return market_loader.load_product_basket(product_basket_config)
+			except Exception as e:
+				self.logger.warn(f"{type(market_loader).__name__} failed .load_product_basket() : {e}")
+
+		raise Exception("(CompositeMarketLoader) All alternatives failed")
 
 	def products_pool(self):
 		# mongo can fail with ServerSelectionTimeoutError

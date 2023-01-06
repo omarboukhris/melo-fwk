@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 
 from melo_fwk.basket.product_basket import ProductBasket
@@ -13,6 +14,7 @@ import pandas as pd
 
 @dataclass
 class BaseTradingSystem:
+	name: str = str(uuid.uuid4())
 	strat_basket: StratBasket = StratBasket.empty()
 	product_basket: ProductBasket = ProductBasket([])
 	size_policy: BaseSizePolicy = BaseSizePolicy(0., 0.)

@@ -79,9 +79,9 @@ class QuantFlowFactory:
 		return QuantFlowFactory.strat_configs[config_file]
 
 	@classmethod
-	def build_strat_basket(cls, strat_basket_config: List[dict]):
+	def build_strat_basket(cls, strat_basket_config: dict):
 		strat_basket = [
 			QuantFlowFactory.get_strategy(strat_name)(**config)
-			for strat_name, config in strat_basket_config
+			for strat_name, config in strat_basket_config.items()
 		]
 		return strat_basket

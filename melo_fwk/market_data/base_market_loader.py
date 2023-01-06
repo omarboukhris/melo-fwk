@@ -1,5 +1,6 @@
 import json
 import random
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
 
@@ -7,24 +8,28 @@ from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.product import Product
 
 
-class BaseMarketLoader:
+class BaseMarketLoader(ABC):
 	parent_folder = Path(Path(__file__).parent)
 
 	def __init__(self):
 		with open(BaseMarketLoader.parent_folder / "config/products_config.json") as fp:
 			self.product_config = json.load(fp)
 
+	@abstractmethod
 	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
-		raise NotImplemented
+		...
 
+	@abstractmethod
 	def _load_product(self, product: str) -> Product:
-		raise NotImplemented
+		...
 
+	@abstractmethod
 	def get_fx(self) -> List[Product]:
-		raise NotImplemented
+		...
 
+	@abstractmethod
 	def get_commodities(self) -> List[Product]:
-		raise NotImplemented
+		...
 
 	def products_pool(self) -> List[Product]:
 		return self.get_commodities() + self.get_fx()
