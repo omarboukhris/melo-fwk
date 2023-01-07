@@ -1,3 +1,5 @@
+from melo_fwk.estimators.var_estimator import VaREstimator
+from melo_fwk.reporters.var_reporter import VaRReporter
 from melo_fwk.utils import quantflow_factory
 
 from melo_fwk.market_data.fs_data_loaders import (
@@ -51,12 +53,14 @@ def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_estimator("StratOptimEstimator", StratOptimEstimator)
 	quantflow_factory.QuantFlowFactory.register_estimator("ForecastWeightsEstimator", ForecastWeightsEstimator)
 	quantflow_factory.QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
+	quantflow_factory.QuantFlowFactory.register_estimator("VaREstimator", VaREstimator)
 
 	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
 	quantflow_factory.QuantFlowFactory.register_reporter("ClustersEstimator", ClustersReporter)
 	quantflow_factory.QuantFlowFactory.register_reporter("StratOptimEstimator", StratOptimReporter)
 	quantflow_factory.QuantFlowFactory.register_reporter("ForecastWeightsEstimator", ForecastWeightsReporter)
 	quantflow_factory.QuantFlowFactory.register_reporter("VolTargetEstimator", VolTargetReporter)
+	quantflow_factory.QuantFlowFactory.register_reporter("VaREstimator", VaRReporter)
 
 def register_strats():
 	quantflow_factory.QuantFlowFactory.register_strategy("ewma", EWMAStrategy)

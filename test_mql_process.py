@@ -67,6 +67,7 @@ class MqlUnitTests(unittest.TestCase):
 
 		templates = {
 			# "alloc": Path(__file__).parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
+			"var": Path(__file__).parent / "mql/data/mql_var_template/var_example_query.sql",
 			"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
