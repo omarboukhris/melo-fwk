@@ -43,7 +43,6 @@ def run_mql_process(mql_query_path: Path):
 		cluster_estim_ = mql_clusters_config.build_clusters_estimator()
 		output = cluster_estim_.run()
 		mql_clusters_config.write_report(output, str(mql_query_path.parent))
-		raise NotImplemented()
 
 	else:
 		mql_config = MeloConfig.build_config(

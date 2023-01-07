@@ -1,6 +1,5 @@
 import ibapi.order
 
-
 class IBKROrderFactory:
 	@staticmethod
 	def create_market_order(action, quantity):

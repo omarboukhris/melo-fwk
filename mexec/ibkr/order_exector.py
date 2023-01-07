@@ -6,40 +6,70 @@ from ibapi.common import OrderId
 from ibapi.contract import Contract
 from ibapi.wrapper import EWrapper
 
-
 class TradeOrderExecutor(EClient, EWrapper):
-	def __init__(self, host, port, client_id):
+	"""
+	This class is used to execute trades through the Interactive Brokers API. It is a subclass of EClient and EWrapper,
+	and therefore it has access to the functions and variables provided by these classes.
+	"""
+
+	def __init__(self, host: str, port: int, client_id: int):
+		"""
+		Constructor for the TradeOrderExecutor class.
+
+		Parameters:
+		host (str): The hostname for the Interactive Brokers API.
+		port (int): The port number for the Interactive Brokers API.
+		client_id (int): The client ID to use when connecting to the Interactive Brokers API.
+		"""
+		# Call the constructors for the parent classes
 		EWrapper.__init__(self)
 		EClient.__init__(self, wrapper=self)
 
+		# Initialize variables to store order information
 		self.position_received = False
 		self.current_position = None
 		self.host = host
 		self.port = port
 		self.client_id = client_id
+		self.order_id = 0
+		self.is_order_complete = False
 
 		# Connect to the API
 		self.connect(host, port, client_id)
 
-		# Initialize variables to store order information
-		self.order_id = 0
-		self.is_order_complete = False
+	def place_order(self, contract: Contract, order: ibapi.order.Order):
+		"""
+		This method is used to place an order through the Interactive Brokers API.
 
-	def place_order(self, contract, order):
+		Parameters:
+		contract (Contract): The contract details for the order.
+		order (ibapi.order.Order): The order details.
+		"""
 		# Send the order to the API
-		self.placeOrder(self.reqIds(self.order_id), contract, order)
+		self.order_id = self.reqIds(self.order_id)
+		self.placeOrder(self.order_id, contract, order)
 
 		# should maybe log some stuff
 
-		# Set the order ID and reset the order complete flag
-		self.order_id = self.reqIds(self.order_id)
+		# reset the order complete flag
 		self.is_order_complete = False
 
 	def cancel_order(self):
-		# Cancel the order
+		"""
+		Cancels the order placed through the API.
+		"""
 		self.cancelOrder(self.order_id)
 
 	def upade_position_size(self, contract, target_size):
+		"""Updates the position size of the given contract to the target size.
+		If the current position size is greater than the target size,
+		sells a portion of the position to reduce the size to the target size.
+		If the current position size is less than the target size,
+		buys a portion of the contract to increase the size to the target size.
+
+		:param contract: The contract for which to update the position size.
+		:param target_size: The target position size.
+		"""
 		# Request the current position
 		self.reqPositions()
 
@@ -74,7 +104,7 @@ class TradeOrderExecutor(EClient, EWrapper):
 		whyHeld: str, mktCapPrice: float):
 
 		super().orderStatus(
-			orderId, status, filled, remaining,avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
+			orderId, status, filled, remaining, avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
 
 		# Check if the order is complete
 		if status == 'Filled':
