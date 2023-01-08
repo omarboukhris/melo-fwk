@@ -64,6 +64,8 @@ class VaREstimator(MeloBaseEstimator):
 			cvar_rand_shock_20_5 = CVaR(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			var_basket.reset_vol()
 
+			# all vars are summed together without proper weights
+			# should display each product var by itself (get var_vect with labels)
 			out = f"\nVaR99 = {var99} | {var_params}\n"
 			out += f"CVaR = {cvar} | {var_params}\n"
 			out += f"VaR99 w/ random shock 20+-5 = {var99_rand_shock_20_5} | {var_params}\n"

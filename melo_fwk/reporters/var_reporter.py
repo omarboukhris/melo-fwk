@@ -43,7 +43,7 @@ class VaRReporter(BaseReporter):
 				prices = var_basket.simulate_hist(*var_params)
 				price_paths = var_basket.simulate_hist_paths(*var_params)
 
-			ss += MdFormatter.h2(f"Year {year}\n")
+			ss += MdFormatter.h2(f"Year {year}, method is '{method}'\n")
 
 			export_list = [
 				f"{export_dir}/{p.name}_{year}.png"
@@ -73,10 +73,5 @@ class VaRReporter(BaseReporter):
 			VarPlotter.save_price_paths(
 				price_paths, var_basket.tails,
 				export_filename=export_path_list)
-
-		# VarPlotter.plot_prices(basket.simulate_hist(n_days, r_spl))
-		# VarPlotter.plot_prices(basket.simulate_price(n_days, n_sim))
-		# VarPlotter.plot_price_paths(basket.simulate_price_paths(n_days, n_sim), basket.tails)
-		# VarPlotter.plot_price_paths(basket.simulate_hist_paths(n_days, r_spl), basket.tails)
 
 		return ss

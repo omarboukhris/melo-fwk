@@ -1,28 +1,27 @@
-import os
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Type
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.config.common_melo_config import CommonMeloConfig
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
+from melo_fwk.estimators_clusters.base_cluster_estimator import BaseClusterEstimator
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.pose_size import BaseSizePolicy
-from melo_fwk.reporters.md_formatter import MdFormatter
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
+from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.utils.weights import Weights
 
-
 @dataclass(frozen=True)
-class MeloClustersConfig:
-	name: str
+class MeloClustersConfig(CommonMeloConfig):
 	product_baskets: List[ProductBasket]
 	strats_list: List[StratBasket]
 	pose_size_list: List[BaseSizePolicy]
-	reporter_class_: callable  # Type[BaseReporter]
-	# add estimator
+	weights: Weights
+	estimator_config_: Tuple[Type[BaseClusterEstimator], List[str]]
 
 	def __post_init__(self):
 		assert len(self.product_baskets) == len(self.strats_list), \
@@ -30,7 +29,7 @@ class MeloClustersConfig:
 		assert len(self.product_baskets) == len(self.pose_size_list), \
 			f"len product != size_policy ({len(self.product_baskets)} != {len(self.pose_size_list)})"
 
-	def build_trading_systems(self):
+	def build_trading_systems(self) -> List[BaseTradingSystem]:
 		return [
 			TradingSystem(product_basket=p_basket, strat_basket=s_basket, size_policy=size_policy)
 			for p_basket, s_basket, size_policy in zip(self.product_baskets, self.strats_list, self.pose_size_list)
@@ -45,6 +44,8 @@ class MeloClustersConfig:
 			strats_list=[c.strat_basket for c in clusters],
 			pose_size_list=[c.size_policy for c in clusters],
 			reporter_class_=EstimatorConfigBuilder.get_reporter(quant_query),
+			estimator_config_=EstimatorConfigBuilder.build_estimator(quant_query),
+			weights=weights,
 		)
 
 	@staticmethod
@@ -71,38 +72,8 @@ class MeloClustersConfig:
 		return clusters, weights
 
 	def build_clusters_estimator(self):
-		"""This is next : Make BaseClusterEstimator to run :
-			VaR
-			Wei optim
-			Vol Target
-		Note: make var estim for singles
-		"""
-		raise NotImplemented
-
-
-	def _check_export_directories(self, output_dir):
-		if not os.path.isdir(output_dir):
-			os.mkdir(output_dir)
-		if not os.path.isdir(output_dir + "/data/"):
-			os.mkdir(output_dir + "/data/")
-		if not os.path.isdir(output_dir + "/data/" + self.name):
-			os.mkdir(output_dir + "/data/" + self.name)
-		if not os.path.isdir(output_dir + "/data/" + self.name + "/assets/"):
-			os.mkdir(output_dir + "/data/" + self.name + "/assets/")
-
-	def write_report(self, estimator_results: dict, output_dir: str = "./"):
-		"""
-		NOTE: Generates artifacts (
-			export folder: $query_name/report.md
-			assets folder: $query_name/assets/*.png
+		return self.estimator_config_[0](
+			estimator_params=self.estimator_config_[1],
+			trading_syst_list=self.build_trading_systems(),
+			weights=self.weights,
 		)
-		:param estimator_results:
-		:param output_dir:
-		:return:
-		"""
-		reporter = self.reporter_class_(self)
-		md_ss = reporter.header()
-		self._check_export_directories(output_dir)
-		md_ss += reporter.process_results(output_dir, "/data/" + self.name, estimator_results)
-		MdFormatter.save_md(output_dir + "/data/" + self.name, "report.md", md_ss)
-
