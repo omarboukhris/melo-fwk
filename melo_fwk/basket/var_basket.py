@@ -24,12 +24,16 @@ class VaRBasket:
 		self.export_filenames = [p.name for p in products]
 
 		self.S0 = dataframe.iloc[-1].to_numpy()
-		self.tails = dataframe.tail(10).values.T
+		self.tails = {
+			product.name: product.get_close_series().tail(10).values.T
+			for product in products
+		}
 		self.pct_returns = dataframe.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
 		self.mu = np.array(self.pct_returns.mean(axis=0))
 		self.std = np.array(self.pct_returns.std(axis=0))
 		self.std_backup = self.std
-		# self.products = products
+
+		self.products = products
 		# self.tsar_list = tsar_list
 
 	def simulate_hist(self, n_days, sample_ratio: float):

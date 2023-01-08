@@ -13,9 +13,10 @@ class VarPlotter:
 			plt.close()
 
 	@staticmethod
-	def save_price_paths(prices: np.array, tails: np.array, export_filename: List[str]):
-		for t, p, fn in zip(tails, prices, export_filename):
-			plt.plot(np.concatenate((np.tile(t, (len(p), 1)).T, p.T)))
+	def save_price_paths(prices: np.array, tails: dict, export_filename: List[str]):
+		for t, p, fn in zip(tails.values(), prices, export_filename):
+			for pi in p:
+				plt.plot(np.concatenate((t, pi)))
 			plt.savefig(fn)
 			plt.close()
 
