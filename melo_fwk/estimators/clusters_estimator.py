@@ -1,7 +1,7 @@
 
 import tqdm
 
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.datastreams import HLOCDataStream
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.cluster import ClusterUtils

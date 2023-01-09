@@ -2,7 +2,7 @@
 import tqdm
 
 from melo_fwk.basket.product_basket import ProductBasket
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.trading_systems import TradingSystem

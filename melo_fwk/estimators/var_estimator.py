@@ -3,7 +3,7 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.basket.product_basket import ProductBasket
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
@@ -76,15 +76,15 @@ class VaREstimator(MeloBaseEstimator):
 			tsar = [t[i] for t in tsar_map.values()]
 			prd = [p[i] for p in prd_map.values()]
 			# Note: could be dangerous to use product subset in varbasket
-			# there won't be much data to model returns (20 frames)
+			# there won't be much data to model returns (1 year)
 			# maybe use whole product ??
+			# NOTE: dump tsar df to markdown as report annex
+			# TODO: add 10 days VaR (hist path) and shocked 10 days VaR (MC path)
 			var_basket = VaRBasket(tsar, prd)
 			var99_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			cvar_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 
 			var_basket.reset_vol().random_vol_shock(0.2, 0.05)
-			# get var_vect, also should probably be rolling var by week or similar
-			# NOTE: dump tsar df as markdown as report annex
 			var99_rsh_20_5_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			cvar_rsh_20_5_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			var_basket.reset_vol()

@@ -1,7 +1,7 @@
 import pandas as pd
 import tqdm
 
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.pose_size.vol_target import VolTarget
 from melo_fwk.trading_systems import TradingSystemIter

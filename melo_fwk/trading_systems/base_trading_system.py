@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.results_basket import ResultsBasket
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.product import Product
 
 from melo_fwk.pose_size import BaseSizePolicy

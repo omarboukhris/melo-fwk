@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Tuple, Type
 
 from melo_fwk.basket.product_basket import ProductBasket
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.config.common_melo_config import CommonMeloConfig
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder

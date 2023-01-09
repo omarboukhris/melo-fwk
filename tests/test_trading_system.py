@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from melo_fwk.basket.start_basket import StratBasket
+from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
