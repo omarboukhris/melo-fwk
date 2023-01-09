@@ -68,4 +68,4 @@ class VolTargetSizePolicy(BaseSizePolicy):
 
 	def position_size_vect(self, forecast: pd.Series, lookback: int = 36) -> pd.Series:
 		# mean (forecast) = 10 // forecast / 10 == buy and hold € [-2, 2]
-		return (self.vol_scalar(lookback) * forecast) / 10.
+		return (self.vol_scalar(lookback) * forecast.to_numpy()) / 10.

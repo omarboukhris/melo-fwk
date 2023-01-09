@@ -16,11 +16,12 @@ class VolTargetEstimator(MeloBaseEstimator):
 	def __init__(self, **kwargs):
 		"""
 		Constructor for the VolTargetEstimator class. Calls the constructor of the parent class MeloBaseEstimator
-		and initializes the logger. It also initializes the following instance variables:
-		trading_capital: The trading capital for the trading system.
-		step: The step size for incrementing the volatility target.
-		start: The starting value for the volatility target.
-		final: The final value for the volatility target.
+		and initializes the logger.
+		It also initializes the following instance variables:
+			trading_capital: The trading capital for the trading system.
+			step: The step size for incrementing the volatility target.
+			start: The starting value for the volatility target.
+			final: The final value for the volatility target.
 		"""
 		super(VolTargetEstimator, self).__init__(**kwargs)
 		self.trading_capital = self.next_float_param(0.)
@@ -44,7 +45,8 @@ class VolTargetEstimator(MeloBaseEstimator):
 
 	def _trade_product(self, product: Product):
 		"""
-		Optimizes the volatility target for a given product product. Returns a data frame containing the optimization results.
+		Optimizes the volatility target for a given product.
+		Returns a data frame containing the optimization results.
 		"""
 		size_policy = self.size_policy
 		size_policy.vol_target = VolTarget(

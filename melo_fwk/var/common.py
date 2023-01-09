@@ -41,7 +41,7 @@ def simpleVaR(
 			gen_path=gen_path,
 		)
 
-	return np.sum(var_vect)
+	return var_vect
 	# ein_symb = "i,i" if full_sum else "i,i->i"
 	# return np.einsum(ein_symb, var_vect, basket.weights)
 

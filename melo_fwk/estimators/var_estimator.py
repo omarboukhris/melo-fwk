@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import tqdm
 
@@ -7,8 +8,8 @@ from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.var.CVaR import CVaR
-from melo_fwk.var.VaR import VaR99
+from melo_fwk.var.CVaR import CVaR, CVaR_vect
+from melo_fwk.var.VaR import VaR99, VaR99_vect
 
 
 class VaREstimator(MeloBaseEstimator):
@@ -23,14 +24,6 @@ class VaREstimator(MeloBaseEstimator):
 		self.gen_path = self.next_int_param(0) != 0
 
 	def run(self):
-		out_dict = {
-			"year": [],
-			"var99": [],
-			"cvar": [],
-			"var99_rand_shock_20_5": [],
-			"cvar_rand_shock_20_5": []
-		}
-		var_basket_map = {}
 
 		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
 		strat_basket = StratBasket(
@@ -44,45 +37,70 @@ class VaREstimator(MeloBaseEstimator):
 
 		var_params = f"Params = [ndays={self.n_days}, sim_param={self.sim_param}, method={self.method}, gen_path={self.gen_path}"
 
-		for year in range(self.begin, self.end):
-			prd_list, tsar_list = [], []
-			for i, (product_name, product) in tqdm.tqdm(enumerate(self.products.items()), leave=False):
-				tsar = trading_subsys.run_product_year(product, year)
-				prd_list.append(product.get_year(year))
-				tsar_list.append(tsar)
+		window_size, min_period, step = 250, 250, 20
+		years = list(range(self.begin, self.end))
+		prd_map, tsar_map, min_len = {}, {}, np.inf
+		for product_name, product in self.products.items():
+			prd_map[product_name] = []
+			tsar_map[product_name] = []
 
-			self.logger.info(f"Simulation year {year} Done, Computing VaR with params :")
-			self.logger.info(var_params)
+			for i, prd in tqdm.tqdm(enumerate(product.rolling(years, window_size, min_period, step)), leave=False):
+				tsar = trading_subsys.run_product(prd)
+				prd_map[product_name].append(prd)
+				tsar_map[product_name].append(tsar)
 
-			var_basket = VaRBasket(tsar_list, prd_list)
-			var_basket_map[year] = var_basket
-			var99 = VaR99(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
-			cvar = CVaR(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
+			min_len = min(min_len, len(prd_map[product_name]))
+
+			self.logger.info(f"Simulation for product {product_name} Done")
+
+		prd_map = {k: v[:min_len] for k, v in prd_map.items()}
+		tsar_map = {k: v[:min_len] for k, v in tsar_map.items()}
+
+		out_dict = {
+			product_name: pd.DataFrame({
+				"idx": [],
+				"var99": [],
+				"cvar": [],
+				"var99_rand_shock_20_5": [],
+				"cvar_rand_shock_20_5": []
+			})
+			for product_name in self.products.keys()
+		}
+
+		self.logger.info(f"Product and Returns maps built")
+		self.logger.info(f"Computing VaR with VaR Params = {var_params}")
+
+		for i in tqdm.tqdm(range(min_len), leave=False):
+			if i in [13, 14]:
+				continue
+			tsar = [t[i] for t in tsar_map.values()]
+			prd = [p[i] for p in prd_map.values()]
+			# Note: could be dangerous to use product subset in varbasket
+			# there won't be much data to model returns (20 frames)
+			# maybe use whole product ??
+			var_basket = VaRBasket(tsar, prd)
+			var99_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
+			cvar_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 
 			var_basket.reset_vol().random_vol_shock(0.2, 0.05)
-			var99_rand_shock_20_5 = VaR99(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
-			cvar_rand_shock_20_5 = CVaR(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
+			# get var_vect, also should probably be rolling var by week or similar
+			# NOTE: dump tsar df as markdown as report annex
+			var99_rsh_20_5_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
+			cvar_rsh_20_5_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			var_basket.reset_vol()
 
-			# all vars are summed together without proper weights
-			# should display each product var by itself (get var_vect with labels)
-			out = f"\nVaR99 = {var99} | {var_params}\n"
-			out += f"CVaR = {cvar} | {var_params}\n"
-			out += f"VaR99 w/ random shock 20+-5 = {var99_rand_shock_20_5} | {var_params}\n"
-			out += f"CVaR w/ random shock 20+-5 = {cvar_rand_shock_20_5} | {var_params}\n"
-
-			out_dict["year"].append(year)
-			out_dict["var99"].append(var99)
-			out_dict["cvar"].append(cvar)
-			out_dict["var99_rand_shock_20_5"].append(var99_rand_shock_20_5)
-			out_dict["cvar_rand_shock_20_5"].append(cvar_rand_shock_20_5)
-
-			self.logger.info(out)
+			loop_args = out_dict.keys(), var99_vect, cvar_vect, var99_rsh_20_5_vect, cvar_rsh_20_5_vect
+			for k, var99, cvar, var99_rand_shock_20_5, cvar_rand_shock_20_5 in zip(*loop_args):
+				out_dict[k] = pd.concat([out_dict[k], pd.DataFrame({
+					"idx": [i],
+					"var99": [var99],
+					"cvar": [np.mean(cvar)],
+					"var99_rand_shock_20_5": [var99_rand_shock_20_5],
+					"cvar_rand_shock_20_5": [np.mean(cvar_rand_shock_20_5)]
+				})])
 
 		self.logger.info("Finished running estimator")
-		return (
-			pd.DataFrame(out_dict),
-			var_basket_map,
-			(self.method, (self.n_days, self.sim_param))
-		)
+
+		return out_dict
+		# (self.method, (self.n_days, self.sim_param))
 

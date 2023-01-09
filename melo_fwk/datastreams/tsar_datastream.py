@@ -23,6 +23,7 @@ class TsarDataStream(BaseDataStream):
 
 	def add(self, other):
 		tsar = TsarDataStream(
+			name=self.name,
 			dataframe=pd.concat([self.dataframe, other.dataframe]).reset_index(drop=True),
 			date_label=self.date_label
 		)

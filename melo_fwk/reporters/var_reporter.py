@@ -1,5 +1,6 @@
 from typing import Tuple, Dict
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import tqdm
 
@@ -19,7 +20,7 @@ class VaRReporter(BaseReporter):
 
 	def process_results(
 		self, query_path: str, export_dir: str,
-		raw_results: Tuple[pd.DataFrame, Dict[int, VaRBasket], Tuple]):
+		raw_results: Dict[str, pd.DataFrame]):
 		"""
 		raw_results dict :
 			key = product name
@@ -27,51 +28,27 @@ class VaRReporter(BaseReporter):
 				key = product_filepath + year
 				value = TSAR
 		"""
-		out_dict, var_basket_map, var_config = raw_results
-		method, var_params = var_config
+		out_dict = raw_results
 		export_dir = query_path + export_dir + "/assets/"
 		self.logger.info("Exporting VaR Results")
 
 		ss = MdFormatter.h2("VaR Estimation Results")
-		ss += f"\n{out_dict.to_markdown()}\n"
+		# ss += f"\n{out_dict.to_markdown()}\n"
 
-		for year, var_basket in tqdm.tqdm(var_basket_map.items(), leave=False):
-			if method == "mc":
-				prices = var_basket.simulate_price(*var_params)
-				price_paths = var_basket.simulate_price_paths(*var_params)
-			else:
-				prices = var_basket.simulate_hist(*var_params)
-				price_paths = var_basket.simulate_hist_paths(*var_params)
+		for product_name, var_df in tqdm.tqdm(out_dict.items(), leave=False):
+			ss += MdFormatter.h3(f"Product VaR {product_name} :\n")
+			ss += f"\n{var_df.to_markdown()}\n"
 
-			ss += MdFormatter.h2(f"Year {year}, method is '{method}'\n")
+			export_filename = f"{export_dir}/{product_name}_hist.png"
+			ss += MdFormatter.bold(MdFormatter.italic(f"VaR histograms for product {product_name}")) + "\n\n"
 
-			export_list = [
-				f"{export_dir}/{p.name}_{year}.png"
-				for p in var_basket.products
-			]
-			export_path_list = [
-				f"{export_dir}/{p.name}_path_{year}.png"
-				for p in var_basket.products
-			]
+			ss += MdFormatter.image(
+				f"price histogram for product {product_name}",
+				export_filename,
+				f"price histogram for product {product_name}",
+			)
 
-			for p, path, product in zip(export_list, export_path_list, var_basket.products):
-
-				ss += MdFormatter.h3(product.name)
-				ss += MdFormatter.image(
-					f"price histogram after year {year}",
-					p, f"price_histogram_after_year_{year}",
-				)
-
-				ss += MdFormatter.image(
-					f"price path, year {year}",
-					path, f"price_path_year_{year}",
-				)
-
-			VarPlotter.save_prices(
-				prices, export_filename=export_list)
-
-			VarPlotter.save_price_paths(
-				price_paths, var_basket.tails,
-				export_filename=export_path_list)
+			var_df.hist(column=["var99", "cvar", "var99_rand_shock_20_5", "cvar_rand_shock_20_5"], bins=8)
+			plt.savefig(export_filename)
 
 		return ss

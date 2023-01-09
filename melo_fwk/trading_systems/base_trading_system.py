@@ -63,10 +63,10 @@ class BaseTradingSystem:
 			dataframe=pd.DataFrame({
 				"Date": product.get_date_series().reset_index(drop=True),
 				"Price": product.get_close_series().reset_index(drop=True),
-				"Forecast": forecast_series,
-				"Size": pose_series,
-				"Account": daily_pnl_series.expanding(1).sum(),
-				"Daily_PnL": daily_pnl_series
+				"Forecast": forecast_series.reset_index(drop=True),
+				"Size": pose_series.reset_index(drop=True),
+				"Account": daily_pnl_series.expanding(1).sum().reset_index(drop=True),
+				"Daily_PnL": daily_pnl_series.reset_index(drop=True)
 			})
 		)
 

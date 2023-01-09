@@ -46,6 +46,6 @@ class VolTargetInertiaPolicy(VolTargetSizePolicy):
 			return _inertia.curr_pose
 
 		_inertia.curr_pose = 0
-		pose_series = (self.vol_scalar(lookback) * forecast) / 10.
+		pose_series = pd.Series((self.vol_scalar(lookback) * forecast.to_numpy()) / 10.)
 		return pose_series.apply(_inertia).round().clip(upper=self.cap, lower=-self.cap)
 
