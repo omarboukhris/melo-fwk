@@ -22,7 +22,6 @@ class StratBasket:
 	def forecast_cumsum_product(self, product: Product) -> pd.Series:
 		f_series = np.array([0.] * len(product.get_close_series()))
 
-		# add div mult at some point
 		for trading_rule, forecast_weight in zip(self.strat_list, self.weights.weights):
 			f_series += forecast_weight * trading_rule.forecast_vect_cap(product.get_close_series()).to_numpy()
 

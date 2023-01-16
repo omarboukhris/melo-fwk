@@ -14,6 +14,8 @@ class BacktestEstimator(MeloBaseEstimator):
 		super(BacktestEstimator, self).__init__(**kwargs)
 		self.logger.info("BacktestEstimator Initialized")
 
+		# read param iter/vect for TSIter/TS
+
 	def run(self):
 		out_dict = dict()
 

@@ -1,7 +1,5 @@
 from melo_fwk.estimators.var_estimator import VaREstimator
-from melo_fwk.estimators_clusters.pf_allocation_estimator import PFAllocationEstimator
-from melo_fwk.estimators_clusters.pf_var_estimator import PFVaREstimator
-from melo_fwk.estimators_clusters.pf_vol_taget_estimator import PFVolTargetEstimator
+from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
 from melo_fwk.reporters.var_reporter import VaRReporter
 from melo_fwk.utils import quantflow_factory
 
@@ -64,15 +62,10 @@ def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_reporter("ForecastWeightsEstimator", ForecastWeightsReporter)
 	quantflow_factory.QuantFlowFactory.register_reporter("VolTargetEstimator", VolTargetReporter)
 	quantflow_factory.QuantFlowFactory.register_reporter("VaREstimator", VaRReporter)
-
-	quantflow_factory.QuantFlowFactory.register_estimator("PFVolTargetEstimator", PFVolTargetEstimator)
 	quantflow_factory.QuantFlowFactory.register_estimator("PFAllocationEstimator", PFAllocationEstimator)
-	quantflow_factory.QuantFlowFactory.register_estimator("PFVaREstimator", PFVaREstimator)
 
 	# Not Implemented yet
-	# quantflow_factory.QuantFlowFactory.register_reporter("PFVolTargetEstimator", PFVolTargetReporter)
 	# quantflow_factory.QuantFlowFactory.register_reporter("PFAllocationEstimator", PFAllocationReporter)
-	# quantflow_factory.QuantFlowFactory.register_reporter("PFVaREstimator", PFVaRReporter)
 
 
 def register_strats():

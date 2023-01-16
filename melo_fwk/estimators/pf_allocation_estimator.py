@@ -3,7 +3,8 @@ from typing import List
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.utils.weights import Weights
 
-class BaseClusterEstimator:
+
+class PFAllocationEstimator:
 
 	def __init__(
 		self,
@@ -16,4 +17,11 @@ class BaseClusterEstimator:
 		self.estimator_params = estimator_params
 
 	def run(self):
-		pass
+		"""
+		run weights optim on 2 levels:
+			clusters
+			portfolio
+		run rolling VaR on portfolio level
+		run vol target on portfolio ?
+		:return:
+		"""

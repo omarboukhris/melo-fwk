@@ -14,7 +14,7 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 class VaRReporter(BaseReporter):
 
 	def __init__(self, input_config: MeloConfig):
-		self.logger = GlobalLogger.build_composite_for("BacktestReporter")
+		self.logger = GlobalLogger.build_composite_for("VaRReporter")
 		self.logger.info("Initializing BacktestReporter")
 		super(VaRReporter, self).__init__(input_config)
 
@@ -37,7 +37,7 @@ class VaRReporter(BaseReporter):
 
 		for product_name, var_df in tqdm.tqdm(out_dict.items(), leave=False):
 			ss += MdFormatter.h3(f"Product VaR {product_name} :\n")
-			ss += f"\n{var_df.to_markdown()}\n"
+			ss += f"\n{var_df.to_markdown(index='idx')}\n"
 
 			export_filename = f"{export_dir}/{product_name}_hist.png"
 			ss += MdFormatter.bold(MdFormatter.italic(f"VaR histograms for product {product_name}")) + "\n\n"

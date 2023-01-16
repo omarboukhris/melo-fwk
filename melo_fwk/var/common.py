@@ -63,4 +63,5 @@ def expected_shortfall(
 		var_list.append(var)
 		alpha += step_size
 
-	return np.array(var_list)
+	# transpose to get products in index 0 and bins in index 2
+	return np.array(var_list).T

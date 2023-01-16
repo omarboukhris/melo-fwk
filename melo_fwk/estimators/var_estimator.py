@@ -71,8 +71,6 @@ class VaREstimator(MeloBaseEstimator):
 		self.logger.info(f"Computing VaR with VaR Params = {var_params}")
 
 		for i in tqdm.tqdm(range(min_len), leave=False):
-			if i in [13, 14]:
-				continue
 			tsar = [t[i] for t in tsar_map.values()]
 			prd = [p[i] for p in prd_map.values()]
 			# Note: could be dangerous to use product subset in varbasket
@@ -84,7 +82,7 @@ class VaREstimator(MeloBaseEstimator):
 			var99_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			cvar_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 
-			var_basket.reset_vol().random_vol_shock(0.2, 0.05)
+			var_basket.random_vol_shock(0.2, 0.05)
 			var99_rsh_20_5_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			cvar_rsh_20_5_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 			var_basket.reset_vol()
@@ -102,5 +100,4 @@ class VaREstimator(MeloBaseEstimator):
 		self.logger.info("Finished running estimator")
 
 		return out_dict
-		# (self.method, (self.n_days, self.sim_param))
 

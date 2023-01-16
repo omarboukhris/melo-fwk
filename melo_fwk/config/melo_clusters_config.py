@@ -6,13 +6,12 @@ from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.config.common_melo_config import CommonMeloConfig
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
-from melo_fwk.estimators_clusters.base_cluster_estimator import BaseClusterEstimator
+from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.pose_size import BaseSizePolicy
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.utils.weights import Weights
 
 @dataclass(frozen=True)
@@ -21,7 +20,7 @@ class MeloClustersConfig(CommonMeloConfig):
 	strats_list: List[StratBasket]
 	pose_size_list: List[BaseSizePolicy]
 	weights: Weights
-	estimator_config_: Tuple[Type[BaseClusterEstimator], List[str]]
+	estimator_config_: Tuple[Type[PFAllocationEstimator], List[str]]
 
 	def __post_init__(self):
 		assert len(self.product_baskets) == len(self.strats_list), \
