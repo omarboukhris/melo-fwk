@@ -22,6 +22,9 @@ class Trader:
 
 	def execute_trade(self, symbol, side, quantity, price, order_type='LIMIT'):
 		if self.backtesting:
+			# Creates and validates a new order but
+			# does not send it into the matching engine
+			# rework the mechanics
 			endpoint = '/api/v3/order/test'
 			base_url = self.testnet_base_url
 		else:

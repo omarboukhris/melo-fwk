@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 import pandas as pd
 
 from melo_fwk.datastreams import TsarDataStream
@@ -32,6 +33,42 @@ class ResultsBasket:
 		}
 
 		return pd.DataFrame({y: r.balance_delta_vect() for y, r in results.items()})
+
+	def apply_weights(self, weights):
+		weighted_results = []
+		for w, result in zip(weights, self.results_map.values()):
+			weighted_results.append(result.apply_weight(w))
+		return ResultsBasket(weighted_results)
+
+	def accumulate(self, column: str):
+		acc = {}
+		for k, tsar in self.results_map.items():
+			acc[k] = tsar.dataframe[column]
+		return pd.DataFrame(acc).dropna().sum(axis=1)
+
+	def rolling(self, column: str):
+		rolling_result = {}
+		for prod_name, tsar in self.results_map.items():
+			rolling_result[prod_name] = [
+				roll_tsar[column].reset_index(drop=True)
+				for roll_tsar in tsar.rolling_dataframe()
+			]
+		min_len = min([len(r) for r in rolling_result.values()])
+		trim_rolling_result = {
+			prod: r[:min_len] for prod, r in rolling_result.items()
+		}
+
+		# transpose dict to list of dataframes
+		out = [
+			pd.DataFrame({
+				k: trim_rolling_result[k][i]
+				for k in trim_rolling_result.keys()
+			})
+			for i in range(min_len)
+		]
+
+		return out
+
 
 	"""
 	TODO: ADD METRICS FROM TSARDATASTREAM

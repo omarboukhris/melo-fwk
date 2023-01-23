@@ -1,5 +1,6 @@
 from melo_fwk.estimators.var_estimator import VaREstimator
 from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
+from melo_fwk.reporters.pf_alloc_reporter import PFAllocationReporter
 from melo_fwk.reporters.var_reporter import VaRReporter
 from melo_fwk.utils import quantflow_factory
 
@@ -64,8 +65,7 @@ def register_estimator():
 	quantflow_factory.QuantFlowFactory.register_reporter("VaREstimator", VaRReporter)
 	quantflow_factory.QuantFlowFactory.register_estimator("PFAllocationEstimator", PFAllocationEstimator)
 
-	# Not Implemented yet
-	# quantflow_factory.QuantFlowFactory.register_reporter("PFAllocationEstimator", PFAllocationReporter)
+	quantflow_factory.QuantFlowFactory.register_reporter("PFAllocationEstimator", PFAllocationReporter)
 
 
 def register_strats():

@@ -44,6 +44,7 @@ class PortfolioFsManager(BasePortfolioManager):
 			result = json.load(fs)
 
 		return BaseTradingSystem(
+			name=result["name"],
 			product_basket=mongo_market_mgr.load_product_basket(result["product_basket"]),
 			strat_basket=QuantFlowFactory.build_strat_basket(result["strat_basket"]),
 			size_policy=QuantFlowFactory.get_size_policy(result["size_policy"])(

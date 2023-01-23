@@ -47,7 +47,11 @@ class StratBasket:
 		)
 
 	def to_dict(self):
+		# add weights export
 		return {
-			type(s).__name__: s.to_dict()
-			for s in self.strat_list
+			"strat_list": {
+				type(s).__name__: s.to_dict()
+				for s in self.strat_list
+			},
+			"weights": self.weights.to_dict()
 		}

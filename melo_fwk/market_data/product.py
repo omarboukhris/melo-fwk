@@ -51,8 +51,8 @@ class Product:
 		years = self.years() if years is None else years
 		prod_datastream = self.get_years(years).datastream
 		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
-		rolling_datastream = prod_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
-		for roll in rolling_datastream:
+		rolling_df = prod_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
+		for roll in rolling_df:
 			if len(roll) >= window_size:
 				yield roll
 
@@ -60,8 +60,8 @@ class Product:
 		years = self.years() if years is None else years
 		prod_datastream = self.get_years(years).datastream
 		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
-		rolling_datastream = prod_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
-		for roll in rolling_datastream:
+		rolling_df = prod_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
+		for roll in rolling_df:
 			if len(roll) >= window_size:
 				yield Product(
 					name=self.name,

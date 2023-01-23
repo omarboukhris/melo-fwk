@@ -29,6 +29,34 @@ class TsarDataStream(BaseDataStream):
 		)
 		return tsar
 
+	def apply_weight(self, w):
+		return TsarDataStream(
+			name=self.name,
+			dataframe=pd.DataFrame({
+				"Date": self.dates,
+				"Price": self.price_series,
+				"Forecast": self.forecast_series,
+				"Size": self.size_series * w,
+				"Account": self.account_series * w,
+				"Daily_PnL": self.daily_pnl_series * w
+			})
+		)
+
+
+	def get_years(self, years: list):
+		assert np.array([year in self.years for year in years]).all(), \
+			f"(AssertionError) Product {self.name} : {years} not in {self.years()}"
+		tsar = TsarDataStream(
+			name=self.name,
+			dataframe=self.dataframe.loc[
+				self.dataframe["Year"].isin(years),
+			].reset_index(drop=True),
+			date_label=self.date_label,
+		)
+		if len(tsar.dataframe) != 0:
+			tsar._offset_account()
+		return tsar
+
 	def get_year(self, y: int):
 		# offset account with start capital
 		# useful when running whole history with the same vol target
@@ -47,6 +75,27 @@ class TsarDataStream(BaseDataStream):
 		self.dataframe["Account"] -= self.account_series.iat[0]
 		self.account_series -= self.account_series.iat[0]
 
+	def rolling_dataframe(self, years: List[int] = None, window_size: int = 250, min_periods: int = 250, step: int = 20):
+		years = self.years if years is None else years
+		result_datastream = self.get_years(years)
+		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
+		rolling_df = result_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
+		for roll in rolling_df:
+			if len(roll) >= window_size:
+				yield roll.reset_index(drop=True)
+
+	def rolling(self, years: List[int] = None, window_size: int = 250, min_periods: int = 250, step: int = 20):
+		years = self.years if years is None else years
+		result_datastream = self.get_years(years)
+		indexer = pd.api.indexers.FixedForwardWindowIndexer(window_size=window_size)
+		rolling_df = result_datastream.dataframe.rolling(window=indexer, min_periods=min_periods, step=step)
+		for roll in rolling_df:
+			if len(roll) >= window_size:
+				yield TsarDataStream(
+					name=self.name,
+					dataframe=roll.reset_index(drop=True),
+					date_label=self.date_label
+				)
 
 	def get_metric_by_name(self, name: str, rf: float = 0.):
 		if name in ["pnl", "PnL"]:

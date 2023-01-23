@@ -3,6 +3,9 @@ import json
 import glob
 from typing import List
 
+from melo_fwk.basket.strat_basket import StratBasket
+from melo_fwk.utils.weights import Weights
+
 
 class QuantFlowFactory:
 
@@ -80,8 +83,9 @@ class QuantFlowFactory:
 
 	@classmethod
 	def build_strat_basket(cls, strat_basket_config: dict):
-		strat_basket = [
+		strat_list = [
 			QuantFlowFactory.get_strategy(strat_name)(**config)
-			for strat_name, config in strat_basket_config.items()
+			for strat_name, config in strat_basket_config["strat_list"].items()
 		]
-		return strat_basket
+		weights = Weights(**strat_basket_config["weights"])
+		return StratBasket(strat_list, weights)
