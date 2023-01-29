@@ -1,6 +1,8 @@
 # Melo Framework
 
-This project is a work in progress
+### Project status
+Work In Progress
+
 
 ## Getting started
 
@@ -22,9 +24,6 @@ pip install dependencies then pip install this repo
 ### Requirements
 
 pandas, matplotlib, yfinance, numpy, pyparse, scikit-optimize, mongodb, scikit-learn, scipy
-
-### Project status
-Work In Progress
 
 ## MeloQL Usage
 
