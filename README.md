@@ -1,5 +1,7 @@
 # Melo Framework
 
+This project is a work in progress
+
 ## Getting started
 
 This project is a quantitative trading backtest ecosystem.
