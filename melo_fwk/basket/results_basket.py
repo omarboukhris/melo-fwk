@@ -11,6 +11,9 @@ class ResultsBasket:
 	def __init__(self, results_list: List[TsarDataStream]):
 		self.results_map = {r.name: r for r in results_list}
 
+	def __len__(self):
+		return len(self.results_map)
+
 	def get_year(self, y: int):
 		return ResultsBasket([r.get_year(y) for r in self.results_map.values()])
 

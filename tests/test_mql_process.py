@@ -36,14 +36,13 @@ def run_mql_process(mql_query_path: Path):
 
 	if "Clusters" in quant_query.keys():
 		pf_mgr = CompositePortfolioManager.from_config(
-			"tests/rc/pf_config.json")
+			"rc/pf_config.json")
 		market_mgr = CompositeMarketLoader.from_config(
-			"tests/rc/loader_config.json")
+			"rc/loader_config.json")
 		mql_clusters_config = MeloClustersConfig.build_config(pf_mgr, market_mgr, quant_query)
 		cluster_estim_ = mql_clusters_config.build_clusters_estimator()
 		output = cluster_estim_.run()
-		raise NotImplemented()
-		# mql_clusters_config.write_report(output, str(mql_query_path.parent))
+		mql_clusters_config.write_report(output, str(mql_query_path.parent))
 
 	else:
 		mql_config = MeloConfig.build_config(
@@ -58,7 +57,7 @@ def run_mql_process(mql_query_path: Path):
 
 		mql_config.write_report(output, str(mql_query_path.parent))
 
-		pf_mgr = CompositePortfolioManager.from_config("tests/rc/pf_config.json")
+		pf_mgr = CompositePortfolioManager.from_config("rc/pf_config.json")
 		mql_config.export_trading_system(pf_mgr)
 
 
@@ -67,13 +66,13 @@ class MqlUnitTests(unittest.TestCase):
 	def test_mql_process(self):
 
 		templates = {
-			# "alloc": Path(__file__).parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
-			"var": Path(__file__).parent / "mql/data/mql_var_template/var_example_query.sql",
-			"backtest": Path(__file__).parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
-			"fw_opt": Path(__file__).parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
-			"vol_target_opt": Path(__file__).parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-			"clustering": Path(__file__).parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
-			"fast_strat_opt": Path(__file__).parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+			"alloc": Path(__file__).parent.parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
+			"var": Path(__file__).parent.parent / "mql/data/mql_var_template/var_example_query.sql",
+			"backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
+			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
+			"clustering": Path(__file__).parent.parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
+			"fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 		}
 		# still missing :
 		# alloc opt

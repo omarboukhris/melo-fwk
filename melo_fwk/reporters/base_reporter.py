@@ -1,9 +1,15 @@
 from melo_fwk.config import MeloConfig
+from melo_fwk.config.common_melo_config import CommonMeloConfig
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.reporters.md_formatter import MdFormatter
 
 
-class BaseReporter:
+class GenericReporter:
+	def __init__(self, input_config: CommonMeloConfig):
+		self.name = input_config.name
+		self.reporter_class = str(input_config.reporter_class_)
+
+class BaseReporter(GenericReporter):
 	def __init__(self, input_config: MeloConfig):
 		"""
 		Displays input parameter responsible for the generated results
@@ -12,6 +18,7 @@ class BaseReporter:
 		:param input_config:
 		:return:
 		"""
+		super().__init__(input_config)
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 		# name:
