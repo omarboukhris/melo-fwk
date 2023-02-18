@@ -1,5 +1,9 @@
 # Melo Framework
 
+### Project status
+Work In Progress
+
+
 ## Getting started
 
 This project is a quantitative trading backtest ecosystem.
@@ -21,9 +25,6 @@ pip install dependencies then pip install this repo
 
 pandas, matplotlib, yfinance, numpy, pyparse, scikit-optimize, mongodb, scikit-learn, scipy
 
-### Project status
-Work In Progress
-
 ## MeloQL Usage
 
 Tutorial on Mql is cooking
@@ -41,38 +42,36 @@ from minimelo.pose_size import VolTargetInertiaPolicy
 from melo_fwk.plots import TsarPlotter
 
 # fetch product
-product = CommodityDataLoader.Gold
+commo_dl = CommodityDataLoader()
+product = commo_dl.commo_data_registry["Gold"]
 
-# setup strategy & strategy weight
-strats = [
-	EWMAStrategy(
-		fast_span=16,
-		slow_span=64,
-		scale=16.,
-	),
-]
-strat_weights = [1.]
+strat_basket = StratBasket(
+	strat_list=[
+		EWMAStrategy(
+			fast_span=16,
+			slow_span=64,
+			scale=16.,
+		),
+	],
+	weights=Weights([1.], 1.)
+)
 
-# setup balance
-balance = 60000
-
-# setup size_policy
+# setup balance  and vol target
+start_capital = 60000
 size_policy = VolTargetInertiaPolicy(
-	annual_vol_target=0.25,
-	trading_capital=balance)
+	annual_vol_target=25e-2,
+	trading_capital=start_capital)
 
 # init trading system
-trading_subsys = TradingSystem(
-	product=product,
-	trading_rules=strat,
-	forecast_weights=fw,
+trading_subsys = tr(
+	strat_basket=strat_basket,
 	size_policy=size_policy
 )
 
 # run trading system for each year
 #  and save result in dictionary
 results = {
-	f"Gold_{year}": trading_subsys.run_year(year)
+	f"Gold_{year}": trading_subsys.run_product_year(product, year)
 	for year in product.years()
 }
 
@@ -122,6 +121,9 @@ class NewStrategy(BaseStrategy, StratParamSpace):
 	# of all forecast series from price data
 	def forecast_vect(self, data: pd.Series) -> pd.Series:
 		pass  # do your calculations here
+	
+	def forecast_df(self, data: pd.DataFrame) -> pd.DataFrame:
+		pass
 ```
 
 This component on it's own is sufficient to be used in a harcoded backtesting scenario.
@@ -166,6 +168,9 @@ class NewVolTargetPolicy(BaseSizePolicy):
 	# this is the method we need to override
 	# computes number of contracts to buy/sell depending on forecast and risk appetite
 	def position_size_vect(self, forecast: pd.Series, lookback: int = 36) -> pd.Series:
+		pass
+	
+	def position_size_df(self, forecast: pd.DataFrame) -> pd.DataFrame:
 		pass
 ```
 Then we register the component to the factory in order to use it with mql.
