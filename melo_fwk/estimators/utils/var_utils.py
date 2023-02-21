@@ -109,7 +109,7 @@ class VaRUtils:
 		var99_rsh_20_5_vect = VaR99_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 		cvar_rsh_20_5_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 		var_basket.reset_vol()
-		return cvar_rsh_20_5_vect, cvar_vect, var99_rsh_20_5_vect, var99_vect
+		return var99_vect, cvar_vect, var99_rsh_20_5_vect, cvar_rsh_20_5_vect
 
 	def run_full_VaR_sim(self, begin, end):
 		self.logger.info(f"Running simulations for {len(self.products.values())} products from {begin} to {end}")
