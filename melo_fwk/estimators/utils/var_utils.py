@@ -5,6 +5,7 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.basket.var_basket import VaRBasket
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.var.CVaR import CVaR_vect
 from melo_fwk.var.VaR import VaR99_vect
@@ -12,8 +13,11 @@ from melo_fwk.var.VaR import VaR99_vect
 
 class VaRUtils:
 
-	def __init__(self, trading_subsys: BaseTradingSystem, products: dict):
+	def __init__(self, trading_subsys: BaseTradingSystem, products: dict, weights: list = None):
+		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 		self.trading_subsys = trading_subsys
+		self.weights = weights if weights is not None else [1.] * len(products.values())
+		assert len(products.values()) == len(self.weights), "(VaRUtils) Weights and products size don't correspond"
 		self.products = products
 
 		self.n_days = 0
@@ -45,12 +49,12 @@ class VaRUtils:
 		window_size, min_period, step = 250, 250, 20
 		years = list(range(begin, end))
 		prd_map, tsar_map, min_len = {}, {}, np.inf
-		for product_name, product in self.products.items():
+		for w, (product_name, product) in zip(self.weights, self.products.items()):
 			prd_map[product_name] = []
 			tsar_map[product_name] = []
 
 			for i, prd in tqdm.tqdm(enumerate(product.rolling(years, window_size, min_period, step)), leave=False):
-				tsar = self.trading_subsys.run_product(prd)
+				tsar = self.trading_subsys.run_product(prd).apply_weight(w)
 				prd_map[product_name].append(prd)
 				tsar_map[product_name].append(tsar)
 
@@ -81,8 +85,8 @@ class VaRUtils:
 			prd = [p[i] for p in prd_map.values()]
 			var_basket = VaRBasket(tsar, prd)
 
-			loop_args = out_dict.keys(), self.compute_risk_profile(var_basket)
-			for k, (var99, cvar, var99_rand_shock_20_5, cvar_rand_shock_20_5) in zip(*loop_args):
+			loop_args = self.compute_risk_profile(var_basket)
+			for k, var99, cvar, var99_rand_shock_20_5, cvar_rand_shock_20_5 in zip(out_dict.keys(), *loop_args):
 				out_dict[k] = pd.concat([out_dict[k], pd.DataFrame({
 					"idx": [i],
 					"var99": [var99],
@@ -106,3 +110,18 @@ class VaRUtils:
 		cvar_rsh_20_5_vect = CVaR_vect(var_basket, self.n_days, self.sim_param, self.method, self.gen_path)
 		var_basket.reset_vol()
 		return cvar_rsh_20_5_vect, cvar_vect, var99_rsh_20_5_vect, var99_vect
+
+	def run_full_VaR_sim(self, begin, end):
+		self.logger.info(f"Running simulations for {len(self.products.values())} products from {begin} to {end}")
+		sim_results = self.run_simulations(begin, end)
+		self.logger.info(f"Product and Returns maps built")
+
+		var_params = f"Params=[ndays={self.n_days},sim_param={self.sim_param},method={self.method}, gen_path={self.gen_path}]"
+		self.logger.info(f"Computing VaR with VaR Params = {var_params}")
+		self.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
+
+		out_dict = self.get_risk_profile(*sim_results)
+		self.logger.info("Finished running estimator")
+
+		return out_dict
+

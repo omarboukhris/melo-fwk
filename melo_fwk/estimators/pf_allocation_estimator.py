@@ -22,6 +22,7 @@ class PFAllocationEstimator:
 		weights: Weights,
 		estimator_params: List[str]
 	):
+		self.begin, self.end = None, None
 		self.trading_syst_list = trading_syst_list
 		self.weights = weights
 		self.estimator_params = iter(estimator_params)
@@ -56,8 +57,8 @@ class PFAllocationEstimator:
 		out_dict = dict()
 		acc_trading_sys = pd.DataFrame({})
 		n = len(self.trading_syst_list)
-		rolling_weighted_results, rolling_products_baskets = [], []
 		self.logger.info(f"Running Estimatior on {n} clusters")
+		cluster_weights = []
 		for trading_sys in tqdm.tqdm(self.trading_syst_list, leave=False):
 			trading_results = trading_sys.run()
 			optim_df = PFAllocationEstimator.optimize_weights_by_cluster(trading_results)
@@ -66,9 +67,9 @@ class PFAllocationEstimator:
 			mean_div_mult = optim_df["DivMult"].mean()
 			mean_weights = optim_df["OptimResult.x"].mean()
 			weights = mean_weights * mean_div_mult
+			cluster_weights.append(weights)
 
 			weighted_results = trading_results.apply_weights(weights)
-			rolling_weighted_results.append(weighted_results)
 			acc_trading_sys[trading_sys.name] = weighted_results.accumulate("Account")
 
 		self.logger.info("Running estimator on portfolio")
@@ -83,21 +84,21 @@ class PFAllocationEstimator:
 		pf_optim_results = pd.DataFrame(pf_optim_results)
 		prod_list = [ts.product_basket for ts in self.trading_syst_list]
 		var_profiles, weights = [], []
-		for i, (w_r, prd) in enumerate(zip(rolling_weighted_results, prod_list)):
-			weight_i = pf_optim_results["OptimResult.x"].mean()[i]
-			weights.append(weight_i)
-			distributed_w = [weight_i] * len(w_r)
-			true_weighted_results = w_r.apply_weights(distributed_w)
+		mean_div_mult = pf_optim_results["DivMult"].mean()
+		for i in range(len(prod_list)):
+			mean_weights = pf_optim_results["OptimResult.x"].mean()[i]
+			weights_i = mean_weights * mean_div_mult * cluster_weights[i]
+			weights.append(weights_i)
 
-			var_basket = VaRBasket(
-				tsar_list=true_weighted_results.results_map.values(),
-				products=prd.products.values())
-			var_utils = VaRUtils.with_products(products=prd.products)
+		for trading_sys, products_basket, w_i in tqdm.tqdm(zip(self.trading_syst_list, prod_list, weights)):
+			var_utils = VaRUtils(trading_subsys=trading_sys, products=products_basket.products, weights=w_i)
 			var_utils.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
-			var_profiles.append(var_utils.compute_risk_profile(var_basket=var_basket))
+			# add begin...end parsing in mql pf alloc rule
+			self.begin, self.end = min(products_basket.years()), max(products_basket.years())
+			var_profiles.append(var_utils.run_full_VaR_sim(self.begin, self.end))
 
 		self.logger.info("Finished running estimator")
-		return out_dict, pd.DataFrame(pf_optim_results).mean(), var_profiles, weights
+		return out_dict, pd.DataFrame(pf_optim_results).mean(numeric_only=False), var_profiles, weights
 
 	@staticmethod
 	def optimize_weights_by_cluster(trading_results):

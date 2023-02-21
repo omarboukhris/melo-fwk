@@ -37,17 +37,5 @@ class VaREstimator(MeloBaseEstimator):
 		)
 
 		var_utils = VaRUtils(trading_subsys, self.products)
-
-		self.logger.info(f"Running simulations for {len(self.products.values())} products from {self.begin} to {self.end}")
-		sim_results = var_utils.run_simulations(self.begin, self.end)
-		self.logger.info(f"Product and Returns maps built")
-
-		var_params = f"Params=[ndays={self.n_days},sim_param={self.sim_param},method={self.method}, gen_path={self.gen_path}]"
-		self.logger.info(f"Computing VaR with VaR Params = {var_params}")
 		var_utils.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
-
-		out_dict = var_utils.get_risk_profile(*sim_results)
-		self.logger.info("Finished running estimator")
-
-		return out_dict
-
+		return var_utils.run_full_VaR_sim(self.begin, self.end)
