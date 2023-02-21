@@ -5,6 +5,7 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.basket.var_basket import VaRBasket
+from melo_fwk.estimators.utils.var_utils import VaRUtils
 from melo_fwk.estimators.utils.weights_optim import WeightsOptim
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
@@ -61,9 +62,6 @@ class PFAllocationEstimator:
 			trading_results = trading_sys.run()
 			optim_df = PFAllocationEstimator.optimize_weights_by_cluster(trading_results)
 
-			# <--- this is where rolling products list should be created, used later for var
-			# write a method for that
-
 			out_dict[trading_sys.name] = optim_df
 			mean_div_mult = optim_df["DivMult"].mean()
 			mean_weights = optim_df["OptimResult.x"].mean()
@@ -82,17 +80,24 @@ class PFAllocationEstimator:
 				PFAllocationEstimator.run_weights_optim(rolling_tr))
 
 		# apply pf weights to positions in rolling_weighted_results
+		pf_optim_results = pd.DataFrame(pf_optim_results)
 		prod_list = [ts.product_basket for ts in self.trading_syst_list]
-		for w_r, pf_r, prd in zip(rolling_weighted_results, pf_optim_results, prod_list):
-			distributed_w = [pf_r["OptimResult.x"].mean()] * len(w_r)
-			####################################
-			# once var refactored, make sure to use it here to compute weighted var for whole PF
-			# return result with outdict ...
-			# should be list of rolling dict with weighted VaR estimates
-			# add new result to types in raw results param in reporter
+		var_profiles, weights = [], []
+		for i, (w_r, prd) in enumerate(zip(rolling_weighted_results, prod_list)):
+			weight_i = pf_optim_results["OptimResult.x"].mean()[i]
+			weights.append(weight_i)
+			distributed_w = [weight_i] * len(w_r)
+			true_weighted_results = w_r.apply_weights(distributed_w)
+
+			var_basket = VaRBasket(
+				tsar_list=true_weighted_results.results_map.values(),
+				products=prd.products.values())
+			var_utils = VaRUtils.with_products(products=prd.products)
+			var_utils.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
+			var_profiles.append(var_utils.compute_risk_profile(var_basket=var_basket))
 
 		self.logger.info("Finished running estimator")
-		return out_dict, pd.DataFrame(pf_optim_results)
+		return out_dict, pd.DataFrame(pf_optim_results).mean(), var_profiles, weights
 
 	@staticmethod
 	def optimize_weights_by_cluster(trading_results):
