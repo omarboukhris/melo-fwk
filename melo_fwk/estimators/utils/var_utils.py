@@ -25,10 +25,6 @@ class VaRUtils:
 		self.sim_param = 0
 		self.gen_path = False
 
-	@staticmethod
-	def with_products(products: dict):
-		return VaRUtils(trading_subsys=BaseTradingSystem(), products=products)
-
 	def set_VaR_params(self, n_days: int, method: str, sim_param: Union[float, int], gen_path: bool):
 		self.n_days = n_days
 		self.method = method

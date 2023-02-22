@@ -1,16 +1,7 @@
-import numpy as np
-import pandas as pd
-import tqdm
-
-from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.strat_basket import StratBasket
-from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.estimators.base_estimator import MeloBaseEstimator
 from melo_fwk.estimators.utils.var_utils import VaRUtils
-from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.var.CVaR import CVaR, CVaR_vect
-from melo_fwk.var.VaR import VaR99, VaR99_vect
 
 
 class VaREstimator(MeloBaseEstimator):

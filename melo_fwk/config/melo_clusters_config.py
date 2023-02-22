@@ -21,6 +21,7 @@ class MeloClustersConfig(CommonMeloConfig):
 	strats_list: List[StratBasket]
 	pose_size_list: List[BaseSizePolicy]
 	weights: Weights
+	time_period: List[int]
 	estimator_config_: Tuple[Type[PFAllocationEstimator], List[str]]
 
 	def __post_init__(self):
@@ -42,7 +43,7 @@ class MeloClustersConfig(CommonMeloConfig):
 
 	@staticmethod
 	def build_config(pf_mgr: BasePortfolioManager, market_db: BaseMarketLoader, quant_query: dict):
-		clusters, weights = MeloClustersConfig.load_clusters(pf_mgr, market_db, quant_query)
+		time_period, clusters, weights = MeloClustersConfig.load_clusters(pf_mgr, market_db, quant_query)
 		return MeloClustersConfig(
 			name=ConfigBuilderHelper.strip_single(quant_query, "QueryName"),
 			cluster_names=[c.name for c in clusters],
@@ -51,6 +52,7 @@ class MeloClustersConfig(CommonMeloConfig):
 			pose_size_list=[c.size_policy for c in clusters],
 			reporter_class_=EstimatorConfigBuilder.get_reporter(quant_query),
 			estimator_config_=EstimatorConfigBuilder.build_estimator(quant_query),
+			time_period=time_period,
 			weights=weights,
 		)
 
@@ -59,12 +61,14 @@ class MeloClustersConfig(CommonMeloConfig):
 		pf_mgr: BasePortfolioManager,
 		market_db: BaseMarketLoader,
 		quant_query: dict
-	) -> Tuple[List[BaseTradingSystem], Weights]:
+	) -> Tuple[List[int], List[BaseTradingSystem], Weights]:
 
 		clusters_dict = ConfigBuilderHelper.strip_single(quant_query, "Clusters")
 		clusters_name = [s.strip() for s in ConfigBuilderHelper.strip_single(clusters_dict, "AlphanumList").split(",")]
 		clusters_weights = [float(s) for s in ConfigBuilderHelper.strip_single(clusters_dict, "WeightsList").split(",")]
 		clusters_divmult = float(ConfigBuilderHelper.strip_single(clusters_dict, "DivMult"))
+		time_period_dict = ConfigBuilderHelper.strip_single(clusters_dict, "TimePeriod")
+		time_period = [int(year) for year in time_period_dict.pop("timeperiod", [0, 0])]
 
 		weights = Weights(
 			weights=clusters_weights,
@@ -75,11 +79,12 @@ class MeloClustersConfig(CommonMeloConfig):
 			pf_mgr.load_portfolio_config(market_db, c_name)
 			for c_name in clusters_name
 		]
-		return clusters, weights
+		return time_period, clusters, weights
 
 	def build_clusters_estimator(self):
 		return self.estimator_config_[0](
 			estimator_params=self.estimator_config_[1],
+			time_period=self.time_period,
 			trading_syst_list=self.build_trading_systems(),
 			weights=self.weights,
 		)

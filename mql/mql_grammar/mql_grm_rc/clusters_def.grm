@@ -1,4 +1,3 @@
-
 Clusters ->
     clusters. lpar. s:AlphanumList rpar.
     |
@@ -8,6 +7,18 @@ Clusters ->
     clusters. lpar. s:AlphanumList rpar.
     with. weights. lpar. s:WeightsList rpar.
     and. divmult. is. DivMult=numeric.
+    |
+
+    clusters. lpar. s:AlphanumList rpar. !TimePeriod
+    |
+    clusters. lpar. s:AlphanumList rpar. !TimePeriod
+    with. weights. lpar. s:WeightsList rpar.
+    |
+    clusters. lpar. s:AlphanumList rpar. !TimePeriod
+    with. weights. lpar. s:WeightsList rpar.
+    and. divmult. is. DivMult=numeric.
+
+TimePeriod -> from. timeperiod=numeric. to. timeperiod=numeric.
 
 AlphanumList ->
     alphanum. |

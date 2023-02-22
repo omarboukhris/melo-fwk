@@ -1,49 +1,35 @@
 from typing import List
 
-import numpy as np
 import pandas as pd
 import tqdm
 
-from melo_fwk.basket.var_basket import VaRBasket
+from melo_fwk.estimators.estimator_params import EstimatorParameters
 from melo_fwk.estimators.utils.var_utils import VaRUtils
 from melo_fwk.estimators.utils.weights_optim import WeightsOptim
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.utils.weights import Weights
-from melo_fwk.var.CVaR import CVaR_vect
-from melo_fwk.var.VaR import VaR99_vect
 
-
-class PFAllocationEstimator:
+class PFAllocationEstimator(EstimatorParameters):
 
 	def __init__(
 		self,
 		trading_syst_list: List[BaseTradingSystem],
+		time_period: List[int],
 		weights: Weights,
 		estimator_params: List[str]
 	):
-		self.begin, self.end = None, None
+		super().__init__(estimator_params)
+
+		self.begin, self.end = time_period
 		self.trading_syst_list = trading_syst_list
 		self.weights = weights
-		self.estimator_params = iter(estimator_params)
 		self.n_days = self.next_int_param(1)
 		self.method = self.next_str_param("mc")
 		self.sim_param = self.next_int_param(1000) if self.method == "mc" else self.next_float_param(0.8)
 		self.gen_path = self.next_int_param(0) != 0
 		self.logger = GlobalLogger.build_composite_for(
 			PFAllocationEstimator.__name__)
-
-	def next_str_param(self, default_val):
-		try:
-			return next(self.estimator_params)
-		except StopIteration:
-			return default_val
-
-	def next_int_param(self, default_val):
-		return int(self.next_str_param(default_val))
-
-	def next_float_param(self, default_val):
-		return float(self.next_str_param(default_val))
 
 	def run(self):
 		"""
@@ -85,8 +71,9 @@ class PFAllocationEstimator:
 		prod_list = [ts.product_basket for ts in self.trading_syst_list]
 		var_profiles, weights = [], []
 		mean_div_mult = pf_optim_results["DivMult"].mean()
+		mean_weights_result = pf_optim_results["OptimResult.x"].mean()
 		for i in range(len(prod_list)):
-			mean_weights = pf_optim_results["OptimResult.x"].mean()[i]
+			mean_weights = mean_weights_result[i]
 			weights_i = mean_weights * mean_div_mult * cluster_weights[i]
 			weights.append(weights_i)
 
@@ -94,11 +81,11 @@ class PFAllocationEstimator:
 			var_utils = VaRUtils(trading_subsys=trading_sys, products=products_basket.products, weights=w_i)
 			var_utils.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
 			# add begin...end parsing in mql pf alloc rule
-			self.begin, self.end = min(products_basket.years()), max(products_basket.years())
+			# self.begin, self.end = min(products_basket.years()), max(products_basket.years())
 			var_profiles.append(var_utils.run_full_VaR_sim(self.begin, self.end))
 
 		self.logger.info("Finished running estimator")
-		return out_dict, pd.DataFrame(pf_optim_results).mean(numeric_only=False), var_profiles, weights
+		return out_dict, pf_optim_results, var_profiles, weights
 
 	@staticmethod
 	def optimize_weights_by_cluster(trading_results):
