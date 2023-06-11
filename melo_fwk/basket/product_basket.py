@@ -1,3 +1,5 @@
+from functools import reduce
+
 import numpy as np
 from typing import List
 
@@ -15,16 +17,30 @@ class ProductBasket:
 		return self.products[name]
 
 	def close_df(self) -> pd.DataFrame:
-		return pd.DataFrame({
-			p.name: p.datastream.get_close_series()
-			for p in self.products.values()
-		})
+		""" make config to setup interpolation strat """
+
+		out = pd.DataFrame({}, columns=["Date"])
+		for p in self.products.values():
+			cols = list(out.columns) + [p.name]
+			out = out.merge(
+				p.datastream.dataframe.reset_index(drop=True).rename(columns={"Close": p.name}),
+				on="Date", how="outer")[cols]
+		out = out.interpolate(axis=0, limit_area="inside").fillna(0.).sort_values("Date")
+		return out.set_index("Date")
 
 	def daily_diff_df(self) -> pd.DataFrame:
-		return pd.DataFrame({
-			p.name: p.datastream.get_daily_diff_series()
-			for p in self.products.values()
-		})
+		out = pd.DataFrame({}, columns=["Date"])
+		for p in self.products.values():
+			cols = list(out.columns) + [p.name]
+			out = out.merge(
+				p.datastream.dataframe.reset_index(drop=True).rename(columns={"Daily_diff": p.name}),
+				on="Date", how="outer")[cols]
+		out = out.interpolate(axis=0, limit_area="inside").fillna(0.).sort_values("Date")
+		return out.set_index("Date")
+		# return pd.DataFrame({
+		# 	p.name: p.datastream.get_daily_diff_series()
+		# 	for p in self.products.values()
+		# })
 
 	def get_year(self, y: int, stitch: bool = False):
 		return ProductBasket([

@@ -81,8 +81,8 @@ class BaseTradingSystem:
 			results_list.append(TsarDataStream(
 				name=product.name,
 				dataframe=pd.DataFrame({
-					"Date": product.get_date_series().reset_index(drop=True),
-					"Price": product.get_close_series().reset_index(drop=True),
+					"Date": product.get_date_series(),
+					"Price": product.get_close_series(),
 					"Forecast": forecast_df[product.name],
 					"Size": pose_df[product.name],
 					"Account": daily_pnl_df[product.name].expanding(1).sum(),

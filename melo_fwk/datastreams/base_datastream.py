@@ -11,7 +11,7 @@ class BaseDataStream:
 		date_label: str = "Date"
 	):
 
-		self.dataframe = dataframe
+		self.dataframe = dataframe.set_index(date_label, drop=False)
 		self.date_label = date_label
 		self.years = common.parse_year_from_date(self.dataframe)
 

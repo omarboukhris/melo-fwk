@@ -3,11 +3,16 @@ import unittest
 import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
+from melo_fwk.basket.strat_basket import StratBasket
+from melo_fwk.loggers.console_logger import ConsoleLogger
+from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,
 )
 from melo_fwk.strategies import EWMAStrategy
+from melo_fwk.utils.weights import Weights
+
 
 class BasketRegressionUnitTest(unittest.TestCase):
 
@@ -44,6 +49,34 @@ class BasketRegressionUnitTest(unittest.TestCase):
 				flag = (forecast[2:] == forecast_df[col][2:]).all()
 				# print(flag, col)
 				assert flag, p.name
+
+	def test_strat_basket(self):
+		self.init()
+
+		GlobalLogger.set_loggers([ConsoleLogger])
+
+		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+
+		products = market.sample_products_alpha(1)
+		prod_bsk = ProductBasket(products)
+
+		strat_basket = StratBasket(
+			strat_list=[
+				EWMAStrategy(
+					fast_span=16,
+					slow_span=64,
+					scale=16.,
+				),
+				EWMAStrategy(
+					fast_span=8,
+					slow_span=32,
+				).estimate_forecast_scale(market)
+			],
+			weights=Weights([0.6, 0.4], 1.)
+		)
+
+		strat_basket.forecast_cumsum(prod_bsk)
+
 
 	def test_basket_pose_size(self):
 		self.init()
