@@ -10,7 +10,8 @@ from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 from melo_fwk.utils.weights import Weights
 
-from melo_fwk.var.VaR import VaR99, VaR95
+from melo_fwk.var.VaR\
+	import VaR99, VaR95
 from melo_fwk.var.CVaR import CVaR
 
 import pandas as pd

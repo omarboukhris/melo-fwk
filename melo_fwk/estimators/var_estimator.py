@@ -8,10 +8,12 @@ class VaREstimator(MeloBaseEstimator):
 
 	def __init__(self, **kwargs):
 		super(VaREstimator, self).__init__(**kwargs)
-		self.n_days = self.next_int_param(1)
-		self.method = self.next_str_param("mc")
-		self.sim_param = self.next_int_param(1000) if self.method == "mc" else self.next_float_param(0.8)
-		self.gen_path = self.next_int_param(0) != 0
+		self.n_days = self.estimator_params_dict.get("n_days", 1)
+		self.method = self.estimator_params_dict.get("method", "mc")
+		self.sim_param = self.estimator_params_dict.get("sim_param", 1000) \
+			if self.method == "mc" else \
+			self.estimator_params_dict.get("sim_param", 0.8)
+		self.gen_path = self.estimator_params_dict.get("gen_path", 0) != 0
 		self.logger.info("VaREstimator Initialized")
 
 

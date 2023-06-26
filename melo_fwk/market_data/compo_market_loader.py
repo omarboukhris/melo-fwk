@@ -18,14 +18,12 @@ class CompositeMarketLoader(BaseMarketLoader):
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 	@staticmethod
-	def from_config(config_path: str):
-		with open(config_path, "r") as fs:
-			out = json.load(fs)
+	def from_config(config: dict):
 		market_loaders = [
-			MarketDataMongoLoader(out["dburl"]),
-			MarketDataLoader(Path(out["fallback_path"])),
+			MarketDataMongoLoader(config["dburl"]),
+			MarketDataLoader(Path(config["fallback_path"])),
 		]
-		if not out["mongo_first"]:
+		if not config["mongo_first"]:
 			market_loaders.reverse()
 		return CompositeMarketLoader(market_loaders)
 

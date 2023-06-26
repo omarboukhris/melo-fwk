@@ -9,6 +9,7 @@ from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.config import MeloConfig
 
 from melo_fwk import quantfactory_registry
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 
 from mql.mql_parser import MqlParser
 
@@ -34,11 +35,10 @@ def run_mql_process(mql_query_path: Path):
 	quant_query = parsed_mql["QuantQuery"][0]
 	# print(parsed_mql)
 
+	work_dir = Path(GenericConfigLoader.get_node("working_directory"))
 	if "Clusters" in quant_query.keys():
-		pf_mgr = CompositePortfolioManager.from_config(
-			str(Path(__file__).parent / "rc/pf_config.json"))
-		market_mgr = CompositeMarketLoader.from_config(
-			str(Path(__file__).parent / "rc/loader_config.json"))
+		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
+		market_mgr = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 		mql_clusters_config = MeloClustersConfig.build_config(pf_mgr, market_mgr, quant_query)
 		cluster_estim_ = mql_clusters_config.build_clusters_estimator()
 		output = cluster_estim_.run()
@@ -57,7 +57,7 @@ def run_mql_process(mql_query_path: Path):
 
 		mql_config.write_report(output, str(mql_query_path.parent))
 
-		pf_mgr = CompositePortfolioManager.from_config(str(Path(__file__).parent / "rc/pf_config.json"))
+		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node("CompositeMarketLoader"))
 		mql_config.export_trading_system(pf_mgr)
 
 
@@ -79,6 +79,7 @@ class MqlUnitTests(unittest.TestCase):
 
 		# set loggers
 		GlobalLogger.set_loggers([ConsoleLogger])
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 
 		# register melo components in factory
 		quantfactory_registry.register_all()

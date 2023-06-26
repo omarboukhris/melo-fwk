@@ -12,8 +12,8 @@ class StratOptimEstimator(MeloBaseEstimator):
 	def __init__(self, **kwargs):
 		super(StratOptimEstimator, self).__init__(**kwargs)
 
-		self.metric = self.next_str_param(default_val="pnl")
-		self.n_iter = self.next_int_param(default_val=128)
+		self.metric = self.estimator_params_dict.get("metric", "pnl")
+		self.n_iter = self.estimator_params_dict.get("n_iter", 128)
 
 		self.logger.info("Initialized Estimator")
 

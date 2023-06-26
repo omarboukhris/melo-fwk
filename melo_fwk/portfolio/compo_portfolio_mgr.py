@@ -50,13 +50,11 @@ class CompositePortfolioManager(BasePortfolioManager):
 		raise Exception("(CompositePortfolioManager) All alternatives failed")
 
 	@staticmethod
-	def from_config(config_path: str):
-		with open(config_path, "r") as fs:
-			out = json.load(fs)
+	def from_config(config: dict):
 		pf_loaders = [
-			PortfoliodbManager(out["dburl"]),
-			PortfolioFsManager(Path(out["fallback_path"])),
+			PortfoliodbManager(config["dburl"]),
+			PortfolioFsManager(Path(config["fallback_path"])),
 		]
-		if not out["mongo_first"]:
+		if not config["mongo_first"]:
 			pf_loaders.reverse()
 		return CompositePortfolioManager(pf_loaders)

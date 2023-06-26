@@ -20,7 +20,7 @@ class MeloBaseEstimator(EstimatorParameters):
 		strategies: List[Union[BaseStrategy, tuple]],
 		forecast_weights: Weights,
 		size_policy: Union[BaseSizePolicy, Type[BaseSizePolicy]],
-		estimator_params: List[str]
+		estimator_params: dict
 	):
 		super().__init__(estimator_params)
 

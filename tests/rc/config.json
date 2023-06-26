@@ -1,0 +1,38 @@
+{
+  "working_directory": "/home/omar/PycharmProjects/melo-fwk/tests",
+  "CompositeMarketLoader": {
+    "mongo_first": false,
+    "dburl": "mongodb://localhost:27017/",
+    "fallback_path": "/home/omar/PycharmProjects/melo-fwk/melo_fwk/market_data"
+  },
+  "CompositePortfolioManager": {
+    "mongo_first": false,
+    "dburl": "mongodb://localhost:27017/",
+    "fallback_path": "/home/omar/PycharmProjects/melo-fwk/melo_fwk/portfolio/assets"
+  },
+  "ClustersEstimator": {
+    "sampling_ratio": 0.7
+  },
+  "StratOptimEstimator": {
+    "metric": "pnl",
+    "n_iter": 128
+  },
+  "VaREstimator": {
+    "n_days": 1,
+    "method": "mc",
+    "sim_param": 1000,
+    "gen_path": true
+  },
+  "VolTargetEstimator": {
+    "trading_capital": 0.0,
+    "step": 0.1,
+    "start": 0.1,
+    "final": 1.0
+  },
+  "PFAllocationEstimator": {
+    "n_days": 1,
+    "method": "mc",
+    "sim_param": 1000,
+    "gen_path": true
+  }
+}
