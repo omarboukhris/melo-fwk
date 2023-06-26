@@ -1,5 +1,4 @@
 {
-  "working_directory": "/home/omar/PycharmProjects/melo-fwk/tests",
   "CompositeMarketLoader": {
     "mongo_first": false,
     "dburl": "mongodb://localhost:27017/",
