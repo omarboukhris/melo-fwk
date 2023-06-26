@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -12,17 +13,19 @@ from melo_fwk.plots import TsarPlotter
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):
 
-	def init(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 	def runTest(self):
-		self.init()
 		self.logger.info("run all at once - TradingSystem")
 		self._run_simulation("all", TradingSystem)
 		self.logger.info("run each year seperately - TradingSystem")

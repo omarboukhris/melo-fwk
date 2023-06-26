@@ -79,7 +79,7 @@ class PFAllocationEstimator(EstimatorParameters):
 			weights_i = mean_weights * mean_div_mult * cluster_weights[i]
 			weights.append(weights_i)
 
-		for trading_sys, products_basket, w_i in tqdm.tqdm(zip(self.trading_syst_list, prod_list, weights)):
+		for trading_sys, products_basket, w_i in tqdm.tqdm(zip(self.trading_syst_list, prod_list, weights), leave=False):
 			var_utils = VaRUtils(trading_subsys=trading_sys, products=products_basket.products, weights=w_i)
 			var_utils.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
 			# add begin...end parsing in mql pf alloc rule

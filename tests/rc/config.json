@@ -1,4 +1,6 @@
 {
+  "working_dir": "/home/omar/PycharmProjects/melo-fwk",
+  "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points",
   "CompositeMarketLoader": {
     "mongo_first": false,
     "dburl": "mongodb://localhost:27017/",

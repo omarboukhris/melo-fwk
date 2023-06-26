@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import pandas as pd
 
@@ -11,13 +12,15 @@ from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,
 )
 from melo_fwk.strategies import EWMAStrategy
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.weights import Weights
 
 
 class BasketRegressionUnitTest(unittest.TestCase):
 
 	def init(self):
-		self.market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
+		self.market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 	def test_prod_basket(self):
 		self.init()
@@ -55,7 +58,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 		products = market.sample_products_alpha(1)
 		prod_bsk = ProductBasket(products)
@@ -114,7 +117,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 class BasketUnitTest(unittest.TestCase):
 
 	def init(self):
-		self.market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+		self.market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 	def test_prod_basket(self):
 		self.init()

@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import pandas as pd
 
@@ -10,17 +11,19 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):
 
-	def init(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 	def test_tsys(self):
-		self.init()
 		self.logger.info("run all at once - TradingSystem")
 		self._run_simulation("all", TradingSystem)
 		self.logger.info("run each year seperately - TradingSystem")
@@ -34,7 +37,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def _run_simulation(self, x: str, tr: callable):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 		products = market.sample_products(3)
 		prod_bsk = ProductBasket(products)
@@ -88,7 +91,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def test_reg(self):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 		products = market.sample_products_alpha(1)
 		prod_bsk = ProductBasket(products)

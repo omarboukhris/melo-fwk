@@ -1,5 +1,6 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.strategies import BuyAndHold
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.utils import yaml_io
@@ -35,8 +36,8 @@ class StratConfigRegistry:
 		"""
 		Register config points for current mql query
 		"""
-		config_points_filenames = glob.glob(
-			str(Path(mql_query_path) / "strat_config_points") + "/*")
+		strat_config_points = GenericConfigLoader.get_node("strat_config_points", ".")
+		config_points_filenames = glob.glob(f"{strat_config_points}/*")
 
 		config_points_registry = {}
 		for config_point_fn in config_points_filenames:
