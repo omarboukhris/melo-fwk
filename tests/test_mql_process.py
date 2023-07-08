@@ -17,6 +17,7 @@ from pathlib import Path
 
 
 class MeloMachina:
+
 	def __init__(self, config: Path, loggers: list):
 		# setup config
 		GenericConfigLoader.setup(str(config))
@@ -60,10 +61,10 @@ class MeloMachina:
 			estimator_obj_ = mql_config.build_estimator()
 			output = estimator_obj_.run()
 			# print(output)
-
+			# ##################################################################################
 			mql_config.write_report(output, str(mql_query_path.parent))
 
-			pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node("CompositeMarketLoader"))
+			pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
 			mql_config.export_trading_system(pf_mgr)
 
 
@@ -78,8 +79,8 @@ class MqlUnitTests(unittest.TestCase):
 
 		root_dir = Path(__file__).parent.parent
 		templates = {
-			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
+			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": root_dir / "mql_data/mql_vol_target_optim/posesizeoptim_example_query.sql",

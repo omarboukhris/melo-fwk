@@ -31,6 +31,7 @@ class MeloBaseEstimator(EstimatorParameters):
 
 		self.products = products
 		self.begin, self.end = time_period
+		self.end += 1
 		self.strategies = strategies
 		self.forecast_weights = forecast_weights
 		self.size_policy = size_policy

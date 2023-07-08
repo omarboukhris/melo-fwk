@@ -3,7 +3,7 @@ from typing import List, Union
 
 
 class GenericConfigLoader:
-	global_config = None
+	__global_config = None
 
 	def __init__(self, config: Union[str, List[str]]):
 		self.config_map = {}
@@ -15,11 +15,11 @@ class GenericConfigLoader:
 
 	@staticmethod
 	def setup(config: Union[str, List[str]]):
-		GenericConfigLoader.global_config = GenericConfigLoader(config)
+		GenericConfigLoader.__global_config = GenericConfigLoader(config)
 
 	@staticmethod
 	def get_node(key: str, default: object = None):
-		return GenericConfigLoader.global_config.get(key, default)
+		return GenericConfigLoader.__global_config.get(key, default)
 
 	def load_config(self, c: str):
 		try:

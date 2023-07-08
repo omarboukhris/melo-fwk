@@ -17,7 +17,7 @@ class PFAllocationEstimator(EstimatorParameters):
 		trading_syst_list: List[BaseTradingSystem],
 		time_period: List[int],
 		weights: Weights,
-		estimator_params: List[str]
+		estimator_params: dict
 	):
 		super().__init__(estimator_params)
 

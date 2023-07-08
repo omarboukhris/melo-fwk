@@ -2,7 +2,7 @@ create BacktestExample
 with
     Commodities (Gold, Silver, Palladium, Coffee)
     Fx (EURUSD)
-from 2008 to 2008
+from 2008 to 2009
 
 where strategies are (ewma, ewma)
 with strategyConfig (ewma_strat_0, ewma_strat_0)

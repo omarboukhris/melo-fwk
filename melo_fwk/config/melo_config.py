@@ -27,7 +27,7 @@ class MeloConfig(CommonMeloConfig):
 	# (list(strats OR tuple(type(strat), param)), fw)
 	strategies_config: Tuple[List[Union[BaseStrategy, Tuple[Type[BaseStrategy], Dict]]], Weights]
 	# (estimator, **params)
-	estimator_config_: Tuple[Type[MeloBaseEstimator], List[str]]
+	estimator_config_: Tuple[Type[MeloBaseEstimator], dict]
 	export_name: str
 
 	@staticmethod

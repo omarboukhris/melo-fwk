@@ -2,14 +2,17 @@ import pandas as pd
 import melo_fwk.datastreams.hloc_datastream as ds
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.mongo_db_mgr import MongodbManager
 from melo_fwk.market_data.product import Product
 
 
 class MarketDataMongoLoader(BaseMarketLoader):
 
-	def __init__(self, dburl: str):
+	def __init__(self):
 		super().__init__()
+		config = GenericConfigLoader.get_node(MarketDataMongoLoader.__name__, {})
+		dburl = config["dburl"]
 		self.mongo_mgr = MongodbManager(dburl)
 
 	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:

@@ -9,6 +9,8 @@ from melo_fwk.utils.weights import Weights
 
 class QuantFlowFactory:
 
+	pf_loaders = dict()
+	market_providers = dict()
 	products = dict()
 	strategies = dict()
 	strat_configs = dict()
@@ -17,6 +19,22 @@ class QuantFlowFactory:
 	reporters = dict()
 	size_policies = dict()
 	result_writers = dict()
+
+	@staticmethod
+	def register_pf_loader(pf_loader_label: str, pf_loader: callable):
+		QuantFlowFactory.pf_loaders[pf_loader_label] = pf_loader
+
+	@staticmethod
+	def get_pf_loader(pf_loader_label: str):
+		return QuantFlowFactory.pf_loaders[pf_loader_label]()
+
+	@staticmethod
+	def register_market(market_label: str, market: callable):
+		QuantFlowFactory.market_providers[market_label] = market
+
+	@staticmethod
+	def get_market(market_label: str):
+		return QuantFlowFactory.market_providers[market_label]()
 
 	@staticmethod
 	def register_product(product_label: str, product: tuple):
@@ -81,8 +99,8 @@ class QuantFlowFactory:
 	def get_strat_configs(config_file: str):
 		return QuantFlowFactory.strat_configs[config_file]
 
-	@classmethod
-	def build_strat_basket(cls, strat_basket_config: dict):
+	@staticmethod
+	def build_strat_basket(strat_basket_config: dict):
 		strat_list = [
 			QuantFlowFactory.get_strategy(strat_name)(**config)
 			for strat_name, config in strat_basket_config["strat_list"].items()

@@ -25,7 +25,10 @@ class ProductConfigBuilder:
 
 	@staticmethod
 	def _get_product(products_type: str, product_name: str) -> dict:
-		""" add option to load from market ??"""
+		"""
+		TODO: Rewrite this function to use the proper market from factories and apply lazy loading
+			this should be done after rewriting market loaders and product factory registry for lazy loading
+		"""
 		product_factory_name = f"{products_type}.{product_name}"
 		assert product_factory_name in QuantFlowFactory.products.keys(), \
 			GlobalLogger.build_composite_for("ProductConfigBuilder").error(

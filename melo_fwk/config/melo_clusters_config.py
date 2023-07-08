@@ -22,7 +22,7 @@ class MeloClustersConfig(CommonMeloConfig):
 	pose_size_list: List[BaseSizePolicy]
 	weights: Weights
 	time_period: List[int]
-	estimator_config_: Tuple[Type[PFAllocationEstimator], List[str]]
+	estimator_config_: Tuple[Type[PFAllocationEstimator], dict]
 
 	def __post_init__(self):
 		assert len(self.product_baskets) == len(self.strats_list), \

@@ -116,11 +116,12 @@ class BasketRegressionUnitTest(unittest.TestCase):
 
 class BasketUnitTest(unittest.TestCase):
 
-	def init(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		self.market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 	def test_prod_basket(self):
-		self.init()
 
 		products = self.market.sample_products_alpha(.1)
 		prod_basket = ProductBasket(products)
@@ -129,7 +130,6 @@ class BasketUnitTest(unittest.TestCase):
 			assert (prod_basket.close_df()[prod.name].dropna() == prod.get_close_series()).all(), prod.name
 
 	def test_basket_forecast(self):
-		self.init()
 
 		products = self.market.sample_products_alpha(.1)
 		prod_basket = ProductBasket(products)
@@ -154,7 +154,6 @@ class BasketUnitTest(unittest.TestCase):
 			assert flag, p.name
 
 	def test_basket_pose_size(self):
-		self.init()
 
 		products = self.market.sample_products_alpha(.1)
 		prod_basket = ProductBasket(products)

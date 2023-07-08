@@ -1,16 +1,25 @@
 {
   "working_dir": "/home/omar/PycharmProjects/melo-fwk",
   "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points",
-  "CompositeMarketLoader": {
-    "mongo_first": false,
-    "dburl": "mongodb://localhost:27017/",
-    "fallback_path": "/home/omar/PycharmProjects/melo-fwk/melo_fwk/market_data"
+  "CompositeMarketLoader": ["MarketDataLoader", "MarketDataMongoLoader"],
+  "CompositePortfolioManager": ["PortfolioFsManager", "PortfolioMongoManager"],
+
+  "MarketDataMongoLoader": {
+    "dburl": "mongodb://localhost:27017/"
   },
-  "CompositePortfolioManager": {
-    "mongo_first": false,
-    "dburl": "mongodb://localhost:27017/",
-    "fallback_path": "/home/omar/PycharmProjects/melo-fwk/melo_fwk/portfolio/assets"
+  "MarketDataLoader": {
+    "location": "/home/omar/PycharmProjects/melo-fwk/assets",
+    "all": "**/*.csv"
   },
+
+  "PortfolioMongoManager": {
+    "dburl": "mongodb://localhost:27017/"
+  },
+  "PortfolioFsManager": {
+    "location": "/home/omar/PycharmProjects/melo-fwk/pf_assets"
+  },
+
+
   "ClustersEstimator": {
     "sampling_ratio": 0.7
   },

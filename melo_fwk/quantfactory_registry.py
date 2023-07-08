@@ -1,8 +1,12 @@
 from melo_fwk.estimators.var_estimator import VaREstimator
 from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
+from melo_fwk.market_data.market_data_loader import MarketDataLoader
+from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
+from melo_fwk.portfolio.portfolio_db_mgr import PortfolioMongoManager
+from melo_fwk.portfolio.portfolio_fs_mgr import PortfolioFsManager
 from melo_fwk.reporters.pf_alloc_reporter import PFAllocationReporter
 from melo_fwk.reporters.var_reporter import VaRReporter
-from melo_fwk.utils import quantflow_factory
+from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 
 from melo_fwk.market_data.fs_data_loaders import (
 	CommodityDataLoader,
@@ -46,46 +50,58 @@ def register_all():
 	register_search_spaces()
 	log.info("Registring Size Policies...")
 	register_size_policies()
+	log.info("Registring PF Loaders...")
+	register_pf_loaders()
+	log.info("Registring Market Priveders Components...")
+	register_markets()
 	log.info("Registring Products/Assets historical data...")
 	register_products()
 
 def register_estimator():
-	quantflow_factory.QuantFlowFactory.register_estimator("BacktestEstimator", BacktestEstimator)
-	quantflow_factory.QuantFlowFactory.register_estimator("ClustersEstimator", ClustersEstimator)
-	quantflow_factory.QuantFlowFactory.register_estimator("StratOptimEstimator", StratOptimEstimator)
-	quantflow_factory.QuantFlowFactory.register_estimator("ForecastWeightsEstimator", ForecastWeightsEstimator)
-	quantflow_factory.QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
-	quantflow_factory.QuantFlowFactory.register_estimator("VaREstimator", VaREstimator)
+	QuantFlowFactory.register_estimator("BacktestEstimator", BacktestEstimator)
+	QuantFlowFactory.register_estimator("ClustersEstimator", ClustersEstimator)
+	QuantFlowFactory.register_estimator("StratOptimEstimator", StratOptimEstimator)
+	QuantFlowFactory.register_estimator("ForecastWeightsEstimator", ForecastWeightsEstimator)
+	QuantFlowFactory.register_estimator("VolTargetEstimator", VolTargetEstimator)
+	QuantFlowFactory.register_estimator("VaREstimator", VaREstimator)
 
-	quantflow_factory.QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
-	quantflow_factory.QuantFlowFactory.register_reporter("ClustersEstimator", ClustersReporter)
-	quantflow_factory.QuantFlowFactory.register_reporter("StratOptimEstimator", StratOptimReporter)
-	quantflow_factory.QuantFlowFactory.register_reporter("ForecastWeightsEstimator", ForecastWeightsReporter)
-	quantflow_factory.QuantFlowFactory.register_reporter("VolTargetEstimator", VolTargetReporter)
-	quantflow_factory.QuantFlowFactory.register_reporter("VaREstimator", VaRReporter)
-	quantflow_factory.QuantFlowFactory.register_estimator("PFAllocationEstimator", PFAllocationEstimator)
+	QuantFlowFactory.register_reporter("BacktestEstimator", BacktestReporter)
+	QuantFlowFactory.register_reporter("ClustersEstimator", ClustersReporter)
+	QuantFlowFactory.register_reporter("StratOptimEstimator", StratOptimReporter)
+	QuantFlowFactory.register_reporter("ForecastWeightsEstimator", ForecastWeightsReporter)
+	QuantFlowFactory.register_reporter("VolTargetEstimator", VolTargetReporter)
+	QuantFlowFactory.register_reporter("VaREstimator", VaRReporter)
+	QuantFlowFactory.register_estimator("PFAllocationEstimator", PFAllocationEstimator)
 
-	quantflow_factory.QuantFlowFactory.register_reporter("PFAllocationEstimator", PFAllocationReporter)
+	QuantFlowFactory.register_reporter("PFAllocationEstimator", PFAllocationReporter)
 
 
 def register_strats():
-	quantflow_factory.QuantFlowFactory.register_strategy("ewma", EWMAStrategy)
-	quantflow_factory.QuantFlowFactory.register_strategy("sma", SMAStrategy)
+	QuantFlowFactory.register_strategy("ewma", EWMAStrategy)
+	QuantFlowFactory.register_strategy("sma", SMAStrategy)
 
-	quantflow_factory.QuantFlowFactory.register_strategy(BuyAndHold.__name__, BuyAndHold)
-	quantflow_factory.QuantFlowFactory.register_strategy(EWMAStrategy.__name__, EWMAStrategy)
-	quantflow_factory.QuantFlowFactory.register_strategy(SMAStrategy.__name__, SMAStrategy)
+	QuantFlowFactory.register_strategy(BuyAndHold.__name__, BuyAndHold)
+	QuantFlowFactory.register_strategy(EWMAStrategy.__name__, EWMAStrategy)
+	QuantFlowFactory.register_strategy(SMAStrategy.__name__, SMAStrategy)
 
 
 def register_search_spaces():
-	quantflow_factory.QuantFlowFactory.register_search_space("ewma.search_space", EWMAStrategy.search_space)
-	quantflow_factory.QuantFlowFactory.register_search_space("sma.search_space", SMAStrategy.search_space)
+	QuantFlowFactory.register_search_space("ewma.search_space", EWMAStrategy.search_space)
+	QuantFlowFactory.register_search_space("sma.search_space", SMAStrategy.search_space)
 
 def register_size_policies():
-	quantflow_factory.QuantFlowFactory.register_size_policy("default", BaseSizePolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetSizePolicy", VolTargetSizePolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetInertiaPolicy", VolTargetInertiaPolicy)
-	quantflow_factory.QuantFlowFactory.register_size_policy("VolTargetDiscreteSizePolicy", VolTargetDiscreteSizePolicy)
+	QuantFlowFactory.register_size_policy("default", BaseSizePolicy)
+	QuantFlowFactory.register_size_policy("VolTargetSizePolicy", VolTargetSizePolicy)
+	QuantFlowFactory.register_size_policy("VolTargetInertiaPolicy", VolTargetInertiaPolicy)
+	QuantFlowFactory.register_size_policy("VolTargetDiscreteSizePolicy", VolTargetDiscreteSizePolicy)
+
+def register_markets():
+	QuantFlowFactory.register_market("MarketDataLoader", MarketDataLoader)
+	QuantFlowFactory.register_market("MarketDataMongoLoader", MarketDataMongoLoader)
+
+def register_pf_loaders():
+	QuantFlowFactory.register_pf_loader("PortfolioFsManager", PortfolioFsManager)
+	QuantFlowFactory.register_pf_loader("PortfolioMongoManager", PortfolioMongoManager)
 
 def register_products():
 	# =============================================================
@@ -95,7 +111,7 @@ def register_products():
 	# -------------------------------------------------------------
 	commo_loader = CommodityDataLoader()
 	for prod_name, prod_hloc in commo_loader.commo_data_registry.items():
-		quantflow_factory.QuantFlowFactory.register_product(
+		QuantFlowFactory.register_product(
 			f"Commodities.{prod_name}", prod_hloc
 		)
 
@@ -104,7 +120,7 @@ def register_products():
 	# -------------------------------------------------------------
 	fx_loader = FxDataLoader()
 	for prod_name, prod_hloc in fx_loader.fx_data_registry.items():
-		quantflow_factory.QuantFlowFactory.register_product(
+		QuantFlowFactory.register_product(
 			f"Fx.{prod_name}", prod_hloc
 		)
 
