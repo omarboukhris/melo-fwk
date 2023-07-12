@@ -1,10 +1,14 @@
+import pandas as pd
+import tqdm
+
 from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.strategies import BuyAndHold
 from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.utils import yaml_io
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from pathlib import Path
 
 import glob
@@ -19,7 +23,27 @@ class StratConfigRegistry:
 	def __str__(self):
 		return str(self.config_points_registry)
 
-	def get_strat_config(self, key: str):
+	@staticmethod
+	def export_strat_config_node(opt, export_path: str, strat_name: str) -> None:
+		strat_config_df = pd.DataFrame({
+			"score_vals": -opt.optimizer_results_[0].func_vals,
+			"x_iters": opt.optimizer_results_[0].x_iters
+		}).sort_values(by=["score_vals"], ascending=False).drop_duplicates(subset=["score_vals"])
+		# might eliminate different candidates with exact same score (low probability but exists)
+
+		config_list = {}
+		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__, {}))
+		strat_class_ = QuantFlowFactory.get_strategy(strat_name)
+		for i, (_, config_pt) in tqdm.tqdm(enumerate(strat_config_df.head(5).iterrows()), leave=False):
+			# remove (product, strat_class, size_policy, metric)
+			params = [p for p in config_pt["x_iters"] if type(p) in [int, float]]
+			strat = asdict(strat_class_(*params).estimate_forecast_scale(market))
+			strat.pop("search_space", None)
+			config_list[f"{strat_name}_{i}"] = strat
+
+		yaml_io.write_strat_config_point(config_list, export_path + f"/{strat_name}.yml")
+
+	def get_strat_config(self, key: str) -> dict:
 		"""
 		:param key: Strat config or Strat search space registry key
 		:return: Strat config or Strat search space
@@ -32,11 +56,10 @@ class StratConfigRegistry:
 
 
 	@staticmethod
-	def build_registry(mql_query_path: str):
+	def build_registry(strat_config_points: str):
 		"""
 		Register config points for current mql query
 		"""
-		strat_config_points = GenericConfigLoader.get_node("strat_config_points", ".")
 		config_points_filenames = glob.glob(f"{strat_config_points}/*")
 
 		config_points_registry = {}

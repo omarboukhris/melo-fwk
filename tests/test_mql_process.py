@@ -24,19 +24,22 @@ class MeloMachina:
 		GenericConfigLoader.setup(str(config))
 		# setup logger
 		GlobalLogger.set_loggers(loggers)
-		# setup mql parser
-		self.mql_parser = MqlParser()
 		# register melo components in factory
 		# registration comes after config loading
 		# otherwise product factory would not be initialized
 		QuantFlowRegistry.register_all()
+		# setup mql parser
+		self.mql_parser = MqlParser()
 
 	def run_process(self, query_path: Path):
 		"""
+		Note : this will be obsolete once pf aggregation is implemented
+			will probably be in a seperate melo process
+
 		Estimators should:
 			- Implement the same constructor (see any estimator)
 			- Implement a run() method that returns any result
-		Note:
+
 			Reporter associated to the estimator should be able
 			to process its result
 			TODO: rework reporters with new persistency layer
@@ -69,6 +72,15 @@ class MeloMachina:
 			mql_config.write_report(output, str(query_path.parent))
 			mql_config.export_trading_system(pf_mgr)
 
+	def run(self, query_path: Path):
+		mql_config = self.mql_parser.parse_to_config(str(query_path))
+		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
+		estimator_obj_ = mql_config.build_estimator()
+		output = estimator_obj_.run()
+
+		mql_config.write_report(output, str(query_path.parent))
+		mql_config.export_trading_system(pf_mgr)
+
 
 class MqlUnitTests(unittest.TestCase):
 
@@ -76,11 +88,8 @@ class MqlUnitTests(unittest.TestCase):
 		super().__init__(*args, **kwargs)
 		self.config = Path(__file__).parent / "rc/config.json"
 		self.loggers = [ConsoleLogger]
-
-	def test_mql_process(self):
-
 		root_dir = Path(__file__).parent.parent
-		templates = {
+		self.templates = {
 			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
 			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
@@ -89,15 +98,20 @@ class MqlUnitTests(unittest.TestCase):
 			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"fast_strat_opt": root_dir / "mql_data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 		}
-		# still missing :
-		# alloc opt
 
-		# set loggers
+	def test_mql_process(self):
 		mm = MeloMachina(config=self.config, loggers=self.loggers)
 
-		for key, mql_query in templates.items():
+		for key, mql_query in self.templates.items():
 			print(42*"=" + key + 42*"=")
 			mm.run_process(query_path=mql_query)
+
+	def test_new_mql_process(self):
+		mm = MeloMachina(config=self.config, loggers=self.loggers)
+
+		for key, mql_query in self.templates.items():
+			print(42*"=" + key + 42*"=")
+			mm.run(query_path=mql_query)
 
 
 if __name__ == "__main__":

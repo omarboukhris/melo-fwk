@@ -16,6 +16,7 @@ from pathlib import Path
 from dataclasses import dataclass
 
 from melo_fwk.strategies import BaseStrategy
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.weights import Weights
 
 
@@ -42,7 +43,9 @@ class MeloConfig(CommonMeloConfig):
 		:param quant_query_path:
 		:param quant_query:
 		"""
-		strat_config_registry = StratConfigRegistry.build_registry(str(quant_query_path.parent))
+		strat_config_path = GenericConfigLoader.get_node(
+			"strat_config_points", str(quant_query_path.parent / "strat_config_points"))
+		strat_config_registry = StratConfigRegistry.build_registry(strat_config_path)
 		estimator_class_, estimator_params_ = EstimatorConfigBuilder.build_estimator(quant_query)
 		return MeloConfig(
 			name=ConfigBuilderHelper.strip_single(quant_query, "QueryName"),

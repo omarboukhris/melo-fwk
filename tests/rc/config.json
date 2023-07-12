@@ -29,6 +29,9 @@
     "metric": "pnl",
     "n_iter": 128
   },
+  "StratOptimReporter": {
+    "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points"
+  },
   "VaREstimator": {
     "n_days": 1,
     "method": "mc",
