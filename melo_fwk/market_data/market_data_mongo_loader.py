@@ -28,6 +28,14 @@ class MarketDataMongoLoader(BaseMarketLoader):
 		products = self.mongo_mgr.db_connection.list_collection_names()
 		return [self._load_product(p) for p in products]
 
+	def get(self, category: str, product: str):
+		self.mongo_mgr.connect("market")
+		return [
+			self._load_product(cname)
+			for cname in self.mongo_mgr.db_connection.list_collection_names()
+			if f"{category}." in cname
+		]
+
 	def get_fx(self):
 		self.mongo_mgr.connect("market")
 		return [

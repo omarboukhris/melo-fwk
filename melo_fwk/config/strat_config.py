@@ -69,6 +69,7 @@ class StrategyConfigBuilder:
 		for strat, config in zip(strategies_kw, strat_config_points):
 			if "." in config:
 				# look for key in search space registry
+				# only used when running strat optim
 				sanitized_config = StratConfigRegistry.sanitize_key(config)
 				strategies.append((
 					QuantFlowFactory.get_strategy(strat.strip()),

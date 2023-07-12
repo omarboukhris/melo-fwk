@@ -11,6 +11,7 @@ from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,
 )
+from melo_fwk.quantfactory_registry import QuantFlowRegistry
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.weights import Weights
@@ -58,9 +59,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
-
-		products = market.sample_products_alpha(1)
+		products = self.market.sample_products_alpha(1)
 		prod_bsk = ProductBasket(products)
 
 		strat_basket = StratBasket(
@@ -73,7 +72,7 @@ class BasketRegressionUnitTest(unittest.TestCase):
 				EWMAStrategy(
 					fast_span=8,
 					slow_span=32,
-				).estimate_forecast_scale(market)
+				).estimate_forecast_scale(self.market)
 			],
 			weights=Weights([0.6, 0.4], 1.)
 		)
@@ -119,6 +118,7 @@ class BasketUnitTest(unittest.TestCase):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
+		QuantFlowRegistry.register_all()
 		self.market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 	def test_prod_basket(self):

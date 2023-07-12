@@ -4,6 +4,7 @@ from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.quantfactory_registry import QuantFlowRegistry
 from melo_fwk.trading_systems import TradingSystemIter
 
 from melo_fwk.strategies import EWMAStrategy
@@ -26,6 +27,7 @@ class PortfolioUnitTests(unittest.TestCase):
 		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+		QuantFlowRegistry.register_all()
 
 	def test_portfolio(self):
 		sma_params = {

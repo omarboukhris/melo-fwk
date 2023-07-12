@@ -1,6 +1,8 @@
 {
   "working_dir": "/home/omar/PycharmProjects/melo-fwk",
+  "products_factory_config": "/home/omar/PycharmProjects/melo-fwk/assets/products_factory_config.json",
   "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points",
+
   "CompositeMarketLoader": ["MarketDataLoader", "MarketDataMongoLoader"],
   "CompositePortfolioManager": ["PortfolioFsManager", "PortfolioMongoManager"],
 

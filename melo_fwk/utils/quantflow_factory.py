@@ -6,6 +6,9 @@ from typing import List
 from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.utils.weights import Weights
 
+import json
+from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+
 
 class QuantFlowFactory:
 
@@ -17,8 +20,8 @@ class QuantFlowFactory:
 	search_spaces = dict()
 	estimators = dict()
 	reporters = dict()
+
 	size_policies = dict()
-	result_writers = dict()
 
 	@staticmethod
 	def register_pf_loader(pf_loader_label: str, pf_loader: callable):
@@ -41,8 +44,10 @@ class QuantFlowFactory:
 		QuantFlowFactory.products[product_label] = product
 
 	@staticmethod
-	def get_product(product_label: str):
-		return QuantFlowFactory.products[product_label]
+	def load_products_factory_map():
+		pfactory_config_node = GenericConfigLoader.get_node("products_factory_config", "")
+		with open(pfactory_config_node, "r") as fs:
+			QuantFlowFactory.products = json.load(fs)
 
 	@staticmethod
 	def register_strategy(strategy_label: str, strategy: callable):
@@ -83,10 +88,6 @@ class QuantFlowFactory:
 	@staticmethod
 	def get_reporter(estimator_label: str):
 		return QuantFlowFactory.reporters[estimator_label]
-
-	@staticmethod
-	def get_result_writer(result_writer_label: str):
-		return QuantFlowFactory.result_writers[result_writer_label]
 
 	@staticmethod
 	def register_strat_configs(filepath: str):

@@ -24,6 +24,10 @@ class BaseMarketLoader(ABC):
 		...
 
 	@abstractmethod
+	def get(self, category: str, product: str) -> Product:
+		...
+
+	@abstractmethod
 	def get_fx(self) -> List[Product]:
 		...
 

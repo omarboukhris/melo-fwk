@@ -1,10 +1,14 @@
+from dataclasses import dataclass
 
+from melo_fwk.pose_size import BaseSizePolicy
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 from melo_fwk.config.config_helper import ConfigBuilderHelper
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 
+@dataclass
 class SizePolicyConfigBuilder:
+
 	@staticmethod
 	def get_vol_target_params(quant_query_dict: dict):
 		logger = GlobalLogger.build_composite_for("VolTargetConfigBuilder")
@@ -23,7 +27,7 @@ class SizePolicyConfigBuilder:
 		return 0., 0.
 
 	@staticmethod
-	def build_size_policy(quant_query_dict: dict):
+	def build_size_policy(quant_query_dict: dict) -> BaseSizePolicy:
 		vol_target_params = SizePolicyConfigBuilder.get_vol_target_params(quant_query_dict)
 
 		logger = GlobalLogger.build_composite_for("SizePolicyConfigBuilder")

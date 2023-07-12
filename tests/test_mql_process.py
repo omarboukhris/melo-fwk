@@ -1,14 +1,15 @@
 import unittest
 
 from melo_fwk.config.melo_clusters_config import MeloClustersConfig
+from melo_fwk.config.product_config import ProductFactory
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.portfolio.compo_portfolio_mgr import CompositePortfolioManager
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.loggers.console_logger import ConsoleLogger
 
 from melo_fwk.config import MeloConfig
+from melo_fwk.quantfactory_registry import QuantFlowRegistry
 
-from melo_fwk import quantfactory_registry
 from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 
 from mql.mql_parser import MqlParser
@@ -26,9 +27,11 @@ class MeloMachina:
 		# setup mql parser
 		self.mql_parser = MqlParser()
 		# register melo components in factory
-		quantfactory_registry.register_all()
+		# registration comes after config loading
+		# otherwise product factory would not be initialized
+		QuantFlowRegistry.register_all()
 
-	def run_mql_process(self, mql_query_path: Path):
+	def run_process(self, query_path: Path):
 		"""
 		Estimators should:
 			- Implement the same constructor (see any estimator)
@@ -39,32 +42,31 @@ class MeloMachina:
 			TODO: rework reporters with new persistency layer
 		"""
 
-		parsed_mql = self.mql_parser.parse_to_json(str(mql_query_path))
+		parsed_mql = self.mql_parser.parse_to_json(str(query_path))
 		quant_query = parsed_mql["QuantQuery"][0]
 		# print(parsed_mql)
 
+		market_mgr = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
+		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
 		if "Clusters" in quant_query.keys():
-			pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
-			market_mgr = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 			mql_clusters_config = MeloClustersConfig.build_config(pf_mgr, market_mgr, quant_query)
 			cluster_estim_ = mql_clusters_config.build_clusters_estimator()
 			output = cluster_estim_.run()
-			mql_clusters_config.write_report(output, str(mql_query_path.parent))
+			mql_clusters_config.write_report(output, str(query_path.parent))
 
 		else:
+			pf = ProductFactory(market_mgr)
 			mql_config = MeloConfig.build_config(
-				quant_query_path=mql_query_path,
+				pfactory=pf,
+				quant_query_path=query_path,
 				quant_query=quant_query
 			)
-			# print(mql_config)
 
 			estimator_obj_ = mql_config.build_estimator()
 			output = estimator_obj_.run()
-			# print(output)
-			# ##################################################################################
-			mql_config.write_report(output, str(mql_query_path.parent))
 
-			pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
+			# ##################################################################################
+			mql_config.write_report(output, str(query_path.parent))
 			mql_config.export_trading_system(pf_mgr)
 
 
@@ -80,11 +82,11 @@ class MqlUnitTests(unittest.TestCase):
 		root_dir = Path(__file__).parent.parent
 		templates = {
 			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
-			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": root_dir / "mql_data/mql_vol_target_optim/posesizeoptim_example_query.sql",
 			"clustering": root_dir / "mql_data/mql_clustering_template/clustering_example_query.sql",
+			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"fast_strat_opt": root_dir / "mql_data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 		}
 		# still missing :
@@ -95,7 +97,7 @@ class MqlUnitTests(unittest.TestCase):
 
 		for key, mql_query in templates.items():
 			print(42*"=" + key + 42*"=")
-			mm.run_mql_process(mql_query_path=mql_query)
+			mm.run_process(query_path=mql_query)
 
 
 if __name__ == "__main__":

@@ -35,6 +35,13 @@ class MarketDataLoader(BaseMarketLoader):
 	def get_commodities(self) -> List[Product]:
 		return [self._load_product(p) for p in self._get_dataset_locations(self.glob_all.replace("**", "Commodities"))]
 
+	def get(self, category: str, product: str) -> Product:
+		product_list = self._get_dataset_locations(f"{category}/{product}.csv")
+		assert len(product_list) == 1, \
+			f"BacktestDataLoader.get({category}, {product}) Failed, product = {product_list}"
+
+		return self._load_product(product_list[0])
+
 	def get_commodity_product(self, product: str) -> Product:
 		product_list = self._get_dataset_locations(f"Commodities/{product}.csv")
 		assert len(product_list) == 1, \

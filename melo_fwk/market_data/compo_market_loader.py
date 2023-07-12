@@ -39,6 +39,15 @@ class CompositeMarketLoader(BaseMarketLoader):
 
 		raise Exception("(CompositeMarketLoader) All alternatives failed")
 
+	def get(self, category: str, product: str) -> Product:
+		for market_loader in self.market_loaders:
+			try:
+				return market_loader.get(category, product)
+			except Exception as e:
+				self.logger.warn(f"{type(market_loader).__name__} failed .load_product_basket() : {e}")
+
+		raise Exception("(CompositeMarketLoader) All alternatives failed")
+
 	def get_fx(self):
 		for market_loader in self.market_loaders:
 			try:
