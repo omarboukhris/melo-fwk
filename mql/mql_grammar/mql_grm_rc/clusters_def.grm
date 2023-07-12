@@ -18,6 +18,10 @@ Clusters ->
     with. weights. lpar. s:WeightsList rpar.
     and. divmult. is. DivMult=numeric.
 
+// this is where true clusters expression should be defined
+// TODO: check paper model for implem and cleanup previous parsing rules
+
+
 TimePeriod -> from. timeperiod=numeric. to. timeperiod=numeric.
 
 AlphanumList ->
