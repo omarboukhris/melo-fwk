@@ -1,0 +1,15 @@
+%import "mql_grm_rc/tokens.grm"
+%import "mql_grm_rc/common.grm"
+
+%import "mql_grm_rc/clusters_def.grm"
+%import "mql_grm_rc/process_def.grm"
+
+AXIOM -> QuantQuery
+
+QuantQuery ->
+    atbooks.
+    create. QueryName=alphanum.
+    with. !Clusters
+    select. !ProcessDef
+
+atbooks.("\@books")

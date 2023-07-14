@@ -25,8 +25,8 @@ class MqlDecoderUnitTests(unittest.TestCase):
 	def test_decoder(self):
 		root_dir = Path(__file__).parent.parent
 		templates = {
+			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_2.sql",
 			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
-			# "alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
 			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
 			"vol_target_opt": root_dir / "mql_data/mql_vol_target_optim/posesizeoptim_example_query.sql",
@@ -36,6 +36,7 @@ class MqlDecoderUnitTests(unittest.TestCase):
 
 		for key, mql_query in templates.items():
 			raw_parsed_mql = str(self.mql_parser.parse_to_json(str(mql_query))).replace("'", '"')
+			assert raw_parsed_mql != ""
 			json.loads(raw_parsed_mql, cls=MqlDecoder)
 
 

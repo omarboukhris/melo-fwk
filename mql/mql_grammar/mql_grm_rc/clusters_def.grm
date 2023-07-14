@@ -1,30 +1,18 @@
 Clusters ->
-    clusters. lpar. s:AlphanumList rpar.
-    |
-    clusters. lpar. s:AlphanumList rpar.
-    with. weights. lpar. s:WeightsList rpar.
-    |
-    clusters. lpar. s:AlphanumList rpar.
-    with. weights. lpar. s:WeightsList rpar.
-    and. divmult. is. DivMult=numeric.
-    |
+    clusters. lpar. !Books rpar. |
+    clusters. lpar. !Books rpar. !TimePeriod
 
-    clusters. lpar. s:AlphanumList rpar. !TimePeriod
-    |
-    clusters. lpar. s:AlphanumList rpar. !TimePeriod
-    with. weights. lpar. s:WeightsList rpar.
-    |
-    clusters. lpar. s:AlphanumList rpar. !TimePeriod
-    with. weights. lpar. s:WeightsList rpar.
-    and. divmult. is. DivMult=numeric.
-
-// this is where true clusters expression should be defined
-// TODO: check paper model for implem and cleanup previous parsing rules
-
+Books ->
+    name=alphanum. dblpt. lbrkt. s:AlphanumList rbrkt. |
+    name=alphanum. dblpt. lbrkt. s:NodeList rbrkt. |
+    name=alphanum. dblpt. lbrkt. s:AlphanumList rbrkt. divmult. is. DivMult=numeric. |
+    name=alphanum. dblpt. lbrkt. s:NodeList rbrkt. divmult. is. DivMult=numeric. |
+[]
 
 TimePeriod -> from. timeperiod=numeric. to. timeperiod=numeric.
 
-AlphanumList ->
-    alphanum. |
-    alphanum. comma. |
+NodeList ->
+    alphanum. lpar. numeric. rpar. |
+    alphanum. lpar. numeric. rpar. comma. |
 []
+

@@ -5,16 +5,11 @@
 %import "mql_grm_rc/posesize_def.grm"
 %import "mql_grm_rc/process_def.grm"
 
-%import "mql_grm_rc/clusters_def.grm"
+%import "mql_grm_rc/common.grm"
 
 AXIOM -> QuantQuery
 
 QuantQuery ->
-    create. QueryName=alphanum.
-    with. !Clusters
-    select. !ProcessDef
-    |
-
     // User defines all params
     // No default value used
     create. QueryName=alphanum.
@@ -38,13 +33,4 @@ QuantQuery ->
     with. !ProductsDef
     where. !StrategiesDef
     select. !ProcessDef
-
-    // Which param to search for is defined
-    // by ProcessDef
-    // ====================
-    // add output piping and formatting
-    // how to add forecast scale calibration ?
-    // how to add portfolio alloc optim ?
-    // add costs and trading policy
-
 

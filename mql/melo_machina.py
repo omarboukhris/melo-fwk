@@ -1,4 +1,4 @@
-from melo_fwk.config.melo_clusters_config import MeloClustersConfig
+from melo_fwk.config.melo_books_config import MeloBooksConfig
 from melo_fwk.config.product_config import ProductFactory
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.portfolio.compo_portfolio_mgr import CompositePortfolioManager
@@ -25,7 +25,7 @@ class MeloMachina:
 		# registration comes after config loading
 		# otherwise product factory would not be initialized
 		QuantFlowRegistry.register_all()
-		# setup mql parser
+		# setup mql parsers
 		self.mql_parser = MqlParser()
 
 	def run_process(self, query_path: Path):
@@ -49,7 +49,7 @@ class MeloMachina:
 		market_mgr = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
 		if "Clusters" in quant_query.keys():
-			mql_clusters_config = MeloClustersConfig.build_config(pf_mgr, market_mgr, quant_query)
+			mql_clusters_config = MeloBooksConfig.build_config(pf_mgr, market_mgr, quant_query)
 			cluster_estim_ = mql_clusters_config.build_clusters_estimator()
 			output = cluster_estim_.run()
 			mql_clusters_config.write_report(output, str(query_path.parent))
@@ -71,9 +71,9 @@ class MeloMachina:
 
 	def run(self, query_path: Path):
 		mql_config = self.mql_parser.parse_to_config(str(query_path))
-		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
 		estimator_obj_ = mql_config.build_estimator()
 		output = estimator_obj_.run()
 
 		mql_config.write_report(output, str(query_path.parent))
+		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
 		mql_config.export_trading_system(pf_mgr)

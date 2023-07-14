@@ -15,7 +15,7 @@ from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.utils.weights import Weights
 
 @dataclass(frozen=True)
-class MeloClustersConfig(CommonMeloConfig):
+class MeloBooksConfig(CommonMeloConfig):
 	cluster_names: List[str]
 	product_baskets: List[ProductBasket]
 	strats_list: List[StratBasket]
@@ -43,8 +43,8 @@ class MeloClustersConfig(CommonMeloConfig):
 
 	@staticmethod
 	def build_config(pf_mgr: BasePortfolioManager, market_db: BaseMarketLoader, quant_query: dict):
-		time_period, clusters, weights = MeloClustersConfig.load_clusters(pf_mgr, market_db, quant_query)
-		return MeloClustersConfig(
+		time_period, clusters, weights = MeloBooksConfig.load_clusters(pf_mgr, market_db, quant_query)
+		return MeloBooksConfig(
 			name=ConfigBuilderHelper.strip_single(quant_query, "QueryName"),
 			cluster_names=[c.name for c in clusters],
 			product_baskets=[c.product_basket for c in clusters],
