@@ -13,7 +13,7 @@ from melo_fwk.pose_size import BaseSizePolicy
 
 from pathlib import Path
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 from melo_fwk.strategies import BaseStrategy
 from melo_fwk.utils.generic_config_loader import GenericConfigLoader
@@ -70,16 +70,17 @@ class MeloConfig(CommonMeloConfig):
 		)
 
 	def asdict(self):
-		return {
-			"products_config": self.products_config,
-			"size_policy": self.size_policy,
-			"strat_config_registry": self.strat_config_registry,
-			"strategies_config": self.strategies_config,
-			"estimator_class_": self.estimator_class_,
-			"estimator_params_": self.estimator_params_,
-			"reporter_class_": self.reporter_class_,
-			"export_name": self.export_name,
-		}
+		return asdict(self)
+		# return {
+		# 	"products_config": self.products_config,
+		# 	"size_policy": self.size_policy,
+		# 	"strat_config_registry": self.strat_config_registry,
+		# 	"strategies_config": self.strategies_config,
+		# 	"estimator_class_": self.estimator_class_,
+		# 	"estimator_params_": self.estimator_params_,
+		# 	"reporter_class_": self.reporter_class_,
+		# 	"export_name": self.export_name,
+		# }
 
 	def __str__(self):
 		return str(self.asdict())

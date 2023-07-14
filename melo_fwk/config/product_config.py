@@ -33,7 +33,8 @@ class ProductFactory:
 
 	def _get_product(self, products_type: str, product_name: str) -> dict:
 		"""
-		TODO: Rewrite this function to use the proper market from factories and apply lazy loading
+		TODO: add products leverage & size cap
+			Rewrite this function to use the proper market from factories and apply lazy loading
 			this should be done after rewriting market loaders and product factory registry for lazy loading
 		"""
 		assert products_type in QuantFlowFactory.products.keys(), \

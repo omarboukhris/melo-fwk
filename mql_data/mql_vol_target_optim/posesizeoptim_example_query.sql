@@ -8,6 +8,6 @@ where strategies
 	are (ewma)
     with strategyConfig (ewma_strat_0)
 
-where sizePolicy is VolTargetSizePolicy
+where sizePolicy is VolTargetSizePolicy(0.0, 100000)
 
 select VolTargetEstimator

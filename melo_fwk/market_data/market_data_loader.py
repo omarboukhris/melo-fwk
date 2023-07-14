@@ -18,8 +18,14 @@ class MarketDataLoader(BaseMarketLoader):
 		self.asset_path = Path(param_map["location"])
 		self.glob_all = param_map["all"]
 
-
 	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
+		"""
+		Rewrite this
+			use product factory registry and .get()
+
+		:param product_basket_config:
+		:return:
+		"""
 		registry = pd.DataFrame(self._get_dataset_locations(self.glob_all))
 		years = product_basket_config["years"]
 		output = []
@@ -35,33 +41,18 @@ class MarketDataLoader(BaseMarketLoader):
 	def get_commodities(self) -> List[Product]:
 		return [self._load_product(p) for p in self._get_dataset_locations(self.glob_all.replace("**", "Commodities"))]
 
-	def get(self, category: str, product: str) -> Product:
+	def get(self, category: str, product: str, leverage: float = 1.0, size_cap: float = 50.) -> Product:
 		product_list = self._get_dataset_locations(f"{category}/{product}.csv")
 		assert len(product_list) == 1, \
 			f"BacktestDataLoader.get({category}, {product}) Failed, product = {product_list}"
+		return self._load_product(next(iter(product_list)), leverage, size_cap)
 
-		return self._load_product(product_list[0])
-
-	def get_commodity_product(self, product: str) -> Product:
-		product_list = self._get_dataset_locations(f"Commodities/{product}.csv")
-		assert len(product_list) == 1, \
-			f"BacktestDataLoader.get_sanitized_commodity_hloc_datastream, product = {product_list}"
-
-		return self._load_product(product_list[0])
-
-	def get_fx_product(self, product: str) -> Product:
-		product_list = self._get_dataset_locations(f"Fx/{product}.csv")
-		assert len(product_list) == 1, \
-			f"BacktestDataLoader.get_fx_hloc_datastream, product = {product_list}"
-
-		return self._load_product(product_list[0])
-
-	def _load_product(self, product: dict) -> Product:
+	def _load_product(self, product: dict, leverage: float = 1.0, size_cap: float = 50.) -> Product:
 		input_df = pd.read_csv(product["datasource"])
 		return Product(
 			name=product["name"],
-			block_size=self.product_config["products_block_size"][product["name"]],
-			cap=self.product_config["products_cap_size"][product["name"]],
+			block_size=leverage,
+			cap=size_cap,
 			datastream=ds.HLOCDataStream(dataframe=input_df))
 
 	def _get_dataset_locations(self, path: str) -> List[dict]:

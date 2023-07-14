@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.results_basket import ResultsBasket
 from melo_fwk.basket.strat_basket import StratBasket
+from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.market_data.product import Product
 
 from melo_fwk.pose_size import BaseSizePolicy
@@ -11,6 +12,9 @@ from melo_fwk.pose_size import BaseSizePolicy
 from melo_fwk.datastreams import TsarDataStream
 
 import pandas as pd
+
+from melo_fwk.utils.quantflow_factory import QuantFlowFactory
+
 
 @dataclass
 class BaseTradingSystem:
@@ -90,3 +94,23 @@ class BaseTradingSystem:
 				})
 			))
 		return ResultsBasket(results_list)
+
+	def asdict(self):
+		return {
+			"name": self.name,  # add trading sys name ??
+			"product_basket": self.product_basket.to_dict(),
+			"strat_basket": self.strat_basket.to_dict(),
+			"size_policy": type(self.size_policy).__name__,
+			"vol_target": self.size_policy.vol_target.to_dict(),
+		}
+
+	@staticmethod
+	def from_dict(result, market_mgr: BaseMarketLoader):
+		BaseTradingSystem(
+			name=result["name"],
+			product_basket=market_mgr.load_product_basket(result["product_basket"]),
+			strat_basket=QuantFlowFactory.build_strat_basket(result["strat_basket"]),
+			size_policy=QuantFlowFactory.get_size_policy(result["size_policy"])(
+				**result["vol_target"])
+		)
+

@@ -21,13 +21,7 @@ class PortfolioMongoManager(BasePortfolioManager):
 
 	def save_portfolio_config(self, name: str, portfolio: BaseTradingSystem):
 		self.mongo_mgr.connect("tradingSytemConfig")
-		data_dict = {
-			"name": portfolio.name,  # add trading sys name ??
-			"product_basket": portfolio.product_basket.to_dict(),
-			"strat_basket": portfolio.strat_basket.to_dict(),
-			"size_policy": type(portfolio.size_policy).__name__,
-			"vol_target": portfolio.size_policy.vol_target.to_dict(),
-		}
+		data_dict = portfolio.asdict()
 
 		self.mongo_mgr.insert_data(
 			PortfolioMongoManager.portfolio_table_name, data_dict)
@@ -38,10 +32,4 @@ class PortfolioMongoManager(BasePortfolioManager):
 		result = self.mongo_mgr.select_request(
 			PortfolioMongoManager.portfolio_table_name, {"name": name})
 
-		return BaseTradingSystem(
-			product_basket=market_mgr.load_product_basket(result["product_basket"]),
-			strat_basket=QuantFlowFactory.build_strat_basket(result["strat_basket"]),
-			size_policy=QuantFlowFactory.get_size_policy(result["size_policy"])(
-				**result["vol_target"])
-		)
-
+		return BaseTradingSystem.from_dict(result, market_mgr)

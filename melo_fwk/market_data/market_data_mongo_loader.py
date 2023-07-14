@@ -28,7 +28,7 @@ class MarketDataMongoLoader(BaseMarketLoader):
 		products = self.mongo_mgr.db_connection.list_collection_names()
 		return [self._load_product(p) for p in products]
 
-	def get(self, category: str, product: str):
+	def get(self, category: str, product: str, leverage, size_cap):
 		self.mongo_mgr.connect("market")
 		return [
 			self._load_product(cname)
@@ -53,6 +53,8 @@ class MarketDataMongoLoader(BaseMarketLoader):
 		]
 
 	def _load_product(self, product: str) -> Product:
+		""" this should be rewritten once cap size, block size is written in config spec
+		"""
 		self.mongo_mgr.connect("market")
 		product_df = pd.DataFrame(self.mongo_mgr.select_request(product, verbose=False))
 		del product_df["_id"]

@@ -39,7 +39,7 @@
     "gen_path": true
   },
   "VolTargetEstimator": {
-    "trading_capital": 1000000.0,
+    "trading_capital": 0.0,
     "step": 0.1,
     "start": 0.1,
     "final": 1.0
