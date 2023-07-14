@@ -66,6 +66,7 @@ class MeloMachina:
 			output = estimator_obj_.run()
 
 			# ##################################################################################
+			# rework this to be parametric
 			mql_config.write_report(output, str(query_path.parent))
 			mql_config.export_trading_system(pf_mgr)
 

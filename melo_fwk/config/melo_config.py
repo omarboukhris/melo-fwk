@@ -75,7 +75,8 @@ class MeloConfig(CommonMeloConfig):
 			"size_policy": self.size_policy,
 			"strat_config_registry": self.strat_config_registry,
 			"strategies_config": self.strategies_config,
-			"estimator_config_": self.estimator_config_,
+			"estimator_class_": self.estimator_class_,
+			"estimator_params_": self.estimator_params_,
 			"reporter_class_": self.reporter_class_,
 			"export_name": self.export_name,
 		}

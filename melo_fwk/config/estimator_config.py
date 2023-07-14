@@ -26,16 +26,6 @@ class EstimatorConfigBuilder:
 		return estimator_kw
 
 	@staticmethod
-	def get_estimator_params(quant_query_dict: dict):
-		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProcessDef")
-		if "EstimatorParamList" in stripped_entry.keys():
-			estimator_param_list = ConfigBuilderHelper.strip_single(stripped_entry, "EstimatorParamList").split(",")
-			estimator_param_list = [estimator_param.strip() for estimator_param in estimator_param_list]
-			GlobalLogger.build_composite_for("EstimatorParamCongif").warn(f"Parsed Estimator Params ({estimator_param_list})")
-			return estimator_param_list
-		return []
-
-	@staticmethod
 	def build_estimator(quant_query_dict: dict):
 		estimator_kw = EstimatorConfigBuilder.get_estimator_name(quant_query_dict)
 

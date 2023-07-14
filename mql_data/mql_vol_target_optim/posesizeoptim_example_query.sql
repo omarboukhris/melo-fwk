@@ -10,4 +10,4 @@ where strategies
 
 where sizePolicy is VolTargetSizePolicy
 
-select VolTargetEstimator <1000000>
+select VolTargetEstimator

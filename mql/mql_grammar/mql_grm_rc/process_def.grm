@@ -1,16 +1,7 @@
 
 ProcessDef ->
-    Estimator=alphanum. lt. s:EstimatorParamList gt. export. as. s:ExportName |
-    Estimator=alphanum. lt. s:EstimatorParamList gt. |
     Estimator=alphanum. export. as. s:ExportName |
     Estimator=alphanum.
-
-EstimatorParamList ->
-    alphanum. |
-    alphanum. comma. |
-    numeric. |
-    numeric. comma. |
-[]
 
 // add output pipes here
 ExportName -> alphanum.
