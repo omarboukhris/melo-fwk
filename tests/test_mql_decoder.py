@@ -5,9 +5,8 @@ from pathlib import Path
 
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.quantfactory_registry import QuantFlowRegistry
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 from mql.mql_decoder import MqlDecoder
 from mql.mql_parser import MqlParser
 

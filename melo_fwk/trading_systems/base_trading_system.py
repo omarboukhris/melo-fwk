@@ -13,7 +13,7 @@ from melo_fwk.datastreams import TsarDataStream
 
 import pandas as pd
 
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
+from melo_fwk.quantflow_factory import QuantFlowFactory
 
 
 @dataclass
@@ -105,12 +105,12 @@ class BaseTradingSystem:
 		}
 
 	@staticmethod
-	def from_dict(result, market_mgr: BaseMarketLoader):
+	def from_dict(config: dict, market_mgr: BaseMarketLoader):
 		BaseTradingSystem(
-			name=result["name"],
-			product_basket=market_mgr.load_product_basket(result["product_basket"]),
-			strat_basket=QuantFlowFactory.build_strat_basket(result["strat_basket"]),
-			size_policy=QuantFlowFactory.get_size_policy(result["size_policy"])(
-				**result["vol_target"])
+			name=config["name"],
+			product_basket=market_mgr.load_product_basket(config["product_basket"]),
+			strat_basket=QuantFlowFactory.build_strat_basket(config["strat_basket"]),
+			size_policy=QuantFlowFactory.get_size_policy(config["size_policy"])(
+				**config["vol_target"])
 		)
 

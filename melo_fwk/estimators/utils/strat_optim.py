@@ -2,7 +2,7 @@ import numpy as np
 
 from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.trading_systems.trading_system import TradingSystem
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 
 class StrategyEstimator:

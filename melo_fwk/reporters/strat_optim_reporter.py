@@ -1,20 +1,15 @@
 import os.path
-from dataclasses import asdict
 from pathlib import Path
 
 from skopt.plots import plot_objective
 import matplotlib.pyplot as plt
-import pandas as pd
 import tqdm
 
-from melo_fwk.config.melo_config import MeloConfig
-from melo_fwk.config.strat_config import StratConfigRegistry
-from melo_fwk.market_data.market_data_loader import MarketDataLoader
+from mql.mconfig.melo_config import MeloConfig
+from mql.mconfig.strat_config import StratConfigRegistry
 from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
-from melo_fwk.utils import yaml_io
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
+from mutils.generic_config_loader import GenericConfigLoader
 
 
 class StratOptimReporter(BaseReporter):

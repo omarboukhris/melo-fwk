@@ -1,16 +1,15 @@
-from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.mql_dict import MqlDict
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.quantflow_factory import QuantFlowFactory
+from mql.mconfig.mql_dict import MqlDict
 
 
 class EstimatorConfigBuilder:
 
 	@staticmethod
 	def get_export_name(mql_dict: MqlDict):
-		process_mql_dict = mql_dict.strip_single("ProcessDef")
+		process_mql_dict = mql_dict.get_node("ProcessDef")
 		if "ExportName" in process_mql_dict.keys():
-			return process_mql_dict.strip_single("ExportName")
+			return process_mql_dict.get_node("ExportName")
 		else:
 			return None
 
@@ -21,8 +20,8 @@ class EstimatorConfigBuilder:
 
 	@staticmethod
 	def get_estimator_name(mql_dict: MqlDict):
-		process_mql_dict = mql_dict.strip_single("ProcessDef")
-		estimator_kw = process_mql_dict.strip_single("Estimator")
+		process_mql_dict = mql_dict.get_node("ProcessDef")
+		estimator_kw = process_mql_dict.get_node("Estimator")
 		return estimator_kw
 
 	@staticmethod

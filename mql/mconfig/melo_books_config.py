@@ -3,16 +3,16 @@ from typing import List, Tuple, Type
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.strat_basket import StratBasket
-from melo_fwk.config.common_melo_config import CommonMeloConfig
-from melo_fwk.config.mql_dict import MqlDict
-from melo_fwk.config.estimator_config import EstimatorConfigBuilder
+from mql.mconfig.common_melo_config import CommonMeloConfig
+from mql.mconfig.mql_dict import MqlDict
+from mql.mconfig.estimator_config import EstimatorConfigBuilder
 from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
+from melo_fwk.pfio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.pose_size import BaseSizePolicy
 from melo_fwk.trading_systems import TradingSystem
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 @dataclass(frozen=True)
 class MeloBooksConfig(CommonMeloConfig):
@@ -64,11 +64,11 @@ class MeloBooksConfig(CommonMeloConfig):
 	) -> Tuple[List[int], List[BaseTradingSystem], Weights]:
 
 		mql_dict = MqlDict(quant_query)
-		clusters_mql_dict = mql_dict.strip_single("Clusters")
+		clusters_mql_dict = mql_dict.get_node("Clusters")
 		clusters_name = clusters_mql_dict.parse_list("AlphanumList")
 		clusters_weights = clusters_mql_dict.parse_num_list("WeightsList")
-		clusters_divmult = float(mql_dict.strip_single("DivMult"))
-		time_period_mql_dict = clusters_mql_dict.strip_single("TimePeriod")
+		clusters_divmult = float(mql_dict.get_node("DivMult"))
+		time_period_mql_dict = clusters_mql_dict.get_node("TimePeriod")
 		time_period = time_period_mql_dict.parse_num_list("timeperiod", default=[0, 0], type_=int)
 
 		weights = Weights(

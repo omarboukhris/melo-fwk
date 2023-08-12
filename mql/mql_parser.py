@@ -14,7 +14,7 @@ class MqlParser:
 	"""
 
 	_mqlDecoder = MqlDecoder
-	_mql_rc_path = Path(Path(__file__).parent / "mql_grammar")
+	_mql_rc_path = Path(Path(__file__).parent / "grammar")
 
 	def __init__(self):
 		self.parser = ParseSession(0)

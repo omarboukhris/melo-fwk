@@ -13,8 +13,8 @@ from melo_fwk.quantfactory_registry import QuantFlowRegistry
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.weights import Weights
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.basket.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):

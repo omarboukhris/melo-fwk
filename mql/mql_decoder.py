@@ -1,18 +1,17 @@
 import json
 from pathlib import Path
 
-from melo_fwk.config.melo_books_config import MeloBooksConfig
-from melo_fwk.portfolio.compo_portfolio_mgr import CompositePortfolioManager
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mql.mconfig.melo_books_config import MeloBooksConfig
+from melo_fwk.pfio.compo_portfolio_mgr import CompositePortfolioManager
+from mutils.generic_config_loader import GenericConfigLoader
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
-from melo_fwk.config.product_config import ProductFactory
-from melo_fwk.config import MeloConfig
-from melo_fwk.config.mql_dict import MqlDict
-from melo_fwk.config.estimator_config import EstimatorConfigBuilder
-from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder
-from melo_fwk.config.strat_config import StrategyConfigBuilder, StratConfigRegistry
+from mql.mconfig.pose_size_config import SizePolicyConfigBuilder
+from mql.mconfig.product_config import ProductFactory
+from mql.mconfig import MeloConfig
+from mql.mconfig.mql_dict import MqlDict
+from mql.mconfig.estimator_config import EstimatorConfigBuilder
+from mql.mconfig.strat_config import StratConfigRegistry, StrategyConfigBuilder
 
-from melo_fwk.basket.strat_basket import StratBasket
 
 class MqlDecoder(json.JSONDecoder):
 	def __init__(self, *args, **kwargs):
@@ -34,12 +33,12 @@ class MqlDecoder(json.JSONDecoder):
 		else:
 			return self.build_melo_config(quant_query)
 
-	def build_melo_config(self, quant_query):
+	def build_melo_config(self, quant_query: dict):
 		mql_dict = MqlDict(quant_query)
 		estimator_class_, estimator_params_ = EstimatorConfigBuilder.build_estimator(mql_dict)
 		strat_config_registry = StratConfigRegistry.build_registry(str(self.strat_config_point))
 		return MeloConfig(
-			name=mql_dict.strip_single("QueryName"),
+			name=mql_dict.get_node("QueryName"),
 			products_config=self.pfactory.build_products(mql_dict),
 			size_policy=SizePolicyConfigBuilder.build_size_policy(mql_dict),
 			strat_config_registry=strat_config_registry,
@@ -54,12 +53,12 @@ class MqlDecoder(json.JSONDecoder):
 		# TODO: replace this
 		# time_period, clusters, weights = MeloBooksConfig.load_clusters(pf_mgr, market_db, quant_query)
 		mql_dict = MqlDict(quant_query)
-		query_name = mql_dict.strip_single("QueryName")
+		query_name = mql_dict.get_node("QueryName")
 		estimator_config_ = EstimatorConfigBuilder.build_estimator(mql_dict)
-		clusters_mql_dict = mql_dict.strip_single("Clusters")
-		time_period_mql_dict = clusters_mql_dict.strip_single("TimePeriod")
+		clusters_mql_dict = mql_dict.get_node("Clusters")
+		time_period_mql_dict = clusters_mql_dict.get_node("TimePeriod")
 		time_period = time_period_mql_dict.parse_num_list("timeperiod", default=[0, 0], type_=int)
-		books_mql_dict = clusters_mql_dict.strip_single("Books")
+		books_mql_dict = clusters_mql_dict.get_node("Books")
 		books_zip = zip(*books_mql_dict.values())
 		
 

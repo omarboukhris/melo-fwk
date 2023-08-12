@@ -1,13 +1,10 @@
-
-import json
 import glob
-from typing import List
 
 from melo_fwk.basket.strat_basket import StratBasket
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 import json
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 
 
 class QuantFlowFactory:

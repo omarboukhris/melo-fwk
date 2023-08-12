@@ -1,15 +1,12 @@
-import json
-
 from melo_fwk.estimators.var_estimator import VaREstimator
 from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
-from melo_fwk.portfolio.portfolio_db_mgr import PortfolioMongoManager
-from melo_fwk.portfolio.portfolio_fs_mgr import PortfolioFsManager
+from melo_fwk.pfio.portfolio_db_mgr import PortfolioMongoManager
+from melo_fwk.pfio.portfolio_fs_mgr import PortfolioFsManager
 from melo_fwk.reporters.pf_alloc_reporter import PFAllocationReporter
 from melo_fwk.reporters.var_reporter import VaRReporter
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
+from melo_fwk.quantflow_factory import QuantFlowFactory
 
 from melo_fwk.estimators import (
 	ClustersEstimator,

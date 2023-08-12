@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 
 
 class GenericPlotter:

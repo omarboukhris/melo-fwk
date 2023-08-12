@@ -7,7 +7,7 @@ import melo_fwk.datastreams.hloc_datastream as ds
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.market_data.product import Product
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 
 
 class MarketDataLoader(BaseMarketLoader):

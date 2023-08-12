@@ -1,15 +1,14 @@
 import json
 from pathlib import Path
-from typing import List
 
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
+from melo_fwk.pfio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 import glob
 
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
+from mutils.generic_config_loader import GenericConfigLoader
+
 
 class PortfolioFsManager(BasePortfolioManager):
 

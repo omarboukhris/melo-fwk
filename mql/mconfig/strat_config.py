@@ -4,16 +4,15 @@ import tqdm
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.strategies import BuyAndHold
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.mql_dict import MqlDict
-from melo_fwk.utils import yaml_io
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.quantflow_factory import QuantFlowFactory
+from mql.mconfig.mql_dict import MqlDict
+from mutils import yaml_io
 from dataclasses import dataclass, asdict
-from pathlib import Path
 
 import glob
 
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 
 @dataclass(frozen=True)
@@ -83,8 +82,8 @@ class StrategyConfigBuilder:
 			logger.warn("No Strategies Parsed; Using default BuyAndHold")
 			return [BuyAndHold()], Weights([1.], 1.)
 
-		strat_mql_dict = mql_dict.strip_single("StrategiesDef")
-		strategies_kw = strat_mql_dict.strip_single("AlphanumList").split(",")
+		strat_mql_dict = mql_dict.get_node("StrategiesDef")
+		strategies_kw = strat_mql_dict.get_node("AlphanumList").split(",")
 		strat_config_points = strat_mql_dict.parse_list("StrategyConfigList")
 
 		logger.info(f"Loading Strategies {[s.strip() for s in strategies_kw]}")
@@ -116,7 +115,7 @@ class StrategyConfigBuilder:
 			logger.warn("No DivMult Parsed; Using default 1.")
 			return strategies, Weights(forecast_weights, 1.)
 
-		divmult = float(strat_mql_dict.strip_single("DivMult"))
+		divmult = float(strat_mql_dict.get_node("DivMult"))
 
 		logger.info(f"DivMult Parsed; Using {divmult}")
 		return strategies, Weights(forecast_weights, divmult)

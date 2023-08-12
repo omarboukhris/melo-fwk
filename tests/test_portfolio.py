@@ -16,8 +16,8 @@ import pandas as pd
 import tqdm
 import unittest
 
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.weights import Weights
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.basket.weights import Weights
 
 
 class PortfolioUnitTests(unittest.TestCase):

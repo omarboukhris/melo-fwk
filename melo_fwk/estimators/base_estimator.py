@@ -8,7 +8,7 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 from typing import List, Union, Type
 
 from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 
 class MeloBaseEstimator(EstimatorParameters):

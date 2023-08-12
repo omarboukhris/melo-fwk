@@ -1,7 +1,6 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.mql_dict import MqlDict
+from melo_fwk.quantflow_factory import QuantFlowFactory
+from mql.mconfig.mql_dict import MqlDict
 
 class ProductFactory:
 	"""
@@ -17,15 +16,15 @@ class ProductFactory:
 		raise NotImplementedError
 
 	def build_products(self, mql_dict: MqlDict):
-		prod_mql_dict = mql_dict.strip_single("ProductsDef")
-		products_generator = prod_mql_dict.strip_single("ProductsDefList")["ProductsGenerator"]
+		prod_mql_dict = mql_dict.get_node("ProductsDef")
+		products_generator = prod_mql_dict.get_node("ProductsDefList")["ProductsGenerator"]
 		time_period = [int(x) for x in prod_mql_dict.get("timeperiod", [0, 0])]
 
 		self.plogger.info("Loading Products")
 		output_products = {}
 		for prods in products_generator:
 			prods_mql_dict = MqlDict(prods)
-			products_type = prods_mql_dict.strip_single("productType")
+			products_type = prods_mql_dict.get_node("productType")
 			products_name_list = prods_mql_dict.parse_list("AlphanumList")
 			for product_name in products_name_list:
 				product = self._get_product(products_type, product_name)

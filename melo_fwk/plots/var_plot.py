@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 from matplotlib import pyplot as plt
 
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 
 
 class VarPlotter:

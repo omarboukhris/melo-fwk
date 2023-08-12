@@ -1,12 +1,8 @@
-from typing import List
-
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
-from melo_fwk.utils.mongo_db_mgr import MongodbManager
-from melo_fwk.portfolio.base_portfolio_mgr import BasePortfolioManager
+from mutils.generic_config_loader import GenericConfigLoader
+from mutils.mongo_db_mgr import MongodbManager
+from melo_fwk.pfio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
-
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
 
 
 class PortfolioMongoManager(BasePortfolioManager):

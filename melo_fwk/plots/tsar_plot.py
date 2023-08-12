@@ -1,13 +1,12 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import pandas as pd
 from matplotlib.gridspec import GridSpec
 
 import tqdm
 
 from melo_fwk.datastreams import TsarDataStream
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 
 
 class TsarPlotter:

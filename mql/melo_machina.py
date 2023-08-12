@@ -1,13 +1,9 @@
-from melo_fwk.config.melo_books_config import MeloBooksConfig
-from melo_fwk.config.product_config import ProductFactory
-from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
-from melo_fwk.portfolio.compo_portfolio_mgr import CompositePortfolioManager
+from melo_fwk.pfio.compo_portfolio_mgr import CompositePortfolioManager
 from melo_fwk.loggers.global_logger import GlobalLogger
 
-from melo_fwk.config import MeloConfig
 from melo_fwk.quantfactory_registry import QuantFlowRegistry
 
-from melo_fwk.utils.generic_config_loader import GenericConfigLoader
+from mutils.generic_config_loader import GenericConfigLoader
 
 from mql.mql_parser import MqlParser
 

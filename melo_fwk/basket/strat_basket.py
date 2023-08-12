@@ -7,7 +7,7 @@ import pandas as pd
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.product import Product
 from melo_fwk.strategies import BaseStrategy
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 
 @dataclass

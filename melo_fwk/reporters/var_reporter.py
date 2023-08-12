@@ -1,14 +1,12 @@
-from typing import Tuple, Dict
+from typing import Dict
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import tqdm
 
-from melo_fwk.basket.var_basket import VaRBasket
-from melo_fwk.config.melo_config import MeloConfig
+from mql.mconfig.melo_config import MeloConfig
 from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
-from melo_fwk.plots.var_plot import VarPlotter
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 class VaRReporter(BaseReporter):

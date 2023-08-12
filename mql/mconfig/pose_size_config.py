@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 from melo_fwk.pose_size import BaseSizePolicy
-from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.mql_dict import MqlDict
+from melo_fwk.quantflow_factory import QuantFlowFactory
+from mql.mconfig.mql_dict import MqlDict
 from melo_fwk.loggers.global_logger import GlobalLogger
 
 
@@ -17,7 +17,7 @@ class SizePolicyConfigBuilder:
 			# annual_vol_target, trading_capital
 			return 0., 0.
 
-		position_size_mql_dict = mql_dict.strip_single("PositionSizing")
+		position_size_mql_dict = mql_dict.get_node("PositionSizing")
 		if "VolTargetCouple" in position_size_mql_dict.keys():
 			vol_target_cfg = position_size_mql_dict.parse_num_list("VolTargetCouple")
 			logger.info(f"Parsed VolTarget from Query {vol_target_cfg}")
@@ -35,9 +35,9 @@ class SizePolicyConfigBuilder:
 			logger.warn("No PositionSizing Parsed; Using default BaseSizePolicy")
 			return QuantFlowFactory.get_size_policy("default")(*vol_target_params)
 
-		position_size_mql_dict = mql_dict.strip_single("PositionSizing")
+		position_size_mql_dict = mql_dict.get_node("PositionSizing")
 
-		size_policy_factory_name = position_size_mql_dict.strip_single("SizePolicy")
+		size_policy_factory_name = position_size_mql_dict.get_node("SizePolicy")
 		assert size_policy_factory_name in QuantFlowFactory.size_policies.keys(), logger.error(
 			f"{size_policy_factory_name} key is not in [{QuantFlowFactory.size_policies.keys()}]")
 		logger.info(f"PositionSizing Parsed; using {size_policy_factory_name}")
