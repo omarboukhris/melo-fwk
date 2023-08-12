@@ -6,7 +6,7 @@ from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.strategies import BuyAndHold
 from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.config_helper import ConfigBuilderHelper
+from melo_fwk.config.mql_dict import MqlDict
 from melo_fwk.utils import yaml_io
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -77,15 +77,15 @@ class StratConfigRegistry:
 
 class StrategyConfigBuilder:
 	@staticmethod
-	def build_strategy(quant_query_dict: dict, strat_config_registry: StratConfigRegistry):
+	def build_strategy(mql_dict: MqlDict, strat_config_registry: StratConfigRegistry):
 		logger = GlobalLogger.build_composite_for("StratConfigBuilder")
-		if "StrategiesDef" not in quant_query_dict.keys():
+		if "StrategiesDef" not in mql_dict.keys():
 			logger.warn("No Strategies Parsed; Using default BuyAndHold")
 			return [BuyAndHold()], Weights([1.], 1.)
 
-		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "StrategiesDef")
-		strategies_kw = ConfigBuilderHelper.strip_single(stripped_entry, "AlphanumList").split(",")
-		strat_config_points = ConfigBuilderHelper.strip_single(stripped_entry, "StrategyConfigList").split(",")
+		strat_mql_dict = mql_dict.strip_single("StrategiesDef")
+		strategies_kw = strat_mql_dict.strip_single("AlphanumList").split(",")
+		strat_config_points = strat_mql_dict.parse_list("StrategyConfigList")
 
 		logger.info(f"Loading Strategies {[s.strip() for s in strategies_kw]}")
 		strategies = []
@@ -106,19 +106,17 @@ class StrategyConfigBuilder:
 					)
 				)
 
-		if "WeightsList" not in stripped_entry.keys():
+		if "WeightsList" not in strat_mql_dict.keys():
 			logger.warn("No ForecastWeights Parsed; Using default 1/n")
 			return strategies, Weights([1/len(strategies) for _ in strategies], 1.)
 
-		forecast_weights_str = ConfigBuilderHelper.strip_single(stripped_entry, "WeightsList")
-		forecast_weights = [float(fw_str) for fw_str in forecast_weights_str.split(",")]
+		forecast_weights = strat_mql_dict.parse_num_list("WeightsList")
 
-		if "DivMult" not in stripped_entry.keys():
+		if "DivMult" not in strat_mql_dict.keys():
 			logger.warn("No DivMult Parsed; Using default 1.")
 			return strategies, Weights(forecast_weights, 1.)
 
-		divmult_str = ConfigBuilderHelper.strip_single(stripped_entry, "DivMult")
-		divmult = float(divmult_str)
+		divmult = float(strat_mql_dict.strip_single("DivMult"))
 
 		logger.info(f"DivMult Parsed; Using {divmult}")
 		return strategies, Weights(forecast_weights, divmult)

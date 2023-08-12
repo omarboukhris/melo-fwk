@@ -1,7 +1,7 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.config_helper import ConfigBuilderHelper
+from melo_fwk.config.mql_dict import MqlDict
 
 class ProductFactory:
 	"""
@@ -13,16 +13,20 @@ class ProductFactory:
 		self.market = market_mgr
 		self.plogger = GlobalLogger.build_composite_for(ProductFactory.__name__)
 
-	def build_products(self, quant_query_dict: dict):
-		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProductsDef")
-		products_generator = ConfigBuilderHelper.strip_single(stripped_entry, "ProductsDefList")["ProductsGenerator"]
-		time_period = [int(year) for year in stripped_entry.pop("timeperiod", [0, 0])]
+	def build_product_basket(self, mql_dict: MqlDict):
+		raise NotImplementedError
+
+	def build_products(self, mql_dict: MqlDict):
+		prod_mql_dict = mql_dict.strip_single("ProductsDef")
+		products_generator = prod_mql_dict.strip_single("ProductsDefList")["ProductsGenerator"]
+		time_period = [int(x) for x in prod_mql_dict.get("timeperiod", [0, 0])]
 
 		self.plogger.info("Loading Products")
 		output_products = {}
 		for prods in products_generator:
-			products_type = ConfigBuilderHelper.strip_single(prods, "productType")
-			products_name_list = ConfigBuilderHelper.parse_list(prods, "AlphanumList")
+			prods_mql_dict = MqlDict(prods)
+			products_type = prods_mql_dict.strip_single("productType")
+			products_name_list = prods_mql_dict.parse_list("AlphanumList")
 			for product_name in products_name_list:
 				product = self._get_product(products_type, product_name)
 				self.plogger.info(f"Loaded Product {product.keys()}")

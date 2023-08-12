@@ -104,7 +104,7 @@ class QuantFlowRegistry:
 		any(QuantFlowFactory.register_size_policy(label, size) for label, size in QuantFlowRegistry.size_policies.items())
 		log.info("Registring PF Loaders...")
 		any(QuantFlowFactory.register_pf_loader(label, pf_loader) for label, pf_loader in QuantFlowRegistry.pf_loaders.items())
-		log.info("Registring Market Priveders Components...")
+		log.info("Registring Market Providers Components...")
 		any(QuantFlowFactory.register_market(label, market) for label, market in QuantFlowRegistry.market_providers.items())
 		log.info("Registring Products/Assets historical data...")
 		QuantFlowFactory.load_products_factory_map()

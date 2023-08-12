@@ -1,7 +1,7 @@
 from typing import List, Type, Tuple, Dict, Union
 
 from melo_fwk.config.common_melo_config import CommonMeloConfig
-from melo_fwk.config.config_helper import ConfigBuilderHelper
+from melo_fwk.config.mql_dict import MqlDict
 from melo_fwk.config.product_config import ProductFactory
 from melo_fwk.config.strat_config import StratConfigRegistry, StrategyConfigBuilder
 from melo_fwk.config.pose_size_config import SizePolicyConfigBuilder

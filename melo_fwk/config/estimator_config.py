@@ -1,33 +1,33 @@
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.utils.generic_config_loader import GenericConfigLoader
 from melo_fwk.utils.quantflow_factory import QuantFlowFactory
-from melo_fwk.config.config_helper import ConfigBuilderHelper
+from melo_fwk.config.mql_dict import MqlDict
 
 
 class EstimatorConfigBuilder:
 
 	@staticmethod
-	def get_export_name(quant_query_dict: dict):
-		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProcessDef")
-		if "ExportName" in stripped_entry.keys():
-			return ConfigBuilderHelper.strip_single(stripped_entry, "ExportName")
+	def get_export_name(mql_dict: MqlDict):
+		process_mql_dict = mql_dict.strip_single("ProcessDef")
+		if "ExportName" in process_mql_dict.keys():
+			return process_mql_dict.strip_single("ExportName")
 		else:
 			return None
 
 	@staticmethod
-	def get_reporter(quant_query_dict: dict):
-		estim_name = EstimatorConfigBuilder.get_estimator_name(quant_query_dict)
+	def get_reporter(mql_dict: MqlDict):
+		estim_name = EstimatorConfigBuilder.get_estimator_name(mql_dict)
 		return QuantFlowFactory.get_reporter(estim_name)
 
 	@staticmethod
-	def get_estimator_name(quant_query_dict: dict):
-		stripped_entry = ConfigBuilderHelper.strip_single(quant_query_dict, "ProcessDef")
-		estimator_kw = ConfigBuilderHelper.strip_single(stripped_entry, "Estimator")
+	def get_estimator_name(mql_dict: MqlDict):
+		process_mql_dict = mql_dict.strip_single("ProcessDef")
+		estimator_kw = process_mql_dict.strip_single("Estimator")
 		return estimator_kw
 
 	@staticmethod
-	def build_estimator(quant_query_dict: dict):
-		estimator_kw = EstimatorConfigBuilder.get_estimator_name(quant_query_dict)
+	def build_estimator(mql_dict: MqlDict):
+		estimator_kw = EstimatorConfigBuilder.get_estimator_name(mql_dict)
 
 		# estimator_param_list = EstimatorConfigBuilder.get_estimator_params(quant_query_dict)
 

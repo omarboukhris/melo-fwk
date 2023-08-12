@@ -24,9 +24,8 @@ class StratOptimReporter(BaseReporter):
 
 	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
 		strat_optim_report_config_node = GenericConfigLoader.get_node(StratOptimReporter.__name__, {})
-		strat_config_points_path = strat_optim_report_config_node.get("strat_config_points",
-																	  str(Path(query_path) / "strat_config_points"), 1,
-																	  50)
+		strat_config_points_path = strat_optim_report_config_node.get(
+			"strat_config_points", str(Path(query_path) / "strat_config_points"))
 		export_dir = query_path + export_dir
 		if not os.path.isdir(query_path + f"/strat_config_points"):
 			os.mkdir(query_path + f"/strat_config_points")

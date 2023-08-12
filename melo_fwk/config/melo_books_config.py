@@ -4,7 +4,7 @@ from typing import List, Tuple, Type
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.config.common_melo_config import CommonMeloConfig
-from melo_fwk.config.config_helper import ConfigBuilderHelper
+from melo_fwk.config.mql_dict import MqlDict
 from melo_fwk.config.estimator_config import EstimatorConfigBuilder
 from melo_fwk.estimators.pf_allocation_estimator import PFAllocationEstimator
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
@@ -45,7 +45,7 @@ class MeloBooksConfig(CommonMeloConfig):
 	def build_config(pf_mgr: BasePortfolioManager, market_db: BaseMarketLoader, quant_query: dict):
 		time_period, clusters, weights = MeloBooksConfig.load_clusters(pf_mgr, market_db, quant_query)
 		return MeloBooksConfig(
-			name=ConfigBuilderHelper.strip_single(quant_query, "QueryName"),
+			name=quant_query.strip_single("QueryName"),
 			cluster_names=[c.name for c in clusters],
 			product_baskets=[c.product_basket for c in clusters],
 			strats_list=[c.strat_basket for c in clusters],
@@ -63,12 +63,13 @@ class MeloBooksConfig(CommonMeloConfig):
 		quant_query: dict
 	) -> Tuple[List[int], List[BaseTradingSystem], Weights]:
 
-		clusters_dict = ConfigBuilderHelper.strip_single(quant_query, "Clusters")
-		clusters_name = [s.strip() for s in ConfigBuilderHelper.strip_single(clusters_dict, "AlphanumList").split(",")]
-		clusters_weights = [float(s) for s in ConfigBuilderHelper.strip_single(clusters_dict, "WeightsList").split(",")]
-		clusters_divmult = float(ConfigBuilderHelper.strip_single(clusters_dict, "DivMult"))
-		time_period_dict = ConfigBuilderHelper.strip_single(clusters_dict, "TimePeriod")
-		time_period = [int(year) for year in time_period_dict.pop("timeperiod", [0, 0])]
+		mql_dict = MqlDict(quant_query)
+		clusters_mql_dict = mql_dict.strip_single("Clusters")
+		clusters_name = clusters_mql_dict.parse_list("AlphanumList")
+		clusters_weights = clusters_mql_dict.parse_num_list("WeightsList")
+		clusters_divmult = float(mql_dict.strip_single("DivMult"))
+		time_period_mql_dict = clusters_mql_dict.strip_single("TimePeriod")
+		time_period = time_period_mql_dict.parse_num_list("timeperiod", default=[0, 0], type_=int)
 
 		weights = Weights(
 			weights=clusters_weights,
