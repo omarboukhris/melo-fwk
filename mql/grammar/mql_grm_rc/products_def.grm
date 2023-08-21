@@ -1,0 +1,13 @@
+
+ProductsDef ->
+    !ProductsDefList |
+    !ProductsDefList from. timeperiod=numeric. to. timeperiod=numeric.
+
+ProductsDefList ->
+    !ProductsGenerator |
+    !ProductsGenerator comma. |
+[]
+ProductsGenerator -> s:productType. lpar. s:AlphanumList rpar.
+// add optional block size/Leverage and cap size value here
+// don't forget to parse into config somehow ?
+// setup default values when loading product (spot with no cap limit)

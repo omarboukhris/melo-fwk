@@ -24,12 +24,14 @@ class VolTargetSizePolicy(BaseSizePolicy):
 
 	def block_value_vect(self, lookback: int = 36) -> pd.DataFrame:
 		# 1% price differencial
+		prod_basket_close_df = self.prod_basket.close_df()
 		return pd.DataFrame(
 			np.einsum(
 				"i,ji->ji",
 				self.block_size_vect.to_numpy(),
-				self.prod_basket.close_df().ewm(span=lookback, axis=0).mean().to_numpy()),
-			columns=self.product_names()
+				prod_basket_close_df.ewm(span=lookback, axis=0).mean().to_numpy()),
+			columns=self.product_names(),
+			index=prod_basket_close_df.index
 		)
 		# block_size = how many shares the contract controls
 

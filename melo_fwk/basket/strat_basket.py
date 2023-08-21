@@ -7,7 +7,7 @@ import pandas as pd
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.product import Product
 from melo_fwk.strategies import BaseStrategy
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 
 @dataclass
@@ -28,14 +28,16 @@ class StratBasket:
 		return pd.Series(f_series * self.weights.divmult)
 
 	def forecast_cumsum(self, product_basket: ProductBasket) -> pd.DataFrame:
+		prod_basket_close_df = product_basket.close_df()
+		len_df = len(prod_basket_close_df)
 		f_df = pd.DataFrame({
-			p.name: np.zeros(shape=len(product_basket.close_df()))
+			p.name: np.zeros(shape=len_df)
 			for p in product_basket.products.values()
-		})
+		}, index=prod_basket_close_df.index)
 
 		# add div mult at some point
 		for trading_rule, forecast_weight in zip(self.strat_list, self.weights.weights):
-			f_df += forecast_weight * trading_rule.forecast_df_cap(product_basket.close_df())
+			f_df += forecast_weight * trading_rule.forecast_df_cap(prod_basket_close_df)
 
 		return f_df * self.weights.divmult
 

@@ -13,7 +13,7 @@ class ClustersEstimator(MeloBaseEstimator):
 
 	def __init__(self, **kwargs):
 		super(ClustersEstimator, self).__init__(**kwargs)
-		self.sampling_ratio = self.next_float_param(0.7)
+		self.sampling_ratio = self.estimator_params_dict.get("sampling_ratio", 0.7)
 		self.logger.info("Estimator Initialized")
 
 	def run(self):

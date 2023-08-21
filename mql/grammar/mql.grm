@@ -1,0 +1,36 @@
+
+%import "mql_grm_rc/tokens.grm"
+%import "mql_grm_rc/products_def.grm"
+%import "mql_grm_rc/strategies_def.grm"
+%import "mql_grm_rc/posesize_def.grm"
+%import "mql_grm_rc/process_def.grm"
+
+%import "mql_grm_rc/common.grm"
+
+AXIOM -> QuantQuery
+
+QuantQuery ->
+    // User defines all params
+    // No default value used
+    create. QueryName=alphanum.
+    with. !ProductsDef
+    where. !StrategiesDef
+    where. !PositionSizing
+    select. !ProcessDef
+    |
+
+    // User defines Products
+    // default Strategy       : Buy and Hold
+    // default PositionSizing : 1 OR Search
+    create. QueryName=alphanum.
+    with. !ProductsDef
+    select. !ProcessDef
+    |
+
+    // User defines Products & Strategy
+    // default PositionSizing : 1 OR Search
+    create. QueryName=alphanum.
+    with. !ProductsDef
+    where. !StrategiesDef
+    select. !ProcessDef
+

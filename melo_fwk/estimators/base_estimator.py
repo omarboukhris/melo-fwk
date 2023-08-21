@@ -8,7 +8,7 @@ from melo_fwk.loggers.global_logger import GlobalLogger
 from typing import List, Union, Type
 
 from melo_fwk.trading_systems import TradingSystem
-from melo_fwk.utils.weights import Weights
+from melo_fwk.basket.weights import Weights
 
 
 class MeloBaseEstimator(EstimatorParameters):
@@ -20,7 +20,7 @@ class MeloBaseEstimator(EstimatorParameters):
 		strategies: List[Union[BaseStrategy, tuple]],
 		forecast_weights: Weights,
 		size_policy: Union[BaseSizePolicy, Type[BaseSizePolicy]],
-		estimator_params: List[str]
+		estimator_params: dict
 	):
 		super().__init__(estimator_params)
 
@@ -31,6 +31,7 @@ class MeloBaseEstimator(EstimatorParameters):
 
 		self.products = products
 		self.begin, self.end = time_period
+		self.end += 1
 		self.strategies = strategies
 		self.forecast_weights = forecast_weights
 		self.size_policy = size_policy

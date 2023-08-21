@@ -24,10 +24,11 @@ class VolTargetEstimator(MeloBaseEstimator):
 			final: The final value for the volatility target.
 		"""
 		super(VolTargetEstimator, self).__init__(**kwargs)
-		self.trading_capital = self.next_float_param(0.)
-		self.step = self.next_float_param(0.1)
-		self.start = self.next_float_param(0.1)
-		self.final = self.next_float_param(1.)
+		self.trading_capital = self.estimator_params_dict.get(
+			"trading_capital", self.size_policy.vol_target.trading_capital)
+		self.step = self.estimator_params_dict.get("step", 0.1)
+		self.start = self.estimator_params_dict.get("start", 0.1)
+		self.final = self.estimator_params_dict.get("final", 1.)
 		self.logger.info("Initialized Estimator")
 
 	def run(self):

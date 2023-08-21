@@ -39,7 +39,7 @@ class EWMAStrategy(BaseStrategy, EWMAParamSpace):
 		ewma = fast_ewma - slow_ewma
 
 		forecast_vect = self.scale * (ewma / std)
-		return forecast_vect
+		return forecast_vect.fillna(0.)
 
 	def forecast_vect(self, data: pd.Series):
 		fast_ewma = data.ewm(span=int(self.fast_span), adjust=False).mean()

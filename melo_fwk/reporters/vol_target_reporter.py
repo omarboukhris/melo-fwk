@@ -1,7 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from melo_fwk.config.melo_config import MeloConfig
+from mql.mconfig.melo_config import MeloConfig
 from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
 

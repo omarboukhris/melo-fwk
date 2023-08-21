@@ -1,5 +1,5 @@
-from melo_fwk.config import MeloConfig
-from melo_fwk.config.common_melo_config import CommonMeloConfig
+from mql.mconfig import MeloConfig
+from mql.mconfig.common_melo_config import CommonMeloConfig
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.reporters.md_formatter import MdFormatter
 

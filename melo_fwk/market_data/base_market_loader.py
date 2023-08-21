@@ -12,6 +12,10 @@ class BaseMarketLoader(ABC):
 	parent_folder = Path(Path(__file__).parent)
 
 	def __init__(self):
+		"""
+		This should be remodeled, can't write unique cap/block-leverage for each product
+		how to handle ? WIP
+		"""
 		with open(BaseMarketLoader.parent_folder / "config/products_config.json") as fp:
 			self.product_config = json.load(fp)
 
@@ -21,6 +25,10 @@ class BaseMarketLoader(ABC):
 
 	@abstractmethod
 	def _load_product(self, product: str) -> Product:
+		...
+
+	@abstractmethod
+	def get(self, category: str, product: str, leverage: float = 1.0, size_cap: float = 50.) -> Product:
 		...
 
 	@abstractmethod

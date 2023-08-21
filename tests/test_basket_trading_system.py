@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import pandas as pd
 
@@ -7,20 +8,25 @@ from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
+from melo_fwk.quantfactory_registry import QuantFlowRegistry
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
-from melo_fwk.utils.weights import Weights
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.basket.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):
 
-	def init(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+		QuantFlowRegistry.register_all()
+		self.market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 
 	def test_tsys(self):
-		self.init()
 		self.logger.info("run all at once - TradingSystem")
 		self._run_simulation("all", TradingSystem)
 		self.logger.info("run each year seperately - TradingSystem")
@@ -34,9 +40,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def _run_simulation(self, x: str, tr: callable):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
-
-		products = market.sample_products(3)
+		products = self.market.sample_products(3)
 		prod_bsk = ProductBasket(products)
 		# product = FxDataLoader.EURUSD
 
@@ -50,7 +54,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				EWMAStrategy(
 					fast_span=8,
 					slow_span=32,
-				).estimate_forecast_scale(market)
+				).estimate_forecast_scale(self.market)
 			],
 			weights=Weights([0.6, 0.4], 1.)
 		)
@@ -88,9 +92,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def test_reg(self):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
-
-		products = market.sample_products_alpha(1)
+		products = self.market.sample_products_alpha(1)
 		prod_bsk = ProductBasket(products)
 
 		strat_basket = StratBasket(
@@ -103,7 +105,7 @@ class TradingSystemUnitTests(unittest.TestCase):
 				EWMAStrategy(
 					fast_span=8,
 					slow_span=32,
-				).estimate_forecast_scale(market)
+				).estimate_forecast_scale(self.market)
 			],
 			weights=Weights([0.6, 0.4], 1.)
 		)

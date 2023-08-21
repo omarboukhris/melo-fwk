@@ -1,0 +1,67 @@
+{
+  "resolution": "1d",
+  "lookback": "100y",
+  "categories" : ["Commodities", "Fx", "Idx", "Stocks"],
+
+  "Commodities": {
+    "Brent Crude Oil": "BZ=F",
+    "Coffee": "KC=F",
+    "Cocoa": "CC=F",
+    "Copper": "HG=F",
+    "Corn": "ZC=F",
+    "Cotton": "CT=F",
+    "Crude Oil": "CL=F",
+    "Feeder Cattle": "GF=F",
+    "Gold": "GC=F",
+    "XAUUSD": "Gold",
+    "Lean Hogs": "HE=F",
+    "Live Cattle": "LE=F",
+    "Lumber": "LBS=F",
+    "Natural Gas": "NG=F",
+    "Oat": "ZO=F",
+    "Palladium": "PA=F",
+    "Platinum": "PL=F",
+    "RBOB Gasoline": "RB=F",
+    "Silver": "SI=F",
+    "Soybean": "ZS=F",
+    "Soybean Meal": "ZM=F",
+    "Soybean Oil": "ZL=F",
+    "Sugar": "SB=F",
+    "Wheat": "ZW=F"
+  },
+
+  "Fx": {
+    "EURUSD": "EURUSD=X",
+    "EURGBP": "EURGBP=X",
+    "EURCHF": "EURCHF=X",
+    "EURCAD": "EURCAD=X",
+    "EURJPY": "EURJPY=X",
+    "GBPUSD": "GBPUSD=X",
+    "AUDUSD": "AUDUSD=X",
+    "NZDUSD": "NZDUSD=X",
+    "CHFUSD": "CHF=X",
+    "CADUSD": "CAD=X"
+  },
+
+  "Idx": {
+    "CAC40": "^FCHI",
+    "ESTX50": "^STOXX50E",
+    "DAX": "^GDAXI",
+    "FTSE": "^FTSE",
+    "NIKKEI225": "^N225",
+    "HANGSENG": "^HSI",
+    "DAWJONES": "^DJI",
+    "SP500": "^GSPC",
+    "NASDAQ": "^IXIC"
+  },
+
+  "Stocks": {
+    "AAPL": "AAPL",
+    "GOOG": "GOOG",
+    "GOOGL": "GOOGL",
+    "TSLA": "TSLA",
+    "NFLX": "NFLX",
+    "INTC": "INTC",
+    "META": "META"
+  }
+}

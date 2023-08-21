@@ -1,91 +1,34 @@
 import unittest
-
-from melo_fwk.config.melo_clusters_config import MeloClustersConfig
-from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
-from melo_fwk.portfolio.compo_portfolio_mgr import CompositePortfolioManager
-from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.loggers.console_logger import ConsoleLogger
-
-from melo_fwk.config import MeloConfig
-
-from melo_fwk import quantfactory_registry
-
-from mql.mql_parser import MqlParser
-
 from pathlib import Path
 
-
-def run_mql_process(mql_query_path: Path):
-	"""
-	Estimators should:
-		- Implement the same constructor (see any estimator)
-		- Implement a run() method that returns any result
-	Note:
-		Reporter associated to the estimator should be able
-		to process its result
-
-	TODO:
-		Add estimator config load from toml file
-		+ default config load from some assets/folder
-	"""
-
-	mql_parser = MqlParser()
-	parsed_mql = mql_parser.parse_to_json(str(mql_query_path))
-	quant_query = parsed_mql["QuantQuery"][0]
-	# print(parsed_mql)
-
-	if "Clusters" in quant_query.keys():
-		pf_mgr = CompositePortfolioManager.from_config(
-			str(Path(__file__).parent / "rc/pf_config.json"))
-		market_mgr = CompositeMarketLoader.from_config(
-			str(Path(__file__).parent / "rc/loader_config.json"))
-		mql_clusters_config = MeloClustersConfig.build_config(pf_mgr, market_mgr, quant_query)
-		cluster_estim_ = mql_clusters_config.build_clusters_estimator()
-		output = cluster_estim_.run()
-		mql_clusters_config.write_report(output, str(mql_query_path.parent))
-
-	else:
-		mql_config = MeloConfig.build_config(
-			quant_query_path=mql_query_path,
-			quant_query=quant_query
-		)
-		# print(mql_config)
-
-		estimator_obj_ = mql_config.build_estimator()
-		output = estimator_obj_.run()
-		# print(output)
-
-		mql_config.write_report(output, str(mql_query_path.parent))
-
-		pf_mgr = CompositePortfolioManager.from_config(str(Path(__file__).parent / "rc/pf_config.json"))
-		mql_config.export_trading_system(pf_mgr)
+from melo_fwk.loggers.console_logger import ConsoleLogger
+from mql.melo_machina import MeloMachina
 
 
 class MqlUnitTests(unittest.TestCase):
 
-	def test_mql_process(self):
-
-		templates = {
-			"alloc": Path(__file__).parent.parent / "mql/data/mql_alloc_optim_template/allocationoptim_example_query.sql",
-			"var": Path(__file__).parent.parent / "mql/data/mql_var_template/var_example_query.sql",
-			"backtest": Path(__file__).parent.parent / "mql/data/mql_backtest_template/backtest_example_query.sql",
-			"fw_opt": Path(__file__).parent.parent / "mql/data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
-			"vol_target_opt": Path(__file__).parent.parent / "mql/data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-			"clustering": Path(__file__).parent.parent / "mql/data/mql_clustering_template/clustering_example_query.sql",
-			"fast_strat_opt": Path(__file__).parent.parent / "mql/data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.config = Path(__file__).parent / "rc/config.json"
+		self.loggers = [ConsoleLogger]
+		root_dir = Path(__file__).parent.parent
+		self.templates = {
+			# "alloc2": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_2.sql",
+			# "alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query.sql",
+			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
+			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
+			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
+			"vol_target_opt": root_dir / "mql_data/mql_vol_target_optim/posesizeoptim_example_query.sql",
+			"clustering": root_dir / "mql_data/mql_clustering_template/clustering_example_query.sql",
+			"fast_strat_opt": root_dir / "mql_data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
 		}
-		# still missing :
-		# alloc opt
 
-		# set loggers
-		GlobalLogger.set_loggers([ConsoleLogger])
+	def test_mql_process(self):
+		mm = MeloMachina(config=self.config, loggers=self.loggers)
 
-		# register melo components in factory
-		quantfactory_registry.register_all()
-
-		for key, mql_query in templates.items():
+		for key, mql_query in self.templates.items():
 			print(42*"=" + key + 42*"=")
-			run_mql_process(mql_query_path=mql_query)
+			mm.run(query_path=mql_query)
 
 
 if __name__ == "__main__":

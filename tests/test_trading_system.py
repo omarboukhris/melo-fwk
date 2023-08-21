@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -6,23 +7,26 @@ from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
 from melo_fwk.loggers.global_logger import GlobalLogger
-from melo_fwk.market_data.fs_data_loaders import CommodityDataLoader
 from melo_fwk.plots import TsarPlotter
+from melo_fwk.quantfactory_registry import QuantFlowRegistry
 
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
-from melo_fwk.utils.weights import Weights
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.basket.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):
 
-	def init(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
+		QuantFlowRegistry.register_all()
 
 	def runTest(self):
-		self.init()
 		self.logger.info("run all at once - TradingSystem")
 		self._run_simulation("all", TradingSystem)
 		self.logger.info("run each year seperately - TradingSystem")
@@ -40,8 +44,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 	def _run_simulation(self, x: str, tr: callable):
 		GlobalLogger.set_loggers([ConsoleLogger])
 
-		commo_dl = CommodityDataLoader()
-		product = commo_dl.commo_data_registry["Gold"]
+		market_loader = MarketDataLoader()
+		product = market_loader.get("Commodities", "Gold")
+
 		# product = FxDataLoader.EURUSD
 
 		strat_basket = StratBasket(

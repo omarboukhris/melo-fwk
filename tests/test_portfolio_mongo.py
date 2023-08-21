@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.loggers.console_logger import ConsoleLogger
@@ -13,7 +15,8 @@ import pandas as pd
 import tqdm
 import unittest
 
-from melo_fwk.utils.weights import Weights
+from mutils.generic_config_loader import GenericConfigLoader
+from melo_fwk.basket.weights import Weights
 
 
 """
@@ -25,12 +28,13 @@ To populate mongo db run the script :
 """
 class PortfolioMongoUnitTests(unittest.TestCase):
 
-	def init(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		GenericConfigLoader.setup(str(Path(__file__).parent / "rc/config.json"))
 		GlobalLogger.set_loggers([ConsoleLogger])
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 	def test_portfolio(self):
-		self.init()
 		sma_params = {
 			"fast_span": 16,
 			"slow_span": 64,
@@ -43,7 +47,7 @@ class PortfolioMongoUnitTests(unittest.TestCase):
 			weights=Weights([1.], 1.)
 		)
 
-		market = CompositeMarketLoader.from_config("tests/rc/loader_config.json")
+		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 		products = market.get_fx()
 
 		ts_capital = 10000

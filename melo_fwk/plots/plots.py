@@ -1,7 +1,11 @@
+from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+
+from mutils.generic_config_loader import GenericConfigLoader
+
 
 class GenericPlotter:
 	def __init__(self, dataframe: pd.DataFrame, twinx_dataframe: pd.DataFrame = None):
@@ -30,20 +34,23 @@ class GenericPlotter:
 class AccountPlotter:
 	def __init__(self, dataframe: pd.DataFrame, twinx_dataframe: pd.DataFrame = None):
 		self.generic_plotter = GenericPlotter(dataframe, twinx_dataframe)
+		self.working_dir = Path(GenericConfigLoader.get_node("working_dir", "."))
 
 	def save_png(self, filename: str):
-		self.generic_plotter.save_png(filename, "Balance", "Close", "log")
+		self.generic_plotter.save_png(str(self.working_dir / filename), "Balance", "Close", "log")
 
 class HLOCPricePlotter:
 	def __init__(self, dataframe: pd.DataFrame):
 		self.generic_plotter = GenericPlotter(dataframe, None)
+		self.working_dir = Path(GenericConfigLoader.get_node("working_dir", "."))
 
 	def save_png(self, filename: str):
-		self.generic_plotter.save_png(filename, ['Open', 'High', 'Low', 'Close'], None)
+		self.generic_plotter.save_png(str(self.working_dir / filename), ['Open', 'High', 'Low', 'Close'], None)
 
 class ForecastPlotter:
 	def __init__(self, dataframe: pd.DataFrame, twinx_dataframe: pd.DataFrame = None):
 		self.generic_plotter = GenericPlotter(dataframe, twinx_dataframe)
+		self.working_dir = Path(GenericConfigLoader.get_node("working_dir", "."))
 
 	def save_png(self, filename: str):
-		self.generic_plotter.save_png(filename, "Forecast", "Close")
+		self.generic_plotter.save_png(str(self.working_dir / filename), "Forecast", "Close")

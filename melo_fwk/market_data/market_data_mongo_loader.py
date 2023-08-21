@@ -2,14 +2,17 @@ import pandas as pd
 import melo_fwk.datastreams.hloc_datastream as ds
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.utils.mongo_db_mgr import MongodbManager
+from mutils.generic_config_loader import GenericConfigLoader
+from mutils.mongo_db_mgr import MongodbManager
 from melo_fwk.market_data.product import Product
 
 
 class MarketDataMongoLoader(BaseMarketLoader):
 
-	def __init__(self, dburl: str):
+	def __init__(self):
 		super().__init__()
+		config = GenericConfigLoader.get_node(MarketDataMongoLoader.__name__, {})
+		dburl = config["dburl"]
 		self.mongo_mgr = MongodbManager(dburl)
 
 	def load_product_basket(self, product_basket_config: dict) -> ProductBasket:
@@ -24,6 +27,14 @@ class MarketDataMongoLoader(BaseMarketLoader):
 		self.mongo_mgr.connect("market")
 		products = self.mongo_mgr.db_connection.list_collection_names()
 		return [self._load_product(p) for p in products]
+
+	def get(self, category: str, product: str, leverage, size_cap):
+		self.mongo_mgr.connect("market")
+		return [
+			self._load_product(cname)
+			for cname in self.mongo_mgr.db_connection.list_collection_names()
+			if f"{category}." in cname
+		]
 
 	def get_fx(self):
 		self.mongo_mgr.connect("market")
@@ -42,6 +53,8 @@ class MarketDataMongoLoader(BaseMarketLoader):
 		]
 
 	def _load_product(self, product: str) -> Product:
+		""" this should be rewritten once cap size, block size is written in config spec
+		"""
 		self.mongo_mgr.connect("market")
 		product_df = pd.DataFrame(self.mongo_mgr.select_request(product, verbose=False))
 		del product_df["_id"]

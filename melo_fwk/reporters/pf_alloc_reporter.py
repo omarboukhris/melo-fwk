@@ -2,15 +2,14 @@ from typing import Dict, Tuple, List
 
 import pandas as pd
 
-from melo_fwk.config import MeloConfig
-from melo_fwk.config.melo_clusters_config import MeloClustersConfig
+from mql.mconfig.melo_books_config import MeloBooksConfig
 from melo_fwk.loggers.global_logger import GlobalLogger
 from melo_fwk.reporters.base_reporter import GenericReporter
 
 
 class PFAllocationReporter(GenericReporter):
 
-	def __init__(self, input_config: MeloClustersConfig):
+	def __init__(self, input_config: MeloBooksConfig):
 		self.logger = GlobalLogger.build_composite_for("PFAllocationReporter")
 		self.logger.info("Initializing BacktestReporter")
 		super(PFAllocationReporter, self).__init__(input_config)
