@@ -41,7 +41,6 @@ class MqlDecoder(json.JSONDecoder):
 			name=mql_dict.get_node("QueryName"),
 			products_config=self.pfactory.build_products(mql_dict),
 			size_policy=SizePolicyConfigBuilder.build_size_policy(mql_dict),
-			strat_config_registry=strat_config_registry,
 			strategies_config=StrategyConfigBuilder.build_strategy(mql_dict, strat_config_registry),
 			estimator_class_=estimator_class_,
 			estimator_params_=estimator_params_,
@@ -73,7 +72,6 @@ class MqlDecoder(json.JSONDecoder):
 		store clusters/master book = map < name, list(node x weight) x divmult>
 		"""
 
-		pass  # start here
 		return MeloBooksConfig(
 			name=query_name,
 			cluster_names=[c.name for c in clusters],

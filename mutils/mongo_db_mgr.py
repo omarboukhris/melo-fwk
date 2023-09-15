@@ -1,7 +1,7 @@
 import pymongo
 import bson.objectid as boi
 
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 
 class MongodbManager:
 

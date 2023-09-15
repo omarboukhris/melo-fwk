@@ -17,7 +17,6 @@ class MeloConfig(CommonMeloConfig):
 	# {prod_name: Product}, start..end
 	products_config: Tuple[dict, List[int]]
 	size_policy: BaseSizePolicy
-	strat_config_registry: StratConfigRegistry
 	# (list(strats OR tuple(type(strat), param)), fw)
 	strategies_config: Tuple[List[Union[BaseStrategy, Tuple[Type[BaseStrategy], Dict]]], Weights]
 	# (estimator, **params)

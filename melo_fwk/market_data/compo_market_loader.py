@@ -3,7 +3,7 @@ from typing import List
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.market_data.product import Product
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.quantflow_factory import QuantFlowFactory
 
 

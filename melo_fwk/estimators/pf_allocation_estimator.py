@@ -6,7 +6,7 @@ import tqdm
 from melo_fwk.estimators.estimator_params import EstimatorParameters
 from melo_fwk.estimators.utils.var_utils import VaRUtils
 from melo_fwk.estimators.utils.weights_optim import WeightsOptim
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.basket.weights import Weights
 

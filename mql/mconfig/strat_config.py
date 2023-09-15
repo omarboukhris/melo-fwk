@@ -1,7 +1,7 @@
 import pandas as pd
 import tqdm
 
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.strategies import BuyAndHold
 from mutils.generic_config_loader import GenericConfigLoader

@@ -1,6 +1,6 @@
 
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 
 
