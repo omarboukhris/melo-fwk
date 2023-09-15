@@ -1,5 +1,5 @@
 
-from melo_fwk.loggers.composite_logger import CompositeLogger
+from mutils.loggers.composite_logger import CompositeLogger
 
 from typing import List
 

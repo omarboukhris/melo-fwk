@@ -1,5 +1,5 @@
 from melo_fwk.pfio.compo_portfolio_mgr import CompositePortfolioManager
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 
 from melo_fwk.quantfactory_registry import QuantFlowRegistry
 

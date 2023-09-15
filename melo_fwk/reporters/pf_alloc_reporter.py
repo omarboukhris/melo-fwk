@@ -3,7 +3,7 @@ from typing import Dict, Tuple, List
 import pandas as pd
 
 from mql.mconfig.melo_books_config import MeloBooksConfig
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.reporters.base_reporter import GenericReporter
 
 

@@ -1,4 +1,4 @@
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.quantflow_factory import QuantFlowFactory
 from mql.mconfig.mql_dict import MqlDict
 

@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from melo_fwk.basket.strat_basket import StratBasket
-from melo_fwk.loggers.console_logger import ConsoleLogger
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.console_logger import ConsoleLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.plots import AccountPlotter
 from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader

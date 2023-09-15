@@ -1,5 +1,5 @@
 
-from melo_fwk.loggers.base_logger import BaseLogger
+from mutils.loggers.base_logger import BaseLogger
 
 from typing import List
 

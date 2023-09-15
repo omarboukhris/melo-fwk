@@ -5,7 +5,7 @@ import pandas as pd
 import tqdm
 
 from melo_fwk.basket.var_basket import VaRBasket
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.var.CVaR import CVaR_vect
 from melo_fwk.var.VaR import VaR99_vect

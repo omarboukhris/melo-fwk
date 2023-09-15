@@ -5,8 +5,8 @@ import pandas as pd
 
 from melo_fwk.basket.product_basket import ProductBasket
 from melo_fwk.basket.strat_basket import StratBasket
-from melo_fwk.loggers.console_logger import ConsoleLogger
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.console_logger import ConsoleLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,

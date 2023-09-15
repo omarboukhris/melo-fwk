@@ -5,8 +5,8 @@ import numpy as np
 
 from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
-from melo_fwk.loggers.console_logger import ConsoleLogger
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.console_logger import ConsoleLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.plots import TsarPlotter
 from melo_fwk.quantfactory_registry import QuantFlowRegistry
 

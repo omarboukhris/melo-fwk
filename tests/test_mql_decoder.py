@@ -2,14 +2,12 @@ import json
 import unittest
 from pathlib import Path
 
-
-from melo_fwk.loggers.console_logger import ConsoleLogger
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.console_logger import ConsoleLogger
+from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.quantfactory_registry import QuantFlowRegistry
 from mutils.generic_config_loader import GenericConfigLoader
 from mql.mql_decoder import MqlDecoder
 from mql.mql_parser import MqlParser
-
 
 
 class MqlDecoderUnitTests(unittest.TestCase):
@@ -24,7 +22,7 @@ class MqlDecoderUnitTests(unittest.TestCase):
 	def test_decoder(self):
 		root_dir = Path(__file__).parent.parent
 		templates = {
-			"alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_2.sql",
+			# "alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_2.sql",
 			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
 			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
 			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",

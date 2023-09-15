@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from melo_fwk.loggers.base_logger import BaseLogger
+from mutils.loggers.base_logger import BaseLogger
 
 
 class StringStreamLogger(BaseLogger):

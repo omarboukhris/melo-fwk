@@ -7,7 +7,7 @@ import tqdm
 from mql.mconfig.melo_config import MeloConfig
 from melo_fwk.reporters.base_reporter import BaseReporter
 from melo_fwk.reporters.md_formatter import MdFormatter
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 
 class VaRReporter(BaseReporter):
 

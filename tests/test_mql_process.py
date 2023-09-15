@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from melo_fwk.loggers.console_logger import ConsoleLogger
+from mutils.loggers.console_logger import ConsoleLogger
 from mql.melo_machina import MeloMachina
 
 

@@ -34,7 +34,7 @@ from melo_fwk.reporters.strat_optim_reporter import StratOptimReporter
 from melo_fwk.reporters.vol_target_reporter import VolTargetReporter
 from melo_fwk.reporters.clusters_reporter import ClustersReporter
 
-from melo_fwk.loggers.global_logger import GlobalLogger
+from mutils.loggers.global_logger import GlobalLogger
 
 class QuantFlowRegistry:
 	pf_loaders = {
