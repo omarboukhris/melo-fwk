@@ -52,17 +52,15 @@ class Scheduler:
 
 	def start(self):
 		done, proc = set({}), set(self.proc)
-		candidates = self._get_next_jobs(done)
-		self.job_launcher.submit(candidates)
 		while done != proc:
-			while not self.job_launcher.is_done(done) and done != proc:
-				sleep(1)  # get this from config, refresh rate
-			for c in candidates:
-				self.dep_mat[c] = 0
-			done.update(candidates)
 			candidates = self._get_next_jobs(done)
 			self.job_launcher.submit(candidates)
-		pass
+			for c in candidates:
+				self.dep_mat[c] = 0
+			while not self.job_launcher.is_done(done) and done != proc:
+				sleep(1)  # get this from config, refresh rate
+			# update/aggregate shared memory space
+			done.update(candidates)
 
 	def _get_next_jobs(self, done_proc: set):
 		dep_mat = self.dep_mat.copy()

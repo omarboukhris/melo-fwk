@@ -22,6 +22,7 @@ class MqlDecoderUnitTests(unittest.TestCase):
 	def test_decoder(self):
 		root_dir = Path(__file__).parent.parent
 		templates = {
+			"alloc3": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_3.sql",
 			# "alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_2.sql",
 			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
 			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
