@@ -10,7 +10,10 @@ class BasePortfolioManager:
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 	def save_portfolio_config(self, name: str, portfolio: BaseTradingSystem):
-		raise NotImplementedError
+		...
 
 	def load_portfolio_config(self, market_mgr: BaseMarketLoader, name: str) -> BaseTradingSystem:
-		raise NotImplementedError
+		...
+
+	def book_exists(self, name: str) -> bool:
+		...

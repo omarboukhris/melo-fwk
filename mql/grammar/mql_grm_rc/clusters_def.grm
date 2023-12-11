@@ -1,16 +1,20 @@
 Clusters ->
     clusters. lpar. !Books rpar. |
-    clusters. lpar. !Books rpar. !TimePeriod
-
-Books ->
-    name=alphanum. dblpt. lbrkt. s:NodeList rbrkt. ptr. DivMult=numeric. |
-[]
+    clusters. lpar. !WBooks rpar. |
+    clusters. lpar. !Books rpar. !TimePeriod |
+    clusters. lpar. !WBooks rpar. !TimePeriod
 
 TimePeriod -> from. timeperiod=numeric. to. timeperiod=numeric.
 
+Books ->
+    name=alphanum. dblpt. lbrkt. NodeList=s:AlphanumList rbrkt. |
+[]
+
+WBooks ->
+    name=alphanum. dblpt. lbrkt. s:NodeList rbrkt. ptr. DivMult=numeric. |
+[]
+
 NodeList ->
-    AlphanumList |
     alphanum. lpar. numeric. rpar. |
     alphanum. lpar. numeric. rpar. comma. |
 []
-

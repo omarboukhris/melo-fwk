@@ -12,9 +12,6 @@ class ProductFactory:
 		self.market = market_mgr
 		self.plogger = GlobalLogger.build_composite_for(ProductFactory.__name__)
 
-	def build_product_basket(self, mql_dict: MqlDict):
-		raise NotImplementedError
-
 	def build_products(self, mql_dict: MqlDict):
 		prod_mql_dict = mql_dict.get_node("ProductsDef")
 		products_generator = prod_mql_dict.get_node("ProductsDefList")["ProductsGenerator"]

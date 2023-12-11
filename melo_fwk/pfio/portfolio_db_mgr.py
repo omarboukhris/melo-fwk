@@ -29,3 +29,10 @@ class PortfolioMongoManager(BasePortfolioManager):
 			PortfolioMongoManager.portfolio_table_name, {"name": name})
 
 		return BaseTradingSystem.from_dict(result, market_mgr)
+
+	def book_exists(self, name: str) -> bool:
+		self.mongo_mgr.connect("tradingSytemConfig")
+
+		result = self.mongo_mgr.select_request(
+			PortfolioMongoManager.portfolio_table_name, {"name": name})
+		return result != {}
