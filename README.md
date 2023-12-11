@@ -11,11 +11,14 @@ This project is a quantitative trading backtest ecosystem.
 ## Name
 
 Melo-fwk and Melo-ql, respectively melo framework and melo query language
+Mozart is the parallel computation orchestrator
 
 ## Description
 
 Melo-fwk & Melo-ql form a backtesting ecosystem used for trading simulations, quantitative strategy design and portfolio building.
 Strategies and trading policies can easily be extended (WIP).
+
+Mozart is an orchestrator for parallel data pipelines and processes.
 
 ## Installation
 
