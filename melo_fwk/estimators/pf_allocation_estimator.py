@@ -11,6 +11,7 @@ from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
 from melo_fwk.basket.weights import Weights
 
 class PFAllocationEstimator(EstimatorParameters):
+	"""TODO: rework into aggregation class"""
 
 	def __init__(
 		self,

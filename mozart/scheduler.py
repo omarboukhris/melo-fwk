@@ -19,15 +19,40 @@ class JobLauncher:
 	def __init__(self, pool_size: int):
 		self.pool = Pool(processes=pool_size)
 		self.res_list = {}
+		self.status_df = None
+		self.proc = None
+		self.done = set({})
+		self.running = set({})
+
+	def setup(self, proc):
+		self.proc = set(proc)
+		self.done = set({})
+
+	def update(self, done: Set[str]):
+		self.done.update(done)
+
+	def process_running(self):
+		return not self.status()["status"].any() and self.is_not_done()
+
+	def is_not_done(self):
+		return self.done != self.proc
 
 	def submit(self, candidates: set):
 		self.res_list.update({c: self.pool.apply_async(factory, (c,)) for c in candidates})
+		self.running.update(candidates)
 
-	def is_done(self, done: Set[str]):
-		# print({k: r.successful() for k, r in self.res_list.items() if r.ready()})
-		return any(k for k, r in self.res_list.items() if r.ready() and r.successful() and k not in done)
+	def status(self):
+		self.status_df = pd.DataFrame([
+			(k, r.successful()) for k, r in self.res_list.items()
+			if r.ready() and k not in self.done
+		], columns=["job", "status"])
+		return self.status_df
 
-class Scheduler:
+	def submitted_jobs(self):
+		return self.running.union(self.done)
+
+
+class JobScheduler:
 
 	def __init__(self, dep_map: dict, job_launcher: JobLauncher):
 		self.job_launcher = job_launcher
@@ -51,21 +76,29 @@ class Scheduler:
 			f"(Scheduler) Missing nodes in process dependency map {missing}"
 
 	def start(self):
-		done, proc = set({}), set(self.proc)
-		while done != proc:
-			candidates = self._get_next_jobs(done)
+		self.job_launcher.setup(self.proc)
+		while self.job_launcher.is_not_done():
+			candidates = self._get_next_jobs()
 			self.job_launcher.submit(candidates)
-			for c in candidates:
-				self.dep_mat[c] = 0
-			while not self.job_launcher.is_done(done) and done != proc:
+			while self.job_launcher.process_running():
 				sleep(1)  # get this from config, refresh rate
+			done_proc = self.update_dependency_mat(self.job_launcher.status_df)
 			# update/aggregate shared memory space
-			done.update(candidates)
+			self.job_launcher.update(done_proc)
 
-	def _get_next_jobs(self, done_proc: set):
+	def update_dependency_mat(self, status_df: pd.DataFrame):
+		out = []
+		for _, row in status_df.iterrows():
+			job, status = row["job"], row["status"]
+			self.dep_mat[job] = 0 if status else 1
+			if status:
+				out.append(job)
+		return set(out)
+
+	def _get_next_jobs(self):
 		dep_mat = self.dep_mat.copy()
 		dep_mat["SUM_DEP"] = dep_mat.sum(axis=1)
-		candidates = set(dep_mat[dep_mat["SUM_DEP"] == 0].index) - done_proc
+		candidates = set(dep_mat[dep_mat["SUM_DEP"] == 0].index) - self.job_launcher.submitted_jobs()
 		return candidates
 
 
@@ -80,7 +113,7 @@ if __name__ == "__main__":
 	}
 
 	j = JobLauncher(pool_size=2)
-	s = Scheduler(d, j)
+	s = JobScheduler(d, j)
 	s.start()
 
 
