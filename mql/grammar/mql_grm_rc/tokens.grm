@@ -40,8 +40,10 @@ rbrkt.("\]")
 dqu.('"')
 qu.("'")
 antisl.("/")
+equ.("\=")
 
 // variables
+setok.("\$\w+")
+productpair.("\(\s\w+\s\,\s\w+\s\)")
 alphanum.("[a-z_A-Z]\w*")
 numeric.("[0-9]+(\.[0-9]+)?")
-//node.("[a-z_A-Z]\w*\([0-9]+(\.[0-9]+)?\)")

@@ -1,13 +1,13 @@
 import os
 from dataclasses import dataclass
 
-from melo_fwk.reporters.md_formatter import MdFormatter
+from mreport.md_formatter import MdFormatter
 
 
 @dataclass(frozen=True)
 class CommonMeloConfig:
 	name: str
-	reporter_class_: callable  # Type[BaseReporter]
+	# reporter_class_: callable  # Type[BaseReporter]
 
 	def __check_export_directories(self, output_dir):
 		if not os.path.isdir(output_dir):

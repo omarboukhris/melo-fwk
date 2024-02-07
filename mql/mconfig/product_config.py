@@ -1,5 +1,5 @@
 from mutils.loggers.global_logger import GlobalLogger
-from melo_fwk.quantflow_factory import QuantFlowFactory
+from mutils.quantflow_factory import QuantFlowFactory
 from mql.mconfig.mql_dict import MqlDict
 
 class ProductFactory:

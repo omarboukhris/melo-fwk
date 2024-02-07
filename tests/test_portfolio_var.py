@@ -6,7 +6,7 @@ from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.plots import AccountPlotter
 from melo_fwk.basket.var_basket import VaRBasket
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
-from melo_fwk.quantfactory_registry import QuantFlowRegistry
+from mutils.quantfactory_registry import QuantFlowRegistry
 
 from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy

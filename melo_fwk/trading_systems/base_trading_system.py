@@ -13,7 +13,7 @@ from melo_fwk.datastreams import TsarDataStream
 
 import pandas as pd
 
-from melo_fwk.quantflow_factory import QuantFlowFactory
+from mutils.quantflow_factory import QuantFlowFactory
 
 
 @dataclass

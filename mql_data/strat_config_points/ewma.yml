@@ -1,9 +1,0 @@
-ewma_strat_0:
-    fast_span: 16
-    slow_span: 64
-    scale: 16
-
-ewma_strat_1:
-    fast_span: 4
-    slow_span: 32
-    scale: 10.

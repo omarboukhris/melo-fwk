@@ -6,3 +6,7 @@ ProcessDef ->
 // add output pipes here
 ExportName -> alphanum.
 
+
+
+PairProduct -> alphanum. equ. productpair.
+

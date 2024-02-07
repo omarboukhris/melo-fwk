@@ -3,7 +3,7 @@ from typing import List
 from melo_fwk.market_data.base_market_loader import BaseMarketLoader
 from melo_fwk.pfio.base_portfolio_mgr import BasePortfolioManager
 from melo_fwk.trading_systems.base_trading_system import BaseTradingSystem
-from melo_fwk.quantflow_factory import QuantFlowFactory
+from mutils.quantflow_factory import QuantFlowFactory
 
 
 class CompositePortfolioManager(BasePortfolioManager):
