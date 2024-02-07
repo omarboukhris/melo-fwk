@@ -2,7 +2,6 @@ import random
 from functools import reduce
 from multiprocessing import Pool
 from time import sleep
-from typing import List, Set
 
 import numpy as np
 import pandas as pd
@@ -16,7 +15,8 @@ def factory(c):
 
 class JobLauncher:
 
-	def __init__(self, pool_size: int):
+	def __init__(self, func: callable, pool_size: int):
+		self.job = func
 		self.pool = Pool(processes=pool_size)
 		self.res_list = {}
 		self.status_df = None
@@ -28,7 +28,8 @@ class JobLauncher:
 		self.proc = set(proc)
 		self.done = set({})
 
-	def update(self, done: Set[str]):
+	def update(self):
+		done = set(row["job"] for _, row in self.status_df.iterrows() if row["status"])
 		self.done.update(done)
 
 	def process_running(self):
@@ -38,7 +39,7 @@ class JobLauncher:
 		return self.done != self.proc
 
 	def submit(self, candidates: set):
-		self.res_list.update({c: self.pool.apply_async(factory, (c,)) for c in candidates})
+		self.res_list.update({c: self.pool.apply_async(self.job, (c,)) for c in candidates})
 		self.running.update(candidates)
 
 	def status(self):
@@ -78,27 +79,24 @@ class JobScheduler:
 	def start(self):
 		self.job_launcher.setup(self.proc)
 		while self.job_launcher.is_not_done():
-			candidates = self._get_next_jobs()
+			excl = self.job_launcher.submitted_jobs()
+			candidates = self.get_next_jobs() - excl
 			self.job_launcher.submit(candidates)
 			while self.job_launcher.process_running():
 				sleep(1)  # get this from config, refresh rate
-			done_proc = self.update_dependency_mat(self.job_launcher.status_df)
 			# update/aggregate shared memory space
-			self.job_launcher.update(done_proc)
+			self.update_dependency_mat(self.job_launcher.status_df)
+			self.job_launcher.update()
 
 	def update_dependency_mat(self, status_df: pd.DataFrame):
-		out = []
 		for _, row in status_df.iterrows():
 			job, status = row["job"], row["status"]
 			self.dep_mat[job] = 0 if status else 1
-			if status:
-				out.append(job)
-		return set(out)
 
-	def _get_next_jobs(self):
+	def get_next_jobs(self):
 		dep_mat = self.dep_mat.copy()
 		dep_mat["SUM_DEP"] = dep_mat.sum(axis=1)
-		candidates = set(dep_mat[dep_mat["SUM_DEP"] == 0].index) - self.job_launcher.submitted_jobs()
+		candidates = set(dep_mat[dep_mat["SUM_DEP"] == 0].index)
 		return candidates
 
 
@@ -112,7 +110,7 @@ if __name__ == "__main__":
 		"t6": ["t2", "t3"],
 	}
 
-	j = JobLauncher(pool_size=2)
+	j = JobLauncher(func=factory, pool_size=2)
 	s = JobScheduler(d, j)
 	s.start()
 
