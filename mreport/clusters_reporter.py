@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 
 from mql.mconfig.melo_config import MeloConfig
@@ -11,8 +13,8 @@ class ClustersReporter(BaseReporter):
 	def __init__(self, input_config: MeloConfig):
 		super(ClustersReporter, self).__init__(input_config)
 
-	def process_results(self, query_path: str, export_dir: str, raw_results: tuple):
-		export_dir = query_path + export_dir
+	def process_results(self, output_dir: str, export_dir: str, raw_results: tuple):
+		export_dir = Path(output_dir) / export_dir
 		avg_corr, corr_hist = raw_results
 
 		title = f"Average Correllation Heat Map"
@@ -20,7 +22,7 @@ class ClustersReporter(BaseReporter):
 		ss = MdFormatter.h2(title)
 		ss += MdFormatter.image(title, heatmap_png, f"avg_corr")
 
-		filename = f"{export_dir}/{heatmap_png}"
+		filename = str(export_dir / f"{heatmap_png}")
 		HeatMapPlotter.save_heatmap_to_png(filename, avg_corr)
 
 		for k, population in corr_hist.items():

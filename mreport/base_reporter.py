@@ -5,9 +5,8 @@ from mreport.md_formatter import MdFormatter
 
 
 class GenericReporter:
-	def __init__(self, input_config: CommonMeloConfig):
-		self.name = input_config.name
-		self.reporter_class = str(input_config.reporter_class_)
+	def __init__(self, name: str):
+		self.name = name
 
 class BaseReporter(GenericReporter):
 	def __init__(self, input_config: MeloConfig):
@@ -18,11 +17,8 @@ class BaseReporter(GenericReporter):
 		:param input_config:
 		:return:
 		"""
-		super().__init__(input_config)
+		super().__init__(input_config.name)
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
-
-		# name:
-		self.name = input_config.name
 
 		# products:
 		self.products_name_list = list(input_config.products_config[0].keys())
@@ -52,5 +48,5 @@ class BaseReporter(GenericReporter):
 
 		return ss
 
-	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
+	def process_results(self, output_dir: str, export_dir: str, raw_results: dict):
 		pass

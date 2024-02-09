@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import tqdm
 
 from mql.mconfig.melo_config import MeloConfig
@@ -13,7 +15,7 @@ class BacktestReporter(BaseReporter):
 		self.logger.info("Initializing BacktestReporter")
 		super(BacktestReporter, self).__init__(input_config)
 
-	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
+	def process_results(self, output_dir: str, export_dir: str, raw_results: dict):
 		"""
 		raw_results dict :
 			key = product name
@@ -21,7 +23,7 @@ class BacktestReporter(BaseReporter):
 				key = product_filepath + year
 				value = TSAR
 		"""
-		export_dir = query_path + export_dir
+		export_dir = Path(output_dir) / export_dir
 		self.logger.info("Exporting Tsar data")
 		ss = ""
 		for product_name, tsar_dict in tqdm.tqdm(raw_results.items(), leave=False):
@@ -42,7 +44,7 @@ class BacktestReporter(BaseReporter):
 				ss += MdFormatter.item_list(metrics)
 				ss += MdFormatter.image(title, tsar_png, prod_fn_y)
 
-				tsar_png = f"{export_dir}/{tsar_png}"
+				tsar_png = str(export_dir / f"{tsar_png}")
 				TsarPlotter.save_tsar_as_png(tsar_png, tsar)
 
 		self.logger.info("Finished Exporting Tsar data..")

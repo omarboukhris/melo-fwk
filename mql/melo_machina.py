@@ -30,24 +30,28 @@ class MeloMachina:
 		# setup mql parsers
 		self.mql_parser = MqlParser()
 
-	def run(self, book_path: Path, process: str, config: str):
+	def run(self, book_path: Path, process: str, config: str, export_path: str):
 		"""
 		Estimators should:
 			- Implement the same constructor (see any estimator)
 			- Implement a run() method that returns any result
 		"""
 		mql_config = self.mql_parser.parse_to_config(str(book_path))
-		# TODO: Broken here
 		estimator = build_estimator(process, mql_config, config)
 		output = estimator.run()
 
-		mql_config.write_report(output, str(book_path.parent))
-		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
-		mql_config.export_trading_system(pf_mgr)
+		# TODO: Broken here
+		conf_dir = config.replace(".", "_")
+		book_dir = str(book_path.name).replace(".", "_")
+		process_dir = process.replace(".", "_")
+		export_path = Path(export_path) / f"{book_dir}/{process_dir}/{conf_dir}/"
+		export_path.mkdir(parents=True, exist_ok=True)
+		mql_config.write_report(process, output, str(export_path))
+		# pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
+		# mql_config.export_trading_system(pf_mgr)
 
 
 def build_estimator(process, mql_config, config) -> MeloBaseEstimator:
-	# TODO: checkpoint, estim config
 	estimator_obj = QuantFlowFactory.get_estimator(process)
 	with open(str(estim.estim_map.get(config)), "r") as fs:
 		estim_config = json.load(fs)

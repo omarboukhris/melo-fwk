@@ -4,7 +4,6 @@
   "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points",
 
   "CompositeMarketLoader": ["MarketDataLoader", "MarketDataMongoLoader"],
-  "CompositePortfolioManager": ["PortfolioFsManager", "PortfolioMongoManager"],
 
   "MarketDataMongoLoader": {
     "dburl": "mongodb://localhost:27017/"

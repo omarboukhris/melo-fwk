@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict
 
 import matplotlib.pyplot as plt
@@ -17,7 +18,7 @@ class VaRReporter(BaseReporter):
 		super(VaRReporter, self).__init__(input_config)
 
 	def process_results(
-		self, query_path: str, export_dir: str,
+		self, output_dir: str, export_dir: str,
 		raw_results: Dict[str, pd.DataFrame]):
 		"""
 		raw_results dict :
@@ -27,7 +28,7 @@ class VaRReporter(BaseReporter):
 				value = TSAR
 		"""
 		out_dict = raw_results
-		export_dir = query_path + export_dir + "/assets/"
+		export_dir = Path(output_dir) / export_dir / "assets"
 		self.logger.info("Exporting VaR Results")
 
 		ss = MdFormatter.h2("VaR Estimation Results")
@@ -35,9 +36,9 @@ class VaRReporter(BaseReporter):
 
 		for product_name, var_df in tqdm.tqdm(out_dict.items(), leave=False):
 			ss += MdFormatter.h3(f"Product VaR {product_name} :\n")
-			ss += f"\n{var_df.to_markdown(index='idx')}\n"
+			ss += f"\n{var_df.to_markdown(index=True)}\n"
 
-			export_filename = f"{export_dir}/{product_name}_hist.png"
+			export_filename = str(export_dir / f"{product_name}_hist.png")
 			ss += MdFormatter.bold(MdFormatter.italic(f"VaR histograms for product {product_name}")) + "\n\n"
 
 			ss += MdFormatter.image(

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from matplotlib import pyplot as plt
 
@@ -10,8 +12,8 @@ class VolTargetReporter(BaseReporter):
 	def __init__(self, input_config: MeloConfig):
 		super(VolTargetReporter, self).__init__(input_config)
 
-	def process_results(self, query_path: str, export_dir: str, raw_results: dict):
-		export_dir = query_path + export_dir
+	def process_results(self, output_dir: str, export_dir: str, raw_results: dict):
+		export_dir = Path(output_dir) / export_dir
 		output_list = list(raw_results.values())
 		result = pd.DataFrame(output_list[0])
 
@@ -27,7 +29,7 @@ class VolTargetReporter(BaseReporter):
 		# result.plot(x="vol_target", y="gar")
 		result.ewm(span=3, adjust=False).mean().plot(x="vol_target", y="gar")
 		plt.title("smoothed GAR = Ewm_3[f(VT)]")
-		plt.savefig(f"{export_dir}/{png_filename}")
+		plt.savefig(str(export_dir / f"{png_filename}"))
 		plt.close()
 
 		return ss

@@ -24,17 +24,17 @@ class MqlDecoderUnitTests(unittest.TestCase):
 		self.config = Path(__file__).parent / "rc/config.json"
 		self.loggers = [ConsoleLogger]
 		self.templates = [
+			'mepo.generic_strat_optim_example',
 			'mepo.products_cluster_example',
 			'mepo.inf_vol_target_example',
 			'mepo.fw_optim_example',
-			'mepo.generic_strat_optim_example',
 			'mepo.simple_book_backtest_example',
 		]
 		self.processes = [
+			"StratOptimEstimator",
 			"ClustersEstimator",
 			"VolTargetEstimator",
 			"ForecastWeightsEstimator",
-			"StratOptimEstimator",
 			"BacktestEstimator",
 		]
 
@@ -51,7 +51,12 @@ class MqlDecoderUnitTests(unittest.TestCase):
 		for template, process in zip(self.templates, self.processes):
 			print(42*"=" + f"{template}>>{process}" + 42*"=")
 			book_path = books.auto_books.get(template)
-			mm.run(book_path=book_path, process=process, config="estim.default")
+			mm.run(
+				export_path=str(Path(__file__).parent / "rc"),
+				book_path=book_path,
+				process=process,
+				config="estim.default",
+			)
 
 
 if __name__ == "__main__":
