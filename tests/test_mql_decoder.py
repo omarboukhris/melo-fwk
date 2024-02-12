@@ -46,7 +46,10 @@ class MqlDecoderUnitTests(unittest.TestCase):
 			json.loads(raw_parsed_mql, cls=MqlDecoder)
 
 	def test_mepo_process(self):
-		mm = MeloMachina(config=self.config, loggers=self.loggers)
+		GenericConfigLoader.setup(str(self.config))
+		GlobalLogger.set_loggers(self.loggers)
+
+		mm = MeloMachina()
 
 		for template, process in zip(self.templates, self.processes):
 			print(42*"=" + f"{template}>>{process}" + 42*"=")

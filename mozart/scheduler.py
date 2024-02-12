@@ -1,56 +1,73 @@
 import random
 from functools import reduce
-from multiprocessing import Pool
 from time import sleep
 
 import numpy as np
 import pandas as pd
 
-def factory(c):
-	x = random.randint(3, 10)
-	print(f"executing {c} for {x}")
-	sleep(x)
-	print(f"end {c}")
-	return x
+from mepo import books
+from mozart.job_launcher import JobLauncher
+from mql.melo_machina import MeloMachina
+from mutils.generic_config_loader import GenericConfigLoader
+from mutils.loggers.console_logger import ConsoleLogger
+from mutils.loggers.global_logger import GlobalLogger
 
-class JobLauncher:
 
-	def __init__(self, func: callable, pool_size: int):
-		self.job = func
-		self.pool = Pool(processes=pool_size)
-		self.res_list = {}
-		self.status_df = None
-		self.proc = None
-		self.done = set({})
-		self.running = set({})
+class TestHelper:
+	@staticmethod
+	def test_param_map(candidates):
+		return {c: (c, random.randint(3, 10),) for c in candidates}
 
-	def setup(self, proc):
-		self.proc = set(proc)
-		self.done = set({})
+	@staticmethod
+	def process_factory(c, x):
+		print(f"executing {c} for {x} seconds")
+		sleep(x)
+		print(f"end {c}")
+		return x
 
-	def update(self):
-		done = set(row["job"] for _, row in self.status_df.iterrows() if row["status"])
-		self.done.update(done)
 
-	def process_running(self):
-		return not self.status()["status"].any() and self.is_not_done()
+class MeloProcessHelper:
+	process: str
+	estim_config: str
+	export_path: str
+	# loggers_list: list
+	process_config: list
 
-	def is_not_done(self):
-		return self.done != self.proc
+	# add setup method
 
-	def submit(self, candidates: set):
-		self.res_list.update({c: self.pool.apply_async(self.job, (c,)) for c in candidates})
-		self.running.update(candidates)
+	@staticmethod
+	def melo_param_factory(book_name):
+		return (
+			book_name,
+			MeloProcessHelper.process,
+			MeloProcessHelper.estim_config,
+			MeloProcessHelper.export_path,
+			[ConsoleLogger],
+			MeloProcessHelper.process_config
+		)
 
-	def status(self):
-		self.status_df = pd.DataFrame([
-			(k, r.successful()) for k, r in self.res_list.items()
-			if r.ready() and k not in self.done
-		], columns=["job", "status"])
-		return self.status_df
+	@staticmethod
+	def melo_process(
+		book_name: str,
+		process: str,
+		estim_config: str,
+		export_path: str,
+		loggers_list: list,
+		process_config: list
+	):
+		GenericConfigLoader.setup(process_config)
+		GlobalLogger.set_loggers(loggers_list)
 
-	def submitted_jobs(self):
-		return self.running.union(self.done)
+		mm = MeloMachina()
+
+		book_path = books.auto_books.get(book_name)
+		mm.run(
+			export_path=export_path,
+			book_path=book_path,
+			process=process,
+			config=estim_config,
+		)
+		# take export out of melomachina
 
 
 class JobScheduler:
@@ -76,12 +93,13 @@ class JobScheduler:
 		assert len(missing) == 0, \
 			f"(Scheduler) Missing nodes in process dependency map {missing}"
 
-	def start(self):
+	def start(self, param_setup_factory: callable):
 		self.job_launcher.setup(self.proc)
 		while self.job_launcher.is_not_done():
 			excl = self.job_launcher.submitted_jobs()
 			candidates = self.get_next_jobs() - excl
-			self.job_launcher.submit(candidates)
+			candidates_map = param_setup_factory(candidates)
+			self.job_launcher.submit(candidates_map)
 			while self.job_launcher.process_running():
 				sleep(1)  # get this from config, refresh rate
 			# update/aggregate shared memory space
@@ -110,9 +128,8 @@ if __name__ == "__main__":
 		"t6": ["t2", "t3"],
 	}
 
-	j = JobLauncher(func=factory, pool_size=2)
+	j = JobLauncher(func=TestHelper.process_factory, pool_size=2)
 	s = JobScheduler(d, j)
-	s.start()
-
+	s.start(TestHelper.test_param_map)
 
 

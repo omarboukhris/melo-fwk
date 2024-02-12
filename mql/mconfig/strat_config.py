@@ -17,8 +17,6 @@ class StrategyConfigBuilder:
 			return [BuyAndHold()], Weights([1.], 1.)
 
 		strat_mql_dict = mql_dict.get_node("StrategiesDef")
-		strat_config_points = strat_mql_dict.parse_list("StrategyConfigList")
-
 
 		logger.info(f"Loading Strategies {str}")
 		strat_config_list = strat_mql_dict.parse_list("StrategyConfigList")

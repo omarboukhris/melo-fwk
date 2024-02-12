@@ -22,10 +22,11 @@ class ForecastWeightsEstimator(MeloBaseEstimator):
 		self.logger.info("Initialized Estimator")
 
 	def run(self):
-		out_dict = dict()
 		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
-		for product_name, product_dataclass in tqdm.tqdm(self.products.items(), leave=False):
-			out_dict[product_name] = self.optimize_weights_by_product(product_dataclass)
+		out_dict = {
+			product_name: self.optimize_weights_by_product(product_dataclass)
+			for product_name, product_dataclass in tqdm.tqdm(self.products.items(), leave=False)
+		}
 		self.logger.info("Finished running estimator")
 		return out_dict
 

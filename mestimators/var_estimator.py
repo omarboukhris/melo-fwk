@@ -18,7 +18,6 @@ class VaREstimator(MeloBaseEstimator):
 
 
 	def run(self):
-
 		self.logger.info(f"Running Estimatior on {len(self.products)} Products")
 		strat_basket = StratBasket(
 			strat_list=self.strategies,

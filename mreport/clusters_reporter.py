@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from mql.mconfig.melo_config import MeloConfig
 from mreport.base_reporter import BaseReporter
 from mreport.md_formatter import MdFormatter
-from melo_fwk.plots import HeatMapPlotter
+from melo_fwk.plots.heatmap_plot import HeatMapPlotter
 
 
 class ClustersReporter(BaseReporter):

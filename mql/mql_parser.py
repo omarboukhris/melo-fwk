@@ -40,7 +40,7 @@ if __name__ == "__main__":
 		Path(__file__).parent /
 		"data/mql_strat_opt_template/stratoptim_example_query.sql")
 	print(mql_testfile_path)
-	parser, _ = MqlParser()
+	parser = MqlParser()
 	parsed = parser.parse_to_json(mql_testfile_path)
 	print(parsed)
 

@@ -114,7 +114,6 @@ class VaRUtils:
 
 		var_params = f"Params=[ndays={self.n_days},sim_param={self.sim_param},method={self.method}, gen_path={self.gen_path}]"
 		self.logger.info(f"Computing VaR with VaR Params = {var_params}")
-		self.set_VaR_params(self.n_days, self.method, self.sim_param, self.gen_path)
 
 		out_dict = self.get_risk_profile(*sim_results)
 		self.logger.info("Finished running estimator")

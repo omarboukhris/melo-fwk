@@ -7,7 +7,11 @@ ProductsDefList ->
     !ProductsGenerator |
     !ProductsGenerator comma. |
 []
-ProductsGenerator -> s:productType. lpar. s:AlphanumList rpar.
+
+ProductsGenerator ->
+    s:productType. lpar. s:AlphanumList rpar. |
+    s:productType. lpar. s:AlphanumList rpar. pt. leverage. lpar. leverage=numerical. rpar.
+
 // add optional block size/Leverage and cap size value here
 // don't forget to parse into config somehow ?
 // setup default values when loading product (spot with no cap limit)

@@ -92,11 +92,10 @@ class PFAllocationEstimator(EstimatorParameters):
 
 	@staticmethod
 	def optimize_weights_by_cluster(trading_results):
-		optim_results = []
-
-		for rolling_tr in tqdm.tqdm(trading_results.rolling("Account"), leave=False):
-			optim_results.append(
-				PFAllocationEstimator.run_weights_optim(rolling_tr))
+		optim_results = list(map(
+			PFAllocationEstimator.run_weights_optim,
+			tqdm.tqdm(trading_results.rolling("Account"), leave=False)
+		))
 
 		return pd.DataFrame(optim_results)
 

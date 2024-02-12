@@ -1,7 +1,6 @@
 {
   "working_dir": "/home/omar/PycharmProjects/melo-fwk",
   "products_factory_config": "/home/omar/PycharmProjects/melo-fwk/assets/products_factory_config.json",
-  "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points",
 
   "CompositeMarketLoader": ["MarketDataLoader", "MarketDataMongoLoader"],
 
@@ -11,42 +10,5 @@
   "MarketDataLoader": {
     "location": "/home/omar/PycharmProjects/melo-fwk/assets",
     "all": "**/*.csv"
-  },
-
-  "PortfolioMongoManager": {
-    "dburl": "mongodb://localhost:27017/"
-  },
-  "PortfolioFsManager": {
-    "location": "/home/omar/PycharmProjects/melo-fwk/pf_assets"
-  },
-
-
-  "ClustersEstimator": {
-    "sampling_ratio": 0.7
-  },
-  "StratOptimEstimator": {
-    "metric": "pnl",
-    "n_iter": 128
-  },
-  "StratOptimReporter": {
-    "strat_config_points": "/home/omar/PycharmProjects/melo-fwk/mql_data/strat_config_points"
-  },
-  "VaREstimator": {
-    "n_days": 1,
-    "method": "mc",
-    "sim_param": 1000,
-    "gen_path": true
-  },
-  "VolTargetEstimator": {
-    "trading_capital": 0.0,
-    "step": 0.1,
-    "start": 0.1,
-    "final": 1.0
-  },
-  "PFAllocationEstimator": {
-    "n_days": 1,
-    "method": "mc",
-    "sim_param": 1000,
-    "gen_path": true
   }
 }

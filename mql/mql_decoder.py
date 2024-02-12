@@ -1,7 +1,5 @@
 import json
-from pathlib import Path
 
-from melo_fwk.pfio.compo_portfolio_mgr import CompositePortfolioManager
 from mutils.generic_config_loader import GenericConfigLoader
 from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from mql.mconfig.pose_size_config import SizePolicyConfigBuilder
@@ -14,11 +12,8 @@ from mql.mconfig.strat_config import StrategyConfigBuilder
 class MqlDecoder(json.JSONDecoder):
 	def __init__(self, *args, **kwargs):
 		json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
-		self.strat_config_point = Path(GenericConfigLoader.get_node("strat_config_points", "strat_config_points"))
 		self.market_mgr = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
-		pf_mgr = CompositePortfolioManager.from_config(GenericConfigLoader.get_node(CompositePortfolioManager.__name__))
 		self.pfactory = ProductFactory(self.market_mgr)
-		self.pfolio = pf_mgr
 
 	def object_hook(self, obj: dict):
 

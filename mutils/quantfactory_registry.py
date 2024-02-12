@@ -2,8 +2,6 @@ from mestimators.var_estimator import VaREstimator
 from mestimators.pf_allocation_estimator import PFAllocationEstimator
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from melo_fwk.market_data.market_data_mongo_loader import MarketDataMongoLoader
-from melo_fwk.pfio.portfolio_db_mgr import PortfolioMongoManager
-from melo_fwk.pfio.portfolio_fs_mgr import PortfolioFsManager
 from mreport.pf_alloc_reporter import PFAllocationReporter
 from mreport.var_reporter import VaRReporter
 from mutils.quantflow_factory import QuantFlowFactory
@@ -37,10 +35,6 @@ from mreport.clusters_reporter import ClustersReporter
 from mutils.loggers.global_logger import GlobalLogger
 
 class QuantFlowRegistry:
-	pf_loaders = {
-		PortfolioFsManager.__name__: PortfolioFsManager,
-		PortfolioMongoManager.__name__: PortfolioMongoManager,
-	}
 	market_providers = {
 		MarketDataLoader.__name__: MarketDataLoader,
 		MarketDataMongoLoader.__name__: MarketDataMongoLoader,
@@ -99,8 +93,6 @@ class QuantFlowRegistry:
 		any(QuantFlowFactory.register_search_space(label, strat_space) for label, strat_space in QuantFlowRegistry.search_spaces.items())
 		log.info("Registring Size Policies...")
 		any(QuantFlowFactory.register_size_policy(label, size) for label, size in QuantFlowRegistry.size_policies.items())
-		log.info("Registring PF Loaders...")
-		any(QuantFlowFactory.register_pf_loader(label, pf_loader) for label, pf_loader in QuantFlowRegistry.pf_loaders.items())
 		log.info("Registring Market Providers Components...")
 		any(QuantFlowFactory.register_market(label, market) for label, market in QuantFlowRegistry.market_providers.items())
 		log.info("Registring Products/Assets historical data...")

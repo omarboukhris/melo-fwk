@@ -5,7 +5,7 @@ import tqdm
 from mql.mconfig.melo_config import MeloConfig
 from mreport.base_reporter import BaseReporter
 from mreport.md_formatter import MdFormatter
-from melo_fwk.plots import TsarPlotter
+from melo_fwk.plots.tsar_plot import TsarPlotter
 from mutils.loggers.global_logger import GlobalLogger
 
 class BacktestReporter(BaseReporter):
