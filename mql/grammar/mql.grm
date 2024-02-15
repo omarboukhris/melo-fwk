@@ -16,7 +16,7 @@ QuantQuery ->
     with. !ProductsDef
     where. !StrategiesDef
     where. !PositionSizing
-    select. !ProcessDef
+    // select. !ProcessDef
     |
 
     // User defines Products
@@ -24,7 +24,7 @@ QuantQuery ->
     // default PositionSizing : 1 OR Search
     create. QueryName=alphanum.
     with. !ProductsDef
-    select. !ProcessDef
+    // select. !ProcessDef
     |
 
     // User defines Products & Strategy
@@ -32,5 +32,5 @@ QuantQuery ->
     create. QueryName=alphanum.
     with. !ProductsDef
     where. !StrategiesDef
-    select. !ProcessDef
+    // select. !ProcessDef
 

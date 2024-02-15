@@ -1,30 +1,24 @@
 
 StrategiesDef ->
-    strategies. are.
-        lpar. s:AlphanumList rpar.
-    with. strategyconfig.
-        lpar. s:StrategyConfigList rpar.
-    |
-    strategies. are.
-        lpar. s:AlphanumList rpar.
-    with. strategyconfig.
-        lpar. s:StrategyConfigList rpar.
-    with. weights.
-        lpar. s:WeightsList rpar.
-    |
-    strategies. are.
-        lpar. s:AlphanumList rpar.
-    with. strategyconfig.
-        lpar. s:StrategyConfigList rpar.
-    with. weights.
-        lpar. s:WeightsList rpar.
-    and. divmult. is. DivMult=numeric.
+    strategies. are. lpar. StrategyConfigList=s:AlphanumList rpar. |
 
-StrategyConfigList ->
-    alphanum. |
-    alphanum. comma. |
-    alphanum. pt. alphanum. |
-    alphanum. pt. alphanum. comma. |
+    strategies. are. lpar. StrategyConfigList=s:AlphanumList rpar.
+    with. weights. lpar. s:WeightsList rpar. |
+
+    strategies. are. lpar. StrategyConfigList=s:AlphanumList rpar.
+    with. weights. lpar. s:WeightsList rpar. and. divmult. is. DivMult=numeric. |
+
+    strategies. are. lpar. StrategyConfigList=s:SearchSpace rpar. |
+
+    strategies. are. lpar. StrategyConfigList=s:SearchSpace rpar.
+    with. weights. lpar. s:WeightsList rpar. |
+
+    strategies. are. lpar. StrategyConfigList=s:SearchSpace rpar.
+    with. weights. lpar. s:WeightsList rpar. and. divmult. is. DivMult=numeric.
+
+SearchSpace ->
+    setok. |
+    setok. comma. |
 []
 
 WeightsList ->

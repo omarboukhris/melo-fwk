@@ -8,7 +8,7 @@ from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from mutils.loggers.console_logger import ConsoleLogger
 from mutils.loggers.global_logger import GlobalLogger
 from melo_fwk.plots import TsarPlotter
-from melo_fwk.quantfactory_registry import QuantFlowRegistry
+from mutils.quantfactory_registry import QuantFlowRegistry
 
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy

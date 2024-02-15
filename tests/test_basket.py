@@ -11,7 +11,7 @@ from melo_fwk.market_data.compo_market_loader import CompositeMarketLoader
 from melo_fwk.pose_size import (
 	VolTargetInertiaPolicy,
 )
-from melo_fwk.quantfactory_registry import QuantFlowRegistry
+from mutils.quantfactory_registry import QuantFlowRegistry
 from melo_fwk.strategies import EWMAStrategy
 from mutils.generic_config_loader import GenericConfigLoader
 from melo_fwk.basket.weights import Weights

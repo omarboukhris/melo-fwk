@@ -2,9 +2,12 @@ import json
 import unittest
 from pathlib import Path
 
+import mepo.books as mepo
+from mepo import books
+from mql.melo_machina import MeloMachina
 from mutils.loggers.console_logger import ConsoleLogger
 from mutils.loggers.global_logger import GlobalLogger
-from melo_fwk.quantfactory_registry import QuantFlowRegistry
+from mutils.quantfactory_registry import QuantFlowRegistry
 from mutils.generic_config_loader import GenericConfigLoader
 from mql.mql_decoder import MqlDecoder
 from mql.mql_parser import MqlParser
@@ -18,24 +21,45 @@ class MqlDecoderUnitTests(unittest.TestCase):
 		GlobalLogger.set_loggers([ConsoleLogger])
 		QuantFlowRegistry.register_all()
 		self.mql_parser = MqlParser()
+		self.config = Path(__file__).parent / "rc/config.json"
+		self.loggers = [ConsoleLogger]
+		self.templates = [
+			'mepo.generic_strat_optim_example',
+			'mepo.products_cluster_example',
+			'mepo.inf_vol_target_example',
+			'mepo.fw_optim_example',
+			'mepo.simple_book_backtest_example',
+		]
+		self.processes = [
+			"StratOptimEstimator",
+			"ClustersEstimator",
+			"VolTargetEstimator",
+			"ForecastWeightsEstimator",
+			"BacktestEstimator",
+		]
 
-	def test_decoder(self):
-		root_dir = Path(__file__).parent.parent
-		templates = {
-			"alloc3": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_3.sql",
-			# "alloc": root_dir / "mql_data/mql_alloc_optim_template/allocationoptim_example_query_2.sql",
-			"var": root_dir / "mql_data/mql_var_template/var_example_query.sql",
-			"backtest": root_dir / "mql_data/mql_backtest_template/backtest_example_query.sql",
-			"fw_opt": root_dir / "mql_data/mql_forecast_weights_optim/forecastweightsoptim_example_query.sql",
-			"vol_target_opt": root_dir / "mql_data/mql_vol_target_optim/posesizeoptim_example_query.sql",
-			"clustering": root_dir / "mql_data/mql_clustering_template/clustering_example_query.sql",
-			"fast_strat_opt": root_dir / "mql_data/mql_strat_opt_template/fast_stratoptim_example_query.sql",
-		}
-
-		for key, mql_query in templates.items():
+	def test_mepo(self):
+		for key in self.templates:
+			mql_query = mepo.auto_books.get(key)
 			raw_parsed_mql = str(self.mql_parser.parse_to_json(str(mql_query))).replace("'", '"')
 			assert raw_parsed_mql != ""
 			json.loads(raw_parsed_mql, cls=MqlDecoder)
+
+	def test_mepo_process(self):
+		GenericConfigLoader.setup(str(self.config))
+		GlobalLogger.set_loggers(self.loggers)
+
+		mm = MeloMachina()
+
+		for template, process in zip(self.templates, self.processes):
+			print(42*"=" + f"{template}>>{process}" + 42*"=")
+			book_path = books.auto_books.get(template)
+			mm.run(
+				export_path=str(Path(__file__).parent / "rc"),
+				book_path=book_path,
+				process=process,
+				config="estim.default",
+			)
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ class MqlUnitTests(unittest.TestCase):
 
 		for key, mql_query in self.templates.items():
 			print(42*"=" + key + 42*"=")
-			mm.run(query_path=mql_query)
+			mm.run(book_path=mql_query)
 
 
 if __name__ == "__main__":

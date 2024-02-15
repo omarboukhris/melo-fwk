@@ -1,6 +1,8 @@
 from mutils.loggers.global_logger import GlobalLogger
-from melo_fwk.quantflow_factory import QuantFlowFactory
+from mutils.quantflow_factory import QuantFlowFactory
 from mql.mconfig.mql_dict import MqlDict
+
+import assets
 
 class ProductFactory:
 	"""
@@ -26,6 +28,8 @@ class ProductFactory:
 			for product_name in products_name_list:
 				product = self._get_product(products_type, product_name)
 				self.plogger.info(f"Loaded Product {product.keys()}")
+				# product = assets.products_map.get(f"{products_type}.{product_name}")
+				# self.plogger.info(f"Loaded Product {products_type}.{product_name}}")
 				output_products.update(product)
 
 		self.plogger.info(f"{len(output_products)} Products loaded")

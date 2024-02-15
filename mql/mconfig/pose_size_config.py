@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from melo_fwk.pose_size import BaseSizePolicy
-from melo_fwk.quantflow_factory import QuantFlowFactory
+from mutils.quantflow_factory import QuantFlowFactory
 from mql.mconfig.mql_dict import MqlDict
 from mutils.loggers.global_logger import GlobalLogger
 

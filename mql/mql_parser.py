@@ -20,17 +20,12 @@ class MqlParser:
 		self.parser = ParseSession(0)
 		self.parser_books = ParseSession(0)
 		_mql_grammar_path = str(Path(MqlParser._mql_rc_path / "mql.grm"))
-		_mql_books_grammar_path = str(Path(MqlParser._mql_rc_path / "mql_books.grm"))
 		self.parser.load_grammar(
 			filepath=_mql_grammar_path,
 			verbose=False)
-		self.parser_books.load_grammar(
-			filepath=_mql_books_grammar_path,
-			verbose=False)
 
 	def parse_to_json(self, filepath: str):
-		_parser = self._select_parser(filepath)
-		return _parser.parse_to_json(filepath)
+		return self.parser.parse_to_json(filepath)
 
 	def get_books_parser(self):
 		return self.parser_books
@@ -39,18 +34,13 @@ class MqlParser:
 		raw_parsed_mql = str(self.parse_to_json(filepath)).replace("'", '"')
 		return json.loads(raw_parsed_mql, cls=self._mqlDecoder)
 
-	def _select_parser(self, filepath: str) -> ParseSession:
-		with open(filepath, "r") as fs:
-			line = fs.readline().strip()
-		return self.parser_books if line == "@books" else self.parser
-
 
 if __name__ == "__main__":
 	mql_testfile_path = str(
 		Path(__file__).parent /
 		"data/mql_strat_opt_template/stratoptim_example_query.sql")
 	print(mql_testfile_path)
-	parser, _ = MqlParser()
+	parser = MqlParser()
 	parsed = parser.parse_to_json(mql_testfile_path)
 	print(parsed)
 
