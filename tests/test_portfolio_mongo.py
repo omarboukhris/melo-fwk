@@ -9,7 +9,8 @@ from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 
-from melo_fwk.plots import AccountPlotter, TsarPlotter
+from melo_fwk.plots.plots import AccountPlotter
+from melo_fwk.plots.tsar_plot import TsarPlotter
 
 import pandas as pd
 import tqdm
@@ -27,6 +28,22 @@ To populate mongo db run the script :
 	melo_fwk.market_data.assets.export_products_db.py
 """
 class PortfolioMongoUnitTests(unittest.TestCase):
+	sma_params = {
+		"fast_span": 16,
+		"slow_span": 64,
+		"scale": 16,
+	}
+	sma = EWMAStrategy(**sma_params)
+
+	strat_bsk = StratBasket(
+		strat_list=[sma],
+		weights=Weights([1.], 1.)
+	)
+	ts_capital = 10000
+	vol_target = 0.4
+	size_policy = VolTargetInertiaPolicy(
+		annual_vol_target=vol_target,
+		trading_capital=ts_capital)
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -35,35 +52,19 @@ class PortfolioMongoUnitTests(unittest.TestCase):
 		self.logger = GlobalLogger.build_composite_for(type(self).__name__)
 
 	def test_portfolio(self):
-		sma_params = {
-			"fast_span": 16,
-			"slow_span": 64,
-			"scale": 16,
-		}
-		sma = EWMAStrategy(**sma_params)
-
-		strat_bsk = StratBasket(
-			strat_list=[sma],
-			weights=Weights([1.], 1.)
-		)
 
 		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 		products = market.get_fx()
 
-		ts_capital = 10000
-		vol_target = 0.4
 		results = {}
 		balance = 0
-		start_capital = ts_capital * len(products)
+		start_capital = PortfolioMongoUnitTests.ts_capital * len(products)
 
 		for product in tqdm.tqdm(products):
-			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=vol_target,
-				trading_capital=ts_capital)
 
 			tr_sys = TradingSystemIter(
-				strat_basket=strat_bsk,
-				size_policy=size_policy
+				strat_basket=PortfolioMongoUnitTests.strat_bsk,
+				size_policy=PortfolioMongoUnitTests.size_policy
 			)
 
 			# simulation with constant risk

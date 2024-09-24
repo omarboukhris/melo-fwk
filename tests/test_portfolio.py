@@ -10,7 +10,8 @@ from melo_fwk.trading_systems import TradingSystemIter
 from melo_fwk.strategies import EWMAStrategy
 from melo_fwk.pose_size import VolTargetInertiaPolicy
 
-from melo_fwk.plots import AccountPlotter, TsarPlotter
+from melo_fwk.plots.tsar_plot import TsarPlotter
+from melo_fwk.plots.plots import AccountPlotter
 
 import pandas as pd
 import tqdm
@@ -21,6 +22,22 @@ from melo_fwk.basket.weights import Weights
 
 
 class PortfolioUnitTests(unittest.TestCase):
+	sma_params = {
+		"fast_span": 16,
+		"slow_span": 64,
+		"scale": 16,
+	}
+	sma = EWMAStrategy(**sma_params)
+
+	strat_bsk = StratBasket(
+		strat_list=[sma],
+		weights=Weights([1.], 1.)
+	)
+	ts_capital = 10000
+	vol_target = 0.4
+	size_policy = VolTargetInertiaPolicy(
+		annual_vol_target=vol_target,
+		trading_capital=ts_capital)
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -30,35 +47,18 @@ class PortfolioUnitTests(unittest.TestCase):
 		QuantFlowRegistry.register_all()
 
 	def test_portfolio(self):
-		sma_params = {
-			"fast_span": 16,
-			"slow_span": 64,
-			"scale": 16,
-		}
-		sma = EWMAStrategy(**sma_params)
-
-		strat_bsk = StratBasket(
-			strat_list=[sma],
-			weights=Weights([1.], 1.)
-		)
 
 		market = CompositeMarketLoader.from_config(GenericConfigLoader.get_node(CompositeMarketLoader.__name__))
 		products = market.products_pool()
 
-		ts_capital = 10000
-		vol_target = 0.4
 		results = {}
 		balance = 0
-		start_capital = ts_capital * len(products)
+		start_capital = PortfolioUnitTests.ts_capital * len(products)
 
 		for product in tqdm.tqdm(products):
-			size_policy = VolTargetInertiaPolicy(
-				annual_vol_target=vol_target,
-				trading_capital=ts_capital)
-
 			tr_sys = TradingSystemIter(
-				strat_basket=strat_bsk,
-				size_policy=size_policy
+				strat_basket=PortfolioUnitTests.strat_bsk,
+				size_policy=PortfolioUnitTests.size_policy
 			)
 
 			# simulation with constant risk

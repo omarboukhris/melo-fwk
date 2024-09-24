@@ -1,0 +1,48 @@
+{
+    "name": "BacktestExample",
+    "products": {
+        "Commodities": [
+            "Gold",
+            "Silver",
+            "Palladium",
+            "Coffee"
+        ],
+        "Fx": [
+            "EURUSD"
+        ]
+    },
+    "time_period": "range(2008, 2009)",
+    "strategies": [
+        "ewma_strat_0",
+        "ewma_strat_0"
+    ],
+    "weights": [0.5, 0.5],
+    "divmult": 0.7,
+    "sizePolicy": {
+        "type": "VolTargetInertiaPolicy",
+        "vol_target": 0.5,
+        "capital": 100000
+    },
+
+
+
+    "process": {
+        "ProductLoader": {
+            "products": "$products"
+        },
+        "StrategyExecutor": {
+            "strategies": "$strategies",
+            "products": "$products"
+        },
+        "WeightExecutor": {
+            "strategies": "$strategies",
+            "weights": [0.5, 0.5],
+            "divmult": 0.7
+        },
+        "SizePolicyExecutor": {
+            "sizePolicy": "$sizePolicy"
+        }
+    }
+}
+
+
