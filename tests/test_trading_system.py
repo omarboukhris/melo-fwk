@@ -7,7 +7,7 @@ from melo_fwk.basket.strat_basket import StratBasket
 from melo_fwk.market_data.market_data_loader import MarketDataLoader
 from mutils.loggers.console_logger import ConsoleLogger
 from mutils.loggers.global_logger import GlobalLogger
-from melo_fwk.plots import TsarPlotter
+from melo_fwk.plots.tsar_plot import TsarPlotter
 from mutils.quantfactory_registry import QuantFlowRegistry
 
 from melo_fwk.trading_systems import TradingSystem, TradingSystemIter
@@ -18,6 +18,26 @@ from melo_fwk.basket.weights import Weights
 
 
 class TradingSystemUnitTests(unittest.TestCase):
+	strat_basket = StratBasket(
+		strat_list=[
+			EWMAStrategy(
+				fast_span=16,
+				slow_span=64,
+				scale=16.,
+			),
+			EWMAStrategy(
+				fast_span=8,
+				slow_span=32,
+				scale=10.,
+			)
+		],
+		weights=Weights([0.6, 0.4], 1.)
+	)
+
+	start_capital = 60000
+	size_policy = VolTargetInertiaPolicy(
+		annual_vol_target=25e-2,
+		trading_capital=start_capital)
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -49,29 +69,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 
 		# product = FxDataLoader.EURUSD
 
-		strat_basket = StratBasket(
-			strat_list=[
-				EWMAStrategy(
-					fast_span=16,
-					slow_span=64,
-					scale=16.,
-				),
-				EWMAStrategy(
-					fast_span=8,
-					slow_span=32,
-				).estimate_forecast_scale(MarketDataLoader())
-			],
-			weights=Weights([0.6, 0.4], 1.)
-		)
-
-		start_capital = 60000
-		size_policy = VolTargetInertiaPolicy(
-			annual_vol_target=25e-2,
-			trading_capital=start_capital)
-
 		trading_subsys = tr(
-			strat_basket=strat_basket,
-			size_policy=size_policy
+			strat_basket=TradingSystemUnitTests.strat_basket,
+			size_policy=TradingSystemUnitTests.size_policy
 		)
 
 		results = {}
@@ -95,9 +95,9 @@ class TradingSystemUnitTests(unittest.TestCase):
 				for year in product.years()
 			}
 
-		balance = start_capital + np.sum([r.balance_delta() for r in results.values()])
-		risk_free = start_capital * ((1 + 0.05) ** 20 - 1)
-		self.logger.info(f"starting capital : {start_capital}")
+		balance = TradingSystemUnitTests.start_capital + np.sum([r.balance_delta() for r in results.values()])
+		risk_free = TradingSystemUnitTests.start_capital * ((1 + 0.05) ** 20 - 1)
+		self.logger.info(f"starting capital : {TradingSystemUnitTests.start_capital}")
 		self.logger.info(f"final balance : {balance}")
 		self.logger.info(f"5% risk free : {risk_free}")
 

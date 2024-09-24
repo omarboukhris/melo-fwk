@@ -70,7 +70,7 @@ class MeloProcessHelper:
 		# take export out of melomachina
 
 
-class JobScheduler:
+class JobRunner:
 
 	def __init__(self, dep_map: dict, job_launcher: JobLauncher):
 		self.job_launcher = job_launcher
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 	}
 
 	j = JobLauncher(func=TestHelper.process_factory, pool_size=2)
-	s = JobScheduler(d, j)
+	s = JobRunner(d, j)
 	s.start(TestHelper.test_param_map)
 
 

@@ -1,3 +1,4 @@
+from multiprocessing.dummy import Pool as ThreadPool
 from multiprocessing import Pool
 
 import pandas as pd
@@ -5,9 +6,9 @@ import pandas as pd
 
 class JobLauncher:
 
-	def __init__(self, func: callable, pool_size: int):
+	def __init__(self, func: callable, pool_size: int, use_thread: bool = False):
 		self.job = func
-		self.pool = Pool(processes=pool_size)
+		self.pool = Pool(processes=pool_size) if not use_thread else ThreadPool(processes=pool_size)
 		self.res_list = {}
 		self.status_df = None
 		self.proc = None
